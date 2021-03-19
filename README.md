@@ -1485,6 +1485,6 @@ public Map<String,Object> testRSL(@RequestBody @LKAGroup("testRSL") Emp emp) {
 效果图
 ![](https://img-blog.csdnimg.cn/20200731155815625.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
 
-项目开源地址：https://github.com/liukaitydn/LKADocument
+项目开源地址：https://gitee.com/liuk168/lkadoc
 
 **如果大家学得好用，记得给星哦**

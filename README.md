@@ -1,13 +1,12 @@
 
 # 1. 前言
-&emsp;&emsp;Lkadoc接口文档生成框架开源以来，备受好评，后期还会给lkadoc整个开源社区，方便大家讨论和解决问题。Lkadoc的前身叫lkadocument，个人感觉名字太长，不利于工具的推广，所以简化了名称为Lkadoc。名称的含义也很简单，Lk是我名字首字母，a代表接口（api）的意思，doc当然就是指文档（document）了。如果读者有使用过lkadocument的经验就知道，lkadocument的版本分奇数和偶数两种版本，奇数版自带导出PDF所需字体，所以jar包比较大，偶数版没有带字体文件，体积较小。
-&emsp;&emsp;lkadocument发布最新版为1.1.4，也是lkadocument最后一个版本，以后发布的版本工具名称改为lkadoc。因为增加的功能比较多，特别是新增了数据校验等激动人心的功能，所以lkadoc第一个版本直接升级到1.2.0，从1.2.0版开始就不区分奇偶版了，统一为不带字体的，这样jar包体积更少，大家在下载使用时更顺畅。但需要检查系统是否存在simsun.ttc字体，如果系统没有这个字体的话，导出PDF文档中文不能正确显示。 windows系统字体路径：C:/Windows/fonts/simsun.ttc，linux系统字体路径：/usr/share/fonts/win/simsun.ttc，mac系统字体路径：/System/Library/Fonts/simsun.ttc。
+&emsp;&emsp;lkadoc从推出以来，备受好评！因本人工作忙，一直没有时间推广，如果你有幸能看到这篇博客，同时又因为没有一款好的接口文档管理工具而苦恼，那么恭喜你，lkadoc刚好可以解决你的苦恼。在我没有开发lkadoc之前，一直都在用swagger来管理项目的接口，但是在使用过程中我发现swaager是一款只针对后端开发人员的一个接口调试工具，对前端和APP开发人员并不友好，在与前端人员对接口的时候，你如果只是丢个swagger接口文档地址给对方的话，保证会被骂的狗血喷头。这也是我为什么要开发lkadoc的原因，我就想从根本上去解决这个问题，能同时兼顾后端开发人员便利，也能对前端开发人员提供更加友好的接口文档界面。因为我本身只是一个java后端开发人员，对前端和UI这块知识确实有些确欠缺，我在设计UI界面时首先得保证它的便捷性和友好度，其次再会去调整它的外观。我使终认为，东西好用才是王道，当然外观也很重要，只是我觉得来日方长嘛，总有一天我会把外观调成大家都喜欢的样子，但是在此之前你得保证它绝对的好用。
 
 
 # 2. 介绍
-&emsp;&emsp;Lkadoc是一款能够基于注解自动生成带调试功能的接口文档工具，生成的UI界面简约大方，对接口描述一目了然，自面世以来深受大家的推崇和喜爱，大大提高了后端开发效率，减小了前端和后端接口对接的沟通成本。很多以前使用swagger的读者改成了lkadoc方案，反应都说比swagger好用太多了。下面简单的对lkadoc特色功能介绍一下：
+&emsp;&emsp;lkadoc是一款开源的基于springBoot平台功能非常强大的接口文档生成工具。拥有自动生成接口文档信息、在线调试接口、导出PDF或MarkDown文档、字段数据校验等强大的接口文档管理功能。感谢您的使用与支持，希望它能够在工作中给您带来便利！如果觉得好用请推荐给您身边需要的朋友或同事。承诺终身免费，免费提供技术支持！如果您在使用过程中遇到问题或者有好的建议，请加我QQ-281257787或发邮件到我QQ邮箱。下面简单的对lkadoc特色功能介绍一下：
     - 支持导出成PDF和MD格式的文档
-    - 支持在线调试API（包括数组入参、上传文件、文件下载均支持）
+    - 支持在线调试API
     - 支持对接口进行压力测试
     - 支持多项目接口文档聚合展示
     - 支持自动识别对象入参或出参，可实现接口零注解
@@ -18,26 +17,43 @@
     - 支持接口名称和参数添加标签（特殊说明可以加标签提示，减少前后端沟通成本）
     - 支持对象属性分组（包括父类继承属性）
     - 支持对请求参数进行数据校验（支持正则匹配、非空、非null、集合非空、字符串长度、数值范围等常用校验规则，如果关闭接口文档功能不会影响数据校验功能。）
-    - 更多功能...
 
 ### 版本更新说明：
+#### lkadoc 1.3.1于2021年3月18日发布：
+1.UI界面增加搜索接口功能，接口前面增加序号，更方便定位接口
+2.优化导出MD格式样式
+3.优化UI界面样式，提供更多接口信息展示空间
+4.增加选项页右键操作，更方便在不同接口切换
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210318182704483.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
+#### lkadoc 1.2.10于2021年3月4日发布：
+1.@LKADocument注解增加sconAll属性控制是否自动扫描对象所有（未加@LKAProperty注解）属性，默认false，只扫描有@LKAProperty注解的属性
+2.优化UI界面接口名称排序显示，会把相同开头的API名称的接口显示在一起
+3.修复了一些已知的BUG
+4.1.2.7-1.2.9大家别用，有一个致命的BUG，会导至UI界面加载不了，识别不了日期类型，哈哈哈哈，其它1.2.6这个版本非常稳定，我用了大半年没有出问题，1.2.10刚发布，还待考验，哈哈哈哈。
+#### lkadoc 1.2.7于2020年12月5日发布：
+1.增加当参数没有加@LKAParam，@LKAProperty时，lkadoc可以自动扫描参数信息并展示在UI界面，如果在@LKADocument注解设置enToCn为true可以自动翻译英文为中文参数显示在作用一栏，如果对翻译不满意可以双击参数在弹出对话框中选择标签为作用可以自定义翻译结果（自动翻译需连外网）
+2.优化@LKAProperty注解属性，无需isArray来指定是否是集合，无需type来指定对象类型，lkadoc可以自动识别
+#### lkadoc 1.2.6于2020年11月17日发布：
+ 1. 修复不同工程包名相同只能扫描其中一个工程的包路径的BUG
+ 2. 修复因注解使用不规范报空指针的BUG
+#### lkadoc 1.2.5于2020年9月26日发布：
+ 1. 修复数据校验时不能识接interface接口入参@LKAGroup注解的BUG
+ 2. 修复报No content to map due to end-of-input错误信息的BUG
 
 #### lkadoc 1.2.4于2020年9月24日发布：
-
 1. 修复项目在使用shiro等框架时application/json方式对象参数数据校验失效的BUG
-
 2. 修复map集合入参时在自动检测参数paramType类型报数组越界异常的BUG
-
 3. 优化一条注解描述多个参数时，如果哪个参数无需数据校验可在valids属性中用空字符串“”表示
-
 4. 优化入参value属性值前面加“n~”代表非必传参数。例如：
-   优化之前:
+```
+优化之前:
    @LKAParam(values={"姓名","年龄"},testDatas={"张三","22"},requireds={true,false})
    @LKAProperty(value="id主键",testData="1001",required=false)
-
    优化之后:
    @LKAParam(values={"姓名^张三","n~年龄^22"})
    @LKAProperty(value="n~id主键^1001")
+```
 
 #### lkadoc 1.2.3于2020年9月15日发布：
 1. 修复项目不能带中文路径的BUG
@@ -50,12 +66,12 @@
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-annotations</artifactId>
-	<version>1.2.3</version>
+	<version>1.3.1</version>
 </dependency>
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.2.3</version>
+	<version>1.3.1</version>
 </dependency>
 ```
 其中lkadoc-annotations是单独的一个模块，如果工程只用到注解可以只添加lkadoc-annotations模块即可。lkadoc-api模块依赖lkadoc-annotations模块，当然工程只添加lkadoc-api模块的maven配置也会自动把lkadoc-annotations模块引入到当前工程。
@@ -73,7 +89,7 @@
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.2.3</version>
+	<version>1.3.1</version>
 </dependency>
 <!--itextpdf包，把接口信息导出成PDF文档是基于itextpdf来实现的，所以要引入这个包-->
 <dependency>
@@ -111,6 +127,12 @@ lkad:
  version: 1.0
 #接口文档启动开关,true是开启，false是禁用,默认为开启，此开关对数据校验没有影响（选配）
  enabled: true
+#可以为没有加@LKAProperty注解的属性自动翻译英文为中文展示（sconAll为true才会有效果）,默认为false
+ enToCn: false 
+#控制是否自动扫描对象所有（未加@LKAProperty注解）属性，默认false，只扫描有@LKAProperty注解的属性
+ sconAll: false
+ #是否开始数据校验功能，默认为false
+ validation: false
 ```
 
 或者在启动类注解@LKADocument上设置如下属性（和上面配置二选一即可,效果一模一样）
@@ -185,8 +207,8 @@ createTime:接口创建时间（选配）
 updateTime:接口修改时间（选配）
 hidden:是否在UI界面隐藏该接口，默认为false（选配）
 version:接口版本号，如果项目版本号相同，在UI界面会标记为新接口（选配）
-download:是否是下载的方法，默认是false（选配）
-token:是否需要token授权验证，默认是true（选配）
+download:是否是下载的方法，如果该接口涉及到下载文件必须设置成true，默认是false（选配）
+token:是否需要在接口文档UI界面显示authorize token标签，只标识该接口需要token验证，不会影响正常业务，默认是true（选配）
 ```
 
 ### 4.2.1 LKAType和LKAMethod演示代码
@@ -296,7 +318,7 @@ value/values:参数作用（必配）
 description/descriptions:参数的描述（选配）
 #例如：和value/values用法一样（略）
 
-dataType/dataTypes:数据类型，（用dataType配置时默认值String.class;用dataTypes配置时可自动获取参数的数据类型，可省略不配置，但要注意参数的顺序。）（选配）
+dataType/dataTypes:数据类型，（用dataType配置时默认值String.class;用dataTypes配置时可自动获取参数的数据类型，可省略不配置，但要注意参数的顺序。）（选配）(1.2.7版本以后可自动识别基本数据类型，如果是基本数据类型可以不用配置)
 #例如:
 #单个参数配置:
 #@LKAParam(name="name",value="用户名",dataType=String.class)//这里可省略，因为默认是String
@@ -309,13 +331,15 @@ dataType/dataTypes:数据类型，（用dataType配置时默认值String.class;�
     #@LKAParam(name="age",value="年龄",dataType=Integer.class)
 #})
 
-required/requireds:是否必传，默认为true（选配）(更简便的用法是在参数名后加"-n"代表不是必传，不加默认是必传)
+required/requireds:是否必传，默认为true（选配）(更简便的用法是在参数名后加"-n"代表非必传或者在入参value属性值前面加“n~”代表非必传参数)
 #例如:
 #@LKAParam(name="name",value="用户名",required=false)
 #或者
-#@LKAParam(name="name-n",value="用户名") //参数名称后面加"-n"代表不是必传，不加默认是必传
+#@LKAParam(name="name-n",value="用户名") //参数名称后面加"-n"代表非必传
+#或者
+#@LKAParam(name="name",value="n~用户名") //value属性值前面加“n~”代表非必传参数
 
-paramType/paramTypes:参数位置，query、header、path三选一，（用paramType配置时默认为query;用paramTypes配置时Lkadoc可根据参数注解@PathVariable、@RequestHeader自动获取参数位置，可省略不配）
+paramType/paramTypes:参数位置，query、header、path三选一，（用paramType配置时默认为query;用paramTypes配置时Lkadoc可根据参数注解@PathVariable、@RequestHeader自动获取参数位置，可省略不配）(1.2.7版本以后可自动识别，无需配置）
 
 isArray/isArrays:是否是集合或数组，默认false（选配）
 
@@ -514,10 +538,13 @@ LKAProperty注解:用来描述实体类的属性信息
 value:属性的作用
 description:属性的描述
 hidden:是否在UI界面隐藏该属性，默认为false（选填）
-testData:测试数据（选配）(更简便的用法是在value后面的"^"符号后面加上测试数据)
-required:是否必传，默认为true（选配）(更简便的用法是在groups属性里面的组名后面加"-n"代表不是必传，不加默认是必传)
-isArray:是否是数组或集合
-type:当属性为对象类型时，需用type来指定
+testData:测试数据（选配）
+	1.更简便的用法是在value后面的"^"符号后面加上测试数据
+required:是否必传，默认为true（选配）
+	1.更简便的用法是在value前面加"n~"代表非必传
+	2.分组时用法是在groups属性里面的组名后面加"-n"代表不是必传，不加默认是必传
+isArray:是否是数组或集合，1.2.7版本以后无需指定，可自动识别
+type:当属性为对象类型时，需用type来指定，1.2.7版本以后无需指定，可自动识别
 groups:用来进行参数分组
 #数据校验相关属性（后面会详细讲解）
 valids:数据校验常用规则或正则匹配
@@ -599,13 +626,13 @@ public class User {
     private Integer id;
     @LKAProperty(value="用户名称^张三")
     private String name;
-    @LKAProperty(value="年龄^20",required=false,description="范围0-120")
+    @LKAProperty(value="n~年龄^20",description="范围0-120")
     private String age;
-    @LKAProperty(value="角色对象",type=Role.class)
+    @LKAProperty(value="角色对象")
     private Role role;
-    @LKAProperty(value="用户爱好^运动",isArray=true)
+    @LKAProperty(value="用户爱好^运动")
     private String[] likes;
-    @LKAProperty(value="地址信息",isArray=true,type=Address.class)
+    @LKAProperty(value="地址信息")
     private List<Address> addresses;
     ....get/set方法.....
 }
@@ -649,13 +676,13 @@ public class User {
     private Integer id;
     @LKAProperty(value="用户名称^张三",groups= {"addUser"})
     private String name;
-    @LKAProperty(value="年龄^20",required=false,description="范围0-120",groups= {"addUser"})
+    @LKAProperty(value="n~年龄^20",description="范围0-120",groups= {"addUser"})
     private String age;
-    @LKAProperty(value="角色对象",type=Role.class)
+    @LKAProperty(value="角色对象")
     private Role role;
-    @LKAProperty(value="用户爱好^运动",isArray=true)
+    @LKAProperty(value="用户爱好^运动")
     private String[] likes;
-    @LKAProperty(value="地址信息",isArray=true,type=Address.class,groups= {"addUser"})
+    @LKAProperty(value="地址信息",groups= {"addUser"})
     private List<Address> addresses;
     .......get/set.......
 }
@@ -701,9 +728,9 @@ name/names:参数名称，和type参数二选一（必填）
 #})
 value/values:参数作用（必填）
 description/descriptions:参数的描述（选填）
-dataType/dataTypes:参数数据类型，默认String.class（选填）
+dataType/dataTypes:参数数据类型，默认String.class（选填）,1.2.7可自动识别基本数据类型
 isArray/isArrays:是否是集合或数组，默认false（选填）
-type:出参对象类型，和name/names参数二选一（必填）
+type:出参对象类型，和name/names参数二选一（必填），1.2.7可自动识别
 group:和type配合使用，对象参数分组，可过滤没必要的参数（选填）
 #父参数
 parentName:父参名称（选填）

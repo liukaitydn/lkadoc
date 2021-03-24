@@ -191,7 +191,8 @@ h5{
 	margin-left:10px; 
 }
 #menu #open .navBox {
-     height: 100%; 
+     /* height: 100%; */ 
+    height: calc(100vh - 20px); 
     /* overflow-y: auto; */
     overflow: auto;
     padding-left: 0.05rem;

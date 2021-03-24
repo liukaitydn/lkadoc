@@ -958,10 +958,6 @@ $(function(){
 		var path = $(this).parents("table").parent().parent().find(".method-URL").html();
 		//获取是否是下载方法
 		var download = $(this).parents("table").parent().parent().find(".method-download").val();
-		var fileName='fileName.xls';
-		if(download == 'true' && (getServerName()==null || getServerName()=='')){
-			fileName=window.prompt("请输入要下载的文件名称：","fileName.xls");
-		}
 		//contentType
 		var contentType =  $(this).parents("table").parent().parent().find(".content-TYPE").html();
 		// 获取请求参数名称
@@ -1031,6 +1027,7 @@ $(function(){
 			path = path+"?random="+Math.random();
 			delete headerJson['Content-Type'];
 		}
+		var requestLength=$(this).parents("table").find(".request-length");
     	var requestFail=$(this).parents("table").find(".request-fail");
     	var requestSuccess=$(this).parents("table").find(".request-success");
 		var requestStatus = $(this).parents("table").find(".request-status");
@@ -1044,6 +1041,7 @@ $(function(){
 		if(timeNumber.val() == null || timeNumber.val() == ''){
 			timeNumber.val(1);
 		}
+		requestLength.html(0);
 		requestFail.html(0);
 		requestSuccess.html(0);
 		var totalStartTime = new Date().getTime();
@@ -1072,19 +1070,34 @@ $(function(){
 					xhr.onreadystatechange = function () {
 						if(this.status == 200){
 							requestStatus.html(this.status+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg：success');
+							var dataSize = xhr.getResponseHeader("Content-Length");
+					    	if(dataSize == null || dataSize == 'null'){
+					    		dataSize = 0;
+					    	}
+					    	requestLength.html(dataSize+"byte");
 						}else{
 							requestStatus.html(this.status+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg：fail');
 						}
-						
 						// 请求完成
-						if (this.status === 200) {
+						if (this.status == 200 && this.readyState == 4) {
 							var blob = this.response;
 							var reader = new FileReader();
-							// 转换为base64，可以直接放入a表情href
+							// 转换为base64，可以直接放入a标签href
 							reader.readAsDataURL(blob);  
 							reader.onload = function (e) {
 								// 转换完成，创建一个a标签用于下载
 								var a = document.createElement('a');
+								var fileName = '';
+								try{
+									var contentDisposition = xhr.getResponseHeader("content-disposition");
+									fileName = contentDisposition.substring(parseInt(contentDisposition.indexOf("filename="))+parseInt("filename=".length));
+								}catch{
+									fileName= '';
+								}
+								if(fileName==null && fileName ==''){
+									fileName=window.prompt("请设置要下载的文件名称：","fileName.txt");
+								}
+								
 								a.download = fileName;
 								a.href = e.target.result;
 								// 修复firefox中无法触发click
@@ -1153,6 +1166,11 @@ $(function(){
 					    	var totalTime = new Date().getTime()-totalStartTime;
 					    	
 					    	requestStatus.html(xhr.status+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg：'+xhr.statusText);
+					    	var dataSize = xhr.getResponseHeader("Content-Length");
+					    	if(dataSize == null || dataSize == 'null'){
+					    		dataSize = 0;
+					    	}
+					    	requestLength.html(dataSize+"byte");
 							requestTime.html(totalTime+"ms");
 					    	var options = {
 					    			collapsed:false,
@@ -1175,6 +1193,11 @@ $(function(){
 					    	var countTime = new Date().getTime()-ajaxTime;
 					    	var totalTime = new Date().getTime()-totalStartTime;
 					    	requestStatus.html(respose.status+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg：'+respose.statusText);
+					    	var dataSize = xhr.getResponseHeader("Content-Length");
+					    	if(dataSize == null || dataSize == 'null'){
+					    		dataSize = 0;
+					    	}
+					    	requestLength.html(dataSize+"byte");
 							requestTime.html(totalTime+"ms");
 					    	var json = {};
 					    	json['status'] = respose.status;
@@ -1947,6 +1970,7 @@ function buildParams(doc,type,loc,flag,contentType){
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time：</span><span class='request-time'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successful：</span><span class='request-success'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;failures：</span><span class='request-fail'></span>" +
+						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size：</span><span class='request-length'></span>" +
 						"</td></tr>"
 				str+="<tr><td colspan='7' class='resposeData' hidden='hidden'>暂无调试信息</td></tr>"
 			}
@@ -1968,6 +1992,7 @@ function buildParams(doc,type,loc,flag,contentType){
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time：</span><span class='request-time'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successful：</span><span class='request-success'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;failures：</span><span class='request-fail'></span>" +
+						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size：</span><span class='request-length'></span>" +
 						"</td></tr>"
 				str+="<tr><td colspan='7' class='resposeData' hidden='hidden'>暂无调试信息</td></tr>"
 		}else{

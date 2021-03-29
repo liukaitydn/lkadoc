@@ -82,14 +82,15 @@ height:100px;
 .main{
 	width:100%;
 	display:flex;
-	height:-webkit-calc(100% - 50px) !important; 
+	/* height:-webkit-calc(100% - 50px) !important; 
 	height:-moz-calc(100% - 50px) !important; 
-	height:calc(100% - 50px) !important; 
+	height:calc(100% - 50px) !important;  */
+	height:100%;
 	overflow:hidden;
 }
 #line{
 	width:5px;
-	height:100%;
+	height:auto;
 	background:#aaa;
 	cursor: e-resize
 }

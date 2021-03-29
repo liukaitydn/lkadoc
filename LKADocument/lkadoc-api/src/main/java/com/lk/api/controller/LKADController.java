@@ -841,134 +841,141 @@ public class LKADController {
 												request.add(paramModel);
 											}
 											if(param.values() != null && param.values().length>0) {
-												String[] names = null;
-												if(param.names() != null && param.names().length>0) {
-													names = param.names();
-												}else {
-													names = new String[parameters.length];
-													for (int i = 0;i < parameters.length;i++) {
-														names[i] = parameters[i].getName();
-													}
-												}
-												for(int i = 0;i<names.length;i++) {
-													ParamModel paramModel = new ParamModel();
-													String[] split = names[i].split("-");
-													if(split != null && split.length==2) {
-														if("n".equals(split[1].toLowerCase())) {
-															paramModel.setRequired(false);
-														}else {
-															paramModel.setRequired(true);
-														}
-														paramModel.setValue(split[0]);
+												try {
+													String[] names = null;
+													if(param.names() != null && param.names().length>0) {
+														names = param.names();
 													}else {
-														if(param.requireds()!= null && param.requireds().length>0){
-															try {
-																paramModel.setRequired(param.requireds()[i]);
-															} catch (Exception e) {
-																paramModel.setRequired(param.requireds()[0]);
-															}
-														}else {
-															paramModel.setRequired(param.required());
-														}
-														paramModel.setValue(names[i]);
-													}
-													
-													if(param.dataTypes()!= null && param.dataTypes().length>0){
-														try {
-															paramModel.setDataType(param.dataTypes()[i].getSimpleName());
-														} catch (Exception e) {
-															paramModel.setDataType(param.dataTypes()[0].getSimpleName());
-														}
-													}else {
-														paramModel.setDataType(parameters[i].getType().getSimpleName());
-													}
-													
-													if(param.descriptions()!= null && param.descriptions().length>0){
-														try {
-															paramModel.setDescription(param.descriptions()[i]);
-														} catch (Exception e) {
-															paramModel.setDescription(param.descriptions()[0]);
-														}
-													}else {
-														paramModel.setDescription(param.description());
-													}
-													if(param.testDatas()!= null && param.testDatas().length>0){
-														try {
-															paramModel.setTestData(param.testDatas()[i]);
-														} catch (Exception e) {
-															paramModel.setTestData(param.testDatas()[0]);
-														}
-													}else {
-														paramModel.setTestData(param.testData());
-													}
-													if(param.values()!= null && param.values().length>0){
-														try {
-															paramModel.setName(param.values()[i]);
-															String[] split2 = param.values()[i].split("\\^");
-															if(split2.length == 2) {
-																paramModel.setName(split2[0]);
-																paramModel.setTestData(split2[1]);
-															}
-															String[] split3 = split2[0].split("\\~");
-															if(split3.length == 2) {
-																paramModel.setName(split3[1]);
-																if(split3[0].contains("n"))paramModel.setRequired(false);
-															}
-														} catch (Exception e) {
-															paramModel.setName(param.values()[0]);
-															String[] split2 = param.values()[0].split("\\^");
-															if(split2.length == 2) {
-																paramModel.setName(split2[0]);
-																paramModel.setTestData(split2[1]);
-															}
-															String[] split3 = split2[0].split("\\~");
-															if(split3.length == 2) {
-																paramModel.setName(split3[1]);
-																if(split3[0].contains("n"))paramModel.setRequired(false);
-															}
-														}
-													}else {
-														paramModel.setName(param.value());
-														String[] split2 = param.value().split("\\^");
-														if(split2.length == 2) {
-															paramModel.setName(split2[0]);
-															paramModel.setTestData(split2[1]);
-														}
-														String[] split3 = split2[0].split("\\~");
-														if(split3.length == 2) {
-															paramModel.setName(split3[1]);
-															if(split3[0].contains("n"))paramModel.setRequired(false);
+														names = new String[parameters.length];
+														for (int i = 0;i < parameters.length;i++) {
+															names[i] = parameters[i].getName();
 														}
 													}
-													
-													if(param.paramTypes()!= null && param.paramTypes().length>0){
-														try {
-															paramModel.setParamType(param.paramTypes()[i]);
-														} catch (Exception e) {
-															paramModel.setParamType(param.paramTypes()[0]);
-														}
-													}else {
-														try {
-															if(parameters[i].isAnnotationPresent(PathVariable.class)) {
-																paramModel.setParamType(ParamType.PATH);
-															}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
-																paramModel.setParamType(ParamType.HEADER);
+													for(int i = 0;i<names.length;i++) {
+														ParamModel paramModel = new ParamModel();
+														String[] split = names[i].split("-");
+														if(split != null && split.length==2) {
+															if("n".equals(split[1].toLowerCase())) {
+																paramModel.setRequired(false);
 															}else {
+																paramModel.setRequired(true);
+															}
+															paramModel.setValue(split[0]);
+														}else {
+															if(param.requireds()!= null && param.requireds().length>0){
+																try {
+																	paramModel.setRequired(param.requireds()[i]);
+																} catch (Exception e) {
+																	paramModel.setRequired(param.requireds()[0]);
+																}
+															}else {
+																paramModel.setRequired(param.required());
+															}
+															paramModel.setValue(names[i]);
+														}
+														
+														if(param.dataTypes()!= null && param.dataTypes().length>0){
+															try {
+																paramModel.setDataType(param.dataTypes()[i].getSimpleName());
+															} catch (Exception e) {
+																paramModel.setDataType(param.dataTypes()[0].getSimpleName());
+															}
+														}else {
+															paramModel.setDataType(parameters[i].getType().getSimpleName());
+														}
+														
+														if(param.descriptions()!= null && param.descriptions().length>0){
+															try {
+																paramModel.setDescription(param.descriptions()[i]);
+															} catch (Exception e) {
+																paramModel.setDescription(param.descriptions()[0]);
+															}
+														}else {
+															paramModel.setDescription(param.description());
+														}
+														if(param.testDatas()!= null && param.testDatas().length>0){
+															try {
+																paramModel.setTestData(param.testDatas()[i]);
+															} catch (Exception e) {
+																paramModel.setTestData(param.testDatas()[0]);
+															}
+														}else {
+															paramModel.setTestData(param.testData());
+														}
+														if(param.values()!= null && param.values().length>0){
+															try {
+																paramModel.setName(param.values()[i]);
+																String[] split2 = param.values()[i].split("\\^");
+																if(split2.length == 2) {
+																	paramModel.setName(split2[0]);
+																	paramModel.setTestData(split2[1]);
+																}
+																String[] split3 = split2[0].split("\\~");
+																if(split3.length == 2) {
+																	paramModel.setName(split3[1]);
+																	if(split3[0].contains("n"))paramModel.setRequired(false);
+																}
+															} catch (Exception e) {
+																paramModel.setName(param.values()[0]);
+																String[] split2 = param.values()[0].split("\\^");
+																if(split2.length == 2) {
+																	paramModel.setName(split2[0]);
+																	paramModel.setTestData(split2[1]);
+																}
+																String[] split3 = split2[0].split("\\~");
+																if(split3.length == 2) {
+																	paramModel.setName(split3[1]);
+																	if(split3[0].contains("n"))paramModel.setRequired(false);
+																}
+															}
+														}else {
+															paramModel.setName(param.value());
+															String[] split2 = param.value().split("\\^");
+															if(split2.length == 2) {
+																paramModel.setName(split2[0]);
+																paramModel.setTestData(split2[1]);
+															}
+															String[] split3 = split2[0].split("\\~");
+															if(split3.length == 2) {
+																paramModel.setName(split3[1]);
+																if(split3[0].contains("n"))paramModel.setRequired(false);
+															}
+														}
+														
+														if(param.paramTypes()!= null && param.paramTypes().length>0){
+															try {
+																paramModel.setParamType(param.paramTypes()[i]);
+															} catch (Exception e) {
+																paramModel.setParamType(param.paramTypes()[0]);
+															}
+														}else {
+															try {
+																if(parameters[i].isAnnotationPresent(PathVariable.class)) {
+																	paramModel.setParamType(ParamType.PATH);
+																}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
+																	paramModel.setParamType(ParamType.HEADER);
+																}else {
+																	paramModel.setParamType(param.paramType());
+																}
+															} catch (Exception e) {
 																paramModel.setParamType(param.paramType());
 															}
-														} catch (Exception e) {
-															paramModel.setParamType(param.paramType());
 														}
-													}
-													if(param.isArrays()!= null && param.isArrays().length>0){
-														try {
-															paramModel.setArray(param.isArrays()[i]);
-														} catch (Exception e) {
-															paramModel.setArray(param.isArrays()[0]);
+														if(param.isArrays()!= null && param.isArrays().length>0){
+															try {
+																paramModel.setArray(param.isArrays()[i]);
+															} catch (Exception e) {
+																paramModel.setArray(param.isArrays()[0]);
+															}
+														}else {
+															paramModel.setArray(param.isArray());
 														}
-													}else {
-														paramModel.setArray(param.isArray());
+														request.add(paramModel);
 													}
+												} catch (Exception e) {
+													ParamModel paramModel = new ParamModel();
+													paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
+													paramModel.setValue("该接口参数异常！");
 													request.add(paramModel);
 												}
 											}
@@ -1017,132 +1024,139 @@ public class LKADController {
 												request.add(paramModel);
 											}
 											if(param.values() != null && param.values().length>0) {
-												String[] names = null;
-												if(param.names() != null && param.names().length>0) {
-													names = param.names();
-												}else {
-													names = new String[parameters.length];
-													for (int i = 0;i < parameters.length;i++) {
-														names[i] = parameters[i].getName();
-													}
-												}
-												for(int i = 0;i<names.length;i++) {
-													ParamModel paramModel = new ParamModel();
-													String[] split = names[i].split("-");
-													if(split != null && split.length==2) {
-														if("n".equals(split[1].toLowerCase())) {
-															paramModel.setRequired(false);
-														}else {
-															paramModel.setRequired(true);
-														}
-														paramModel.setValue(split[0]);
+												try {
+													String[] names = null;
+													if(param.names() != null && param.names().length>0) {
+														names = param.names();
 													}else {
-														if(param.requireds()!= null && param.requireds().length>0){
-															try {
-																paramModel.setRequired(param.requireds()[i]);
-															} catch (Exception e) {
-																paramModel.setRequired(param.requireds()[0]);
-															}
-														}else {
-															paramModel.setRequired(param.required());
-														}
-														paramModel.setValue(names[i]);
-													}
-													if(param.dataTypes()!= null && param.dataTypes().length>0){
-														try {
-															paramModel.setDataType(param.dataTypes()[i].getSimpleName());
-														} catch (Exception e) {
-															paramModel.setDataType(param.dataTypes()[0].getSimpleName());
-														}
-													}else {
-														paramModel.setDataType(parameters[i].getType().getSimpleName());
-													}
-													if(param.descriptions()!= null && param.descriptions().length>0){
-														try {
-															paramModel.setDescription(param.descriptions()[i]);
-														} catch (Exception e) {
-															paramModel.setDescription(param.descriptions()[0]);
-														}
-													}else {
-														paramModel.setDescription(param.description());
-													}
-													if(param.testDatas()!= null && param.testDatas().length>0){
-														try {
-															paramModel.setTestData(param.testDatas()[i]);
-														} catch (Exception e) {
-															paramModel.setTestData(param.testDatas()[0]);
-														}
-													}else {
-														paramModel.setTestData(param.testData());
-													}
-													if(param.values()!= null && param.values().length>0){
-														try {
-															paramModel.setName(param.values()[i]);
-															String[] split2 = param.values()[i].split("\\^");
-															if(split2.length == 2) {
-																paramModel.setName(split2[0]);
-																paramModel.setTestData(split2[1]);
-															}
-															String[] split3 = split2[0].split("\\~");
-															if(split3.length == 2) {
-																paramModel.setName(split3[1]);
-																if(split3[0].contains("n"))paramModel.setRequired(false);
-															}
-														} catch (Exception e) {
-															paramModel.setName(param.values()[0]);
-															String[] split2 = param.values()[0].split("\\^");
-															if(split2.length == 2) {
-																paramModel.setName(split2[0]);
-																paramModel.setTestData(split2[1]);
-															}
-															String[] split3 = split2[0].split("\\~");
-															if(split3.length == 2) {
-																paramModel.setName(split3[1]);
-																if(split3[0].contains("n"))paramModel.setRequired(false);
-															}
-														}
-													}else {
-														paramModel.setName(param.value());
-														String[] split2 = param.value().split("\\^");
-														if(split2.length == 2) {
-															paramModel.setName(split2[0]);
-															paramModel.setTestData(split2[1]);
-														}
-														String[] split3 = split2[0].split("\\~");
-														if(split3.length == 2) {
-															paramModel.setName(split3[1]);
-															if(split3[0].contains("n"))paramModel.setRequired(false);
+														names = new String[parameters.length];
+														for (int i = 0;i < parameters.length;i++) {
+															names[i] = parameters[i].getName();
 														}
 													}
-													
-													if(param.paramTypes()!= null && param.paramTypes().length>0){
-														try {
-															paramModel.setParamType(param.paramTypes()[i]);
-														} catch (Exception e) {
-															paramModel.setParamType(param.paramTypes()[0]);
-														}
-													}else {
-														try {
-															if(parameters[i].isAnnotationPresent(PathVariable.class)) {
-																paramModel.setParamType(ParamType.PATH);
-															}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
-																paramModel.setParamType(ParamType.HEADER);
+													for(int i = 0;i<names.length;i++) {
+														ParamModel paramModel = new ParamModel();
+														String[] split = names[i].split("-");
+														if(split != null && split.length==2) {
+															if("n".equals(split[1].toLowerCase())) {
+																paramModel.setRequired(false);
 															}else {
+																paramModel.setRequired(true);
+															}
+															paramModel.setValue(split[0]);
+														}else {
+															if(param.requireds()!= null && param.requireds().length>0){
+																try {
+																	paramModel.setRequired(param.requireds()[i]);
+																} catch (Exception e) {
+																	paramModel.setRequired(param.requireds()[0]);
+																}
+															}else {
+																paramModel.setRequired(param.required());
+															}
+															paramModel.setValue(names[i]);
+														}
+														if(param.dataTypes()!= null && param.dataTypes().length>0){
+															try {
+																paramModel.setDataType(param.dataTypes()[i].getSimpleName());
+															} catch (Exception e) {
+																paramModel.setDataType(param.dataTypes()[0].getSimpleName());
+															}
+														}else {
+															paramModel.setDataType(parameters[i].getType().getSimpleName());
+														}
+														if(param.descriptions()!= null && param.descriptions().length>0){
+															try {
+																paramModel.setDescription(param.descriptions()[i]);
+															} catch (Exception e) {
+																paramModel.setDescription(param.descriptions()[0]);
+															}
+														}else {
+															paramModel.setDescription(param.description());
+														}
+														if(param.testDatas()!= null && param.testDatas().length>0){
+															try {
+																paramModel.setTestData(param.testDatas()[i]);
+															} catch (Exception e) {
+																paramModel.setTestData(param.testDatas()[0]);
+															}
+														}else {
+															paramModel.setTestData(param.testData());
+														}
+														if(param.values()!= null && param.values().length>0){
+															try {
+																paramModel.setName(param.values()[i]);
+																String[] split2 = param.values()[i].split("\\^");
+																if(split2.length == 2) {
+																	paramModel.setName(split2[0]);
+																	paramModel.setTestData(split2[1]);
+																}
+																String[] split3 = split2[0].split("\\~");
+																if(split3.length == 2) {
+																	paramModel.setName(split3[1]);
+																	if(split3[0].contains("n"))paramModel.setRequired(false);
+																}
+															} catch (Exception e) {
+																paramModel.setName(param.values()[0]);
+																String[] split2 = param.values()[0].split("\\^");
+																if(split2.length == 2) {
+																	paramModel.setName(split2[0]);
+																	paramModel.setTestData(split2[1]);
+																}
+																String[] split3 = split2[0].split("\\~");
+																if(split3.length == 2) {
+																	paramModel.setName(split3[1]);
+																	if(split3[0].contains("n"))paramModel.setRequired(false);
+																}
+															}
+														}else {
+															paramModel.setName(param.value());
+															String[] split2 = param.value().split("\\^");
+															if(split2.length == 2) {
+																paramModel.setName(split2[0]);
+																paramModel.setTestData(split2[1]);
+															}
+															String[] split3 = split2[0].split("\\~");
+															if(split3.length == 2) {
+																paramModel.setName(split3[1]);
+																if(split3[0].contains("n"))paramModel.setRequired(false);
+															}
+														}
+														
+														if(param.paramTypes()!= null && param.paramTypes().length>0){
+															try {
+																paramModel.setParamType(param.paramTypes()[i]);
+															} catch (Exception e) {
+																paramModel.setParamType(param.paramTypes()[0]);
+															}
+														}else {
+															try {
+																if(parameters[i].isAnnotationPresent(PathVariable.class)) {
+																	paramModel.setParamType(ParamType.PATH);
+																}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
+																	paramModel.setParamType(ParamType.HEADER);
+																}else {
+																	paramModel.setParamType(param.paramType());
+																}
+															} catch (Exception e) {
 																paramModel.setParamType(param.paramType());
 															}
-														} catch (Exception e) {
-															paramModel.setParamType(param.paramType());
 														}
-													}
-													if(param.isArrays()!= null && param.isArrays().length>0){
-														try {
-															paramModel.setArray(param.isArrays()[i]);
-														} catch (Exception e) {
-															paramModel.setArray(param.isArrays()[0]);
+														if(param.isArrays()!= null && param.isArrays().length>0){
+															try {
+																paramModel.setArray(param.isArrays()[i]);
+															} catch (Exception e) {
+																paramModel.setArray(param.isArrays()[0]);
+															}
+														}else {
+															paramModel.setArray(param.isArray());
 														}
-													}else {
-														paramModel.setArray(param.isArray());
+														request.add(paramModel);
 													}
+												} catch (Exception e) {
+													ParamModel paramModel = new ParamModel();
+													paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
+													paramModel.setValue("该接口参数异常！");
 													request.add(paramModel);
 												}
 											}
@@ -1201,133 +1215,140 @@ public class LKADController {
 										request.add(paramModel);
 									}
 									if(param.values() != null && param.values().length>0) {
-										String[] names = null;
-										if(param.names() != null && param.names().length>0) {
-											names = param.names();
-										}else {
-											names = new String[parameters.length];
-											for (int i = 0;i < parameters.length;i++) {
-												names[i] = parameters[i].getName();
-											}
-										}
-										for(int i = 0;i<names.length;i++) {
-											ParamModel paramModel = new ParamModel();
-											String[] split = names[i].split("-");
-											if(split != null && split.length==2) {
-												if("n".equals(split[1].toLowerCase())) {
-													paramModel.setRequired(false);
-												}else {
-													paramModel.setRequired(true);
-												}
-												paramModel.setValue(split[0]);
+										try {
+											String[] names = null;
+											if(param.names() != null && param.names().length>0) {
+												names = param.names();
 											}else {
-												if(param.requireds()!= null && param.requireds().length>0){
-													try {
-														paramModel.setRequired(param.requireds()[i]);
-													} catch (Exception e) {
-														paramModel.setRequired(param.requireds()[0]);
-													}
-												}else {
-													paramModel.setRequired(param.required());
+												names = new String[parameters.length];
+												for (int i = 0;i < parameters.length;i++) {
+													names[i] = parameters[i].getName();
 												}
-												paramModel.setValue(names[i]);
 											}
-											if(param.dataTypes()!= null && param.dataTypes().length>0){
-												try {
-													paramModel.setDataType(param.dataTypes()[i].getSimpleName());
-												} catch (Exception e) {
-													paramModel.setDataType(param.dataTypes()[0].getSimpleName());
-												}
-											}else {
-												paramModel.setDataType(parameters[i].getType().getSimpleName());
-											}
-											if(param.descriptions()!= null && param.descriptions().length>0){
-												try {
-													paramModel.setDescription(param.descriptions()[i]);
-												} catch (Exception e) {
-													paramModel.setDescription(param.descriptions()[0]);
-												}
-											}else {
-												paramModel.setDescription(param.description());
-											}
-											if(param.testDatas()!= null && param.testDatas().length>0){
-												try {
-													paramModel.setTestData(param.testDatas()[i]);
-												} catch (Exception e) {
-													paramModel.setTestData(param.testDatas()[0]);
-												}
-											}else {
-												paramModel.setTestData(param.testData());
-											}
-											if(param.values()!= null && param.values().length>0){
-												try {
-													paramModel.setName(param.values()[i]);
-													String[] split2 = param.values()[i].split("\\^");
-													if(split2.length == 2) {
-														paramModel.setName(split2[0]);
-														paramModel.setTestData(split2[1]);
-													}
-													String[] split3 = split2[0].split("\\~");
-													if(split3.length == 2) {
-														paramModel.setName(split3[1]);
-														if(split3[0].contains("n"))paramModel.setRequired(false);
-													}
-												} catch (Exception e) {
-													paramModel.setName(param.values()[0]);
-													String[] split2 = param.values()[0].split("\\^");
-													if(split2.length == 2) {
-														paramModel.setName(split2[0]);
-														paramModel.setTestData(split2[1]);
-													}
-													String[] split3 = split2[0].split("\\~");
-													if(split3.length == 2) {
-														paramModel.setName(split3[1]);
-														if(split3[0].contains("n"))paramModel.setRequired(false);
-													}
-												}
-											}else {
-												paramModel.setName(param.value());
-												String[] split2 = param.value().split("\\^");
-												if(split2.length == 2) {
-													paramModel.setName(split2[0]);
-													paramModel.setTestData(split2[1]);
-												}
-
-												String[] split3 = split2[0].split("\\~");
-												if(split3.length == 2) {
-													paramModel.setName(split3[1]);
-													if(split3[0].contains("n"))paramModel.setRequired(false);
-												}
-												
-											}
-											if(param.paramTypes()!= null && param.paramTypes().length>0){
-												try {
-													paramModel.setParamType(param.paramTypes()[i]);
-												} catch (Exception e) {
-													paramModel.setParamType(param.paramTypes()[0]);
-												}
-											}else {
-												try {
-													if(parameters[i].isAnnotationPresent(PathVariable.class)) {
-														paramModel.setParamType(ParamType.PATH);
-													}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
-														paramModel.setParamType(ParamType.HEADER);
+											for(int i = 0;i<names.length;i++) {
+												ParamModel paramModel = new ParamModel();
+												String[] split = names[i].split("-");
+												if(split != null && split.length==2) {
+													if("n".equals(split[1].toLowerCase())) {
+														paramModel.setRequired(false);
 													}else {
+														paramModel.setRequired(true);
+													}
+													paramModel.setValue(split[0]);
+												}else {
+													if(param.requireds()!= null && param.requireds().length>0){
+														try {
+															paramModel.setRequired(param.requireds()[i]);
+														} catch (Exception e) {
+															paramModel.setRequired(param.requireds()[0]);
+														}
+													}else {
+														paramModel.setRequired(param.required());
+													}
+													paramModel.setValue(names[i]);
+												}
+												if(param.dataTypes()!= null && param.dataTypes().length>0){
+													try {
+														paramModel.setDataType(param.dataTypes()[i].getSimpleName());
+													} catch (Exception e) {
+														paramModel.setDataType(param.dataTypes()[0].getSimpleName());
+													}
+												}else {
+													paramModel.setDataType(parameters[i].getType().getSimpleName());
+												}
+												if(param.descriptions()!= null && param.descriptions().length>0){
+													try {
+														paramModel.setDescription(param.descriptions()[i]);
+													} catch (Exception e) {
+														paramModel.setDescription(param.descriptions()[0]);
+													}
+												}else {
+													paramModel.setDescription(param.description());
+												}
+												if(param.testDatas()!= null && param.testDatas().length>0){
+													try {
+														paramModel.setTestData(param.testDatas()[i]);
+													} catch (Exception e) {
+														paramModel.setTestData(param.testDatas()[0]);
+													}
+												}else {
+													paramModel.setTestData(param.testData());
+												}
+												if(param.values()!= null && param.values().length>0){
+													try {
+														paramModel.setName(param.values()[i]);
+														String[] split2 = param.values()[i].split("\\^");
+														if(split2.length == 2) {
+															paramModel.setName(split2[0]);
+															paramModel.setTestData(split2[1]);
+														}
+														String[] split3 = split2[0].split("\\~");
+														if(split3.length == 2) {
+															paramModel.setName(split3[1]);
+															if(split3[0].contains("n"))paramModel.setRequired(false);
+														}
+													} catch (Exception e) {
+														paramModel.setName(param.values()[0]);
+														String[] split2 = param.values()[0].split("\\^");
+														if(split2.length == 2) {
+															paramModel.setName(split2[0]);
+															paramModel.setTestData(split2[1]);
+														}
+														String[] split3 = split2[0].split("\\~");
+														if(split3.length == 2) {
+															paramModel.setName(split3[1]);
+															if(split3[0].contains("n"))paramModel.setRequired(false);
+														}
+													}
+												}else {
+													paramModel.setName(param.value());
+													String[] split2 = param.value().split("\\^");
+													if(split2.length == 2) {
+														paramModel.setName(split2[0]);
+														paramModel.setTestData(split2[1]);
+													}
+
+													String[] split3 = split2[0].split("\\~");
+													if(split3.length == 2) {
+														paramModel.setName(split3[1]);
+														if(split3[0].contains("n"))paramModel.setRequired(false);
+													}
+													
+												}
+												if(param.paramTypes()!= null && param.paramTypes().length>0){
+													try {
+														paramModel.setParamType(param.paramTypes()[i]);
+													} catch (Exception e) {
+														paramModel.setParamType(param.paramTypes()[0]);
+													}
+												}else {
+													try {
+														if(parameters[i].isAnnotationPresent(PathVariable.class)) {
+															paramModel.setParamType(ParamType.PATH);
+														}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
+															paramModel.setParamType(ParamType.HEADER);
+														}else {
+															paramModel.setParamType(param.paramType());
+														}
+													} catch (Exception e) {
 														paramModel.setParamType(param.paramType());
 													}
-												} catch (Exception e) {
-													paramModel.setParamType(param.paramType());
 												}
-											}
-											if(param.isArrays()!= null && param.isArrays().length>0){
-												try {
-													paramModel.setArray(param.isArrays()[i]);
-												} catch (Exception e) {
-													paramModel.setArray(param.isArrays()[0]);
+												if(param.isArrays()!= null && param.isArrays().length>0){
+													try {
+														paramModel.setArray(param.isArrays()[i]);
+													} catch (Exception e) {
+														paramModel.setArray(param.isArrays()[0]);
+													}
+												}else {
+													paramModel.setArray(param.isArray());
 												}
-											}else {
-												paramModel.setArray(param.isArray());
+												request.add(paramModel);
 											}
+										} catch (Exception e) {
+											ParamModel paramModel = new ParamModel();
+											paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
+											paramModel.setValue("该接口参数异常！");
 											request.add(paramModel);
 										}
 									}
@@ -1383,136 +1404,143 @@ public class LKADController {
 										request.add(paramModel);
 									}
 									if(param.values() != null && param.values().length>0) {
-										String[] names = null;
-										if(param.names() != null && param.names().length>0) {
-											names = param.names();
-										}else {
-											names = new String[parameters.length];
-											for (int i = 0;i < parameters.length;i++) {
-												names[i] = parameters[i].getName();
-											}
-										}
-										for(int i = 0;i<names.length;i++) {
-											ParamModel paramModel = new ParamModel();
-											String[] split = names[i].split("-");
-											if(split != null && split.length==2) {
-												if("n".equals(split[1].toLowerCase())) {
-													paramModel.setRequired(false);
-												}else {
-													paramModel.setRequired(true);
-												}
-												paramModel.setValue(split[0]);
+										try {
+											String[] names = null;
+											if(param.names() != null && param.names().length>0) {
+												names = param.names();
 											}else {
-												if(param.requireds()!= null && param.requireds().length>0){
-													try {
-														paramModel.setRequired(param.requireds()[i]);
-													} catch (Exception e) {
-														paramModel.setRequired(param.requireds()[0]);
-													}
-												}else {
-													paramModel.setRequired(param.required());
-												}
-												paramModel.setValue(names[i]);
-											}
-											if(param.dataTypes()!= null && param.dataTypes().length>0){
-												try {
-													paramModel.setDataType(param.dataTypes()[i].getSimpleName());
-												} catch (Exception e) {
-													paramModel.setDataType(param.dataTypes()[0].getSimpleName());
-												}
-											}else {
-												paramModel.setDataType(parameters[i].getType().getSimpleName());
-											}
-											if(param.descriptions()!= null && param.descriptions().length>0){
-												try {
-													paramModel.setDescription(param.descriptions()[i]);
-												} catch (Exception e) {
-													paramModel.setDescription(param.descriptions()[0]);
-												}
-											}else {
-												paramModel.setDescription(param.description());
-											}
-											if(param.testDatas()!= null && param.testDatas().length>0){
-												try {
-													paramModel.setTestData(param.testDatas()[i]);
-												} catch (Exception e) {
-													paramModel.setTestData(param.testDatas()[0]);
-												}
-											}else {
-												paramModel.setTestData(param.testData());
-											}
-											if(param.values()!= null && param.values().length>0){
-												try {
-													paramModel.setName(param.values()[i]);
-													String[] split2 = param.values()[i].split("\\^");
-													if(split2.length == 2) {
-														paramModel.setName(split2[0]);
-														paramModel.setTestData(split2[1]);
-													}
-
-													String[] split3 = split2[0].split("\\~");
-													if(split3.length == 2) {
-														paramModel.setName(split3[1]);
-														if(split3[0].contains("n"))paramModel.setRequired(false);
-													}
-													
-												} catch (Exception e) {
-													paramModel.setName(param.values()[0]);
-													String[] split2 = param.values()[0].split("\\^");
-													if(split2.length == 2) {
-														paramModel.setName(split2[0]);
-														paramModel.setTestData(split2[1]);
-													}
-
-													String[] split3 = split2[0].split("\\~");
-													if(split3.length == 2) {
-														paramModel.setName(split3[1]);
-														if(split3[0].contains("n"))paramModel.setRequired(false);
-													}
-												}
-											}else {
-												paramModel.setName(param.value());
-												String[] split2 = param.value().split("\\^");
-												if(split2.length == 2) {
-													paramModel.setName(split2[0]);
-													paramModel.setTestData(split2[1]);
-												}
-
-												String[] split3 = split2[0].split("\\~");
-												if(split3.length == 2) {
-													paramModel.setName(split3[1]);
-													if(split3[0].contains("n"))paramModel.setRequired(false);
+												names = new String[parameters.length];
+												for (int i = 0;i < parameters.length;i++) {
+													names[i] = parameters[i].getName();
 												}
 											}
-											
-											if(param.paramTypes()!= null && param.paramTypes().length>0){
-												try {
-													paramModel.setParamType(param.paramTypes()[i]);
-												} catch (Exception e) {
-													paramModel.setParamType(param.paramTypes()[0]);
-												}
-											}else {
-												try {
-													if(parameters[i].isAnnotationPresent(PathVariable.class)) {
-														paramModel.setParamType(ParamType.PATH);
-													}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
-														paramModel.setParamType(ParamType.HEADER);
+											for(int i = 0;i<names.length;i++) {
+												ParamModel paramModel = new ParamModel();
+												String[] split = names[i].split("-");
+												if(split != null && split.length==2) {
+													if("n".equals(split[1].toLowerCase())) {
+														paramModel.setRequired(false);
 													}else {
+														paramModel.setRequired(true);
+													}
+													paramModel.setValue(split[0]);
+												}else {
+													if(param.requireds()!= null && param.requireds().length>0){
+														try {
+															paramModel.setRequired(param.requireds()[i]);
+														} catch (Exception e) {
+															paramModel.setRequired(param.requireds()[0]);
+														}
+													}else {
+														paramModel.setRequired(param.required());
+													}
+													paramModel.setValue(names[i]);
+												}
+												if(param.dataTypes()!= null && param.dataTypes().length>0){
+													try {
+														paramModel.setDataType(param.dataTypes()[i].getSimpleName());
+													} catch (Exception e) {
+														paramModel.setDataType(param.dataTypes()[0].getSimpleName());
+													}
+												}else {
+													paramModel.setDataType(parameters[i].getType().getSimpleName());
+												}
+												if(param.descriptions()!= null && param.descriptions().length>0){
+													try {
+														paramModel.setDescription(param.descriptions()[i]);
+													} catch (Exception e) {
+														paramModel.setDescription(param.descriptions()[0]);
+													}
+												}else {
+													paramModel.setDescription(param.description());
+												}
+												if(param.testDatas()!= null && param.testDatas().length>0){
+													try {
+														paramModel.setTestData(param.testDatas()[i]);
+													} catch (Exception e) {
+														paramModel.setTestData(param.testDatas()[0]);
+													}
+												}else {
+													paramModel.setTestData(param.testData());
+												}
+												if(param.values()!= null && param.values().length>0){
+													try {
+														paramModel.setName(param.values()[i]);
+														String[] split2 = param.values()[i].split("\\^");
+														if(split2.length == 2) {
+															paramModel.setName(split2[0]);
+															paramModel.setTestData(split2[1]);
+														}
+
+														String[] split3 = split2[0].split("\\~");
+														if(split3.length == 2) {
+															paramModel.setName(split3[1]);
+															if(split3[0].contains("n"))paramModel.setRequired(false);
+														}
+														
+													} catch (Exception e) {
+														paramModel.setName(param.values()[0]);
+														String[] split2 = param.values()[0].split("\\^");
+														if(split2.length == 2) {
+															paramModel.setName(split2[0]);
+															paramModel.setTestData(split2[1]);
+														}
+
+														String[] split3 = split2[0].split("\\~");
+														if(split3.length == 2) {
+															paramModel.setName(split3[1]);
+															if(split3[0].contains("n"))paramModel.setRequired(false);
+														}
+													}
+												}else {
+													paramModel.setName(param.value());
+													String[] split2 = param.value().split("\\^");
+													if(split2.length == 2) {
+														paramModel.setName(split2[0]);
+														paramModel.setTestData(split2[1]);
+													}
+
+													String[] split3 = split2[0].split("\\~");
+													if(split3.length == 2) {
+														paramModel.setName(split3[1]);
+														if(split3[0].contains("n"))paramModel.setRequired(false);
+													}
+												}
+												
+												if(param.paramTypes()!= null && param.paramTypes().length>0){
+													try {
+														paramModel.setParamType(param.paramTypes()[i]);
+													} catch (Exception e) {
+														paramModel.setParamType(param.paramTypes()[0]);
+													}
+												}else {
+													try {
+														if(parameters[i].isAnnotationPresent(PathVariable.class)) {
+															paramModel.setParamType(ParamType.PATH);
+														}else if(parameters[i].isAnnotationPresent(RequestHeader.class)) {
+															paramModel.setParamType(ParamType.HEADER);
+														}else {
+															paramModel.setParamType(param.paramType());
+														}
+													} catch (Exception e) {
 														paramModel.setParamType(param.paramType());
 													}
-												} catch (Exception e) {
-													paramModel.setParamType(param.paramType());
 												}
-											}
-											if(param.isArrays()!= null && param.isArrays().length>0){
-												try {
-													paramModel.setArray(param.isArrays()[i]);
-												} catch (Exception e) {
-													paramModel.setArray(param.isArrays()[0]);
+												if(param.isArrays()!= null && param.isArrays().length>0){
+													try {
+														paramModel.setArray(param.isArrays()[i]);
+													} catch (Exception e) {
+														paramModel.setArray(param.isArrays()[0]);
+													}
+												}else {
+													paramModel.setArray(param.isArray());
 												}
-											}else {
-												paramModel.setArray(param.isArray());
+												request.add(paramModel);
 											}
+										} catch (Exception e) {
+											ParamModel paramModel = new ParamModel();
+											paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
+											paramModel.setValue("该接口参数异常！");
 											request.add(paramModel);
 										}
 									}

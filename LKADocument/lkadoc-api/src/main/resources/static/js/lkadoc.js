@@ -25,7 +25,6 @@ function leftMenu(){
 							flag = false
 							tabBox[m].className='activeTab'
 						}
-						
 					}
 					if(flag){
 						const urlname = this.getAttribute("urlname")
@@ -37,7 +36,7 @@ function leftMenu(){
 						topMenu()
 						delMenu()
 					}
-
+					
 				
 				
 				
@@ -50,7 +49,7 @@ function leftMenu(){
 				let ids = '#method_'+indexFlag
 				let divs = $(ids)[0].getElementsByTagName('div')[0]
 				  
-				divs.style.left = oldLeft  + 'px'
+				$('#tabBox').css("left",oldLeft  + 'px')
 				
 			}
 		}
@@ -156,7 +155,7 @@ function copyUrl(pt){
 
 let indexFlag = null
 let oldWidth = 248
-let oldLeft = 248
+let oldLeft = 258
 function bindResize(el) {
 	
 	  //初始化参数   
@@ -205,8 +204,8 @@ function bindResize(el) {
 		  oldWidth_s = oldWidth+ e.clientX - x
 		 
 		  oldWidth_s=oldWidth_s<minWidth?minWidth:(oldWidth_s>maxWidth?maxWidth:oldWidth_s)
-		  console.log('左位移距离：'+oldFeft_s)
-		  console.log('宽度：'+oldWidth_s)
+		  //console.log('左位移距离：'+oldFeft_s)
+		  //console.log('宽度：'+oldWidth_s)
 		  menuBody.style.width = oldWidth_s+ 'px' //改变宽度
 //	      els.height = e.clientY - y + 'px' //改变高度 
 	  }
@@ -223,7 +222,7 @@ function bindResize(el) {
 	      $(document).unbind("mousemove", mouseMove).unbind("mouseup", mouseUp)
 	    )
 	    oldLeft = oldFeft_s
-	    console.log(oldLeft)
+	    //console.log(oldLeft)
 	    oldWidth = oldWidth_s
 	  }
 	}   

@@ -21,6 +21,20 @@
         - 支持对请求参数进行数据校验（支持正则匹配、非空、非null、集合非空、字符串长度、数值范围等常用校验规则，如果关闭接口文档功能不会影响数据校验功能。）
 
 ### 版本更新说明：
+
+#### lkadoc 1.3.3于2021年3月29发布：
+
+1.修复SpringBoot项目加server.servlet.context-path前缀后静态资源及接口无法调试的问题
+2.远程服务器地址配置由原来的例如：serverNames=192.168.0.77:9010修改为serverNames=192.168.0.77:9010/，如果远程服务器项目也加了contextPath前缀则应该这样配置：serverNames=192.168.0.77:9010/前缀/
+注意：
+a.项目contextPath前缀不会显示在UI界面
+b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前缀，例如：127.0.0.1:8080/前缀/lkadoc.html
+
+#### lkadoc 1.3.2于2021年3月29日发布:
+
+1.修复UI界面在Firefox浏览器显示异常的问题
+2.优化接口入参异常提示
+
 #### lkadoc 1.3.1于2021年3月18日发布：
 1.UI界面增加搜索接口功能，接口前面增加序号，更方便定位接口
 2.优化导出MD格式样式
@@ -68,12 +82,12 @@
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-annotations</artifactId>
-	<version>1.3.1</version>
+	<version>1.3.2</version>
 </dependency>
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.3.1</version>
+	<version>1.3.2</version>
 </dependency>
 ```
 其中lkadoc-annotations是单独的一个模块，如果工程只用到注解可以只添加lkadoc-annotations模块即可。lkadoc-api模块依赖lkadoc-annotations模块，当然工程只添加lkadoc-api模块的maven配置也会自动把lkadoc-annotations模块引入到当前工程。
@@ -91,7 +105,7 @@
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.3.1</version>
+	<version>1.3.2</version>
 </dependency>
 <!--itextpdf包，把接口信息导出成PDF文档是基于itextpdf来实现的，所以要引入这个包-->
 <dependency>

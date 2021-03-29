@@ -12,6 +12,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,7 +100,7 @@ public class LKADController {
 	/* 扫描所有参数 */
 	@Value("${lkad.sconAll:false}")
 	private Boolean sconAll;
-	
+
 	private int reqNum = 0,respNum = 0,proNum = 0;
 	
 	/**
@@ -116,6 +123,17 @@ public class LKADController {
 		for (String key : hSet) {
 			requestHeaders.add(key,headerMap.get(key)==null?"":headerMap.get(key).toString());
 		}
+		
+		List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        messageConverters.add(new ByteArrayHttpMessageConverter());
+        /** 解决中文乱码的converter */
+        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName
+                ("UTF-8"));
+        messageConverters.add(stringHttpMessageConverter);
+        messageConverters.add(new ResourceHttpMessageConverter());
+        messageConverters.add(new SourceHttpMessageConverter());
+        messageConverters.add(new AllEncompassingFormHttpMessageConverter());
+        restTemplate.setMessageConverters(messageConverters);
 		
         //HttpEntity
 		Object object = null;
@@ -425,10 +443,17 @@ public class LKADController {
 									if (url == null) {
 										url = "该API未设置请求路径";
 										requestType = "未知";
+									}else {
+										url = url.toString().substring(1,url.toString().length());
 									}
 									if (url != null && requestType == null) {
 										requestType = "通用";
 									}
+									//获取项目前缀
+									/*String contextPath = applicationContext.getServletContext().getContextPath();
+									if(contextPath != null && !"".equals(contextPath)) {
+										url = contextPath+url;
+									}*/
 									methodModel.setUrl(url.toString());
 									methodModel.setRequestType(requestType.toString());
 								}else {
@@ -441,6 +466,8 @@ public class LKADController {
 											if (url == null) {
 												url = "该API未设置请求路径";
 												requestType = "未知";
+											}else {
+												url = url.toString().substring(1,url.toString().length());
 											}
 											if (url != null && requestType == null) {
 												requestType = "通用";

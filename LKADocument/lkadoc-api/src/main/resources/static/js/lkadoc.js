@@ -30,7 +30,7 @@ function leftMenu(){
 						const urlname = this.getAttribute("urlname")
 						let lis = `<li data="${indexFlag}" class='activeTab'>
 									<span>${urlname}</span>
-									<img src ='../img/cuowu.png' data="${indexFlag}" class='delImg' >
+									<img src ='img/cuowu.png' data="${indexFlag}" class='delImg' >
 								   </li>`
 						$('#tabBox').append(lis);
 						topMenu()
@@ -294,10 +294,10 @@ $(function(){
 	var styleName = localStorage.getItem('styleName');
 	styleName = null;
 	if(styleName == null){
-		css.href='/css/green.css';
+		css.href='css/green.css';
 		$("#changeStyle").find("option").eq(0).prop("selected",true)
 	}else{
-		css.href='/css/'+styleName+'.css';
+		css.href='css/'+styleName+'.css';
 		if(styleName == 'black'){
 			$("#changeStyle").find("option").eq(1).prop("selected",true)
 		}
@@ -319,7 +319,7 @@ $(function(){
 	
 	function reloadDoc(serverName){
 		$.ajax({
-		    url:"/lkad/doc",
+		    url:"lkad/doc",
 		    type:"get",
 		    dataType:"json",
 		    async:false,
@@ -442,10 +442,10 @@ $(function(){
 			}
 			var xhr = new XMLHttpRequest();
 			if(exType == 1){
-				xhr.open("post","/lkad/exportPdf",true);
+				xhr.open("post","lkad/exportPdf",true);
 			}
 			if(exType == 2){
-				xhr.open("post","/lkad/exportMarkDown",true);
+				xhr.open("post","lkad/exportMarkDown",true);
 			}
 			// 设置请求头
 			xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
@@ -507,7 +507,7 @@ $(function(){
 	
 	//设置高亮参数判断
 	function getParamInfo(){
-		$.getJSON("/lkad/getParamInfo",{'random':Math.random(),'serverName':getServerName()},function(data){
+		$.getJSON("lkad/getParamInfo",{'random':Math.random(),'serverName':getServerName()},function(data){
 			if(data != null && data != 'null'){
 				$(".addinfo").each(function(){
 					try{
@@ -560,7 +560,7 @@ $(function(){
 			var bool = confirm("您确定要删除参数标签信息吗？");
 			if(bool){
 				$.ajax({
-					url:"/lkad/delParamInfo",
+					url:"lkad/delParamInfo",
 				    type:"post",
 				    dataType:"text",
 				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
@@ -595,7 +595,7 @@ $(function(){
 				$('#modalconfirm').off(); //解除所有绑定事件
 				modal.style.display = "none";
 				$.ajax({
-					url:"/lkad/addParamInfo",
+					url:"lkad/addParamInfo",
 				    type:"post",
 				    dataType:"text",
 				    data:{"value":value,"type":type,"url":methodurl,"modaltype":modaltype,"content":modalcontent,'random':Math.random(),'serverName':getServerName()},
@@ -642,7 +642,7 @@ $(function(){
 	/*************************接口标签设置***************************/
 	//设置高亮参数判断
 	function getParamInfo2(){
-		$.getJSON("/lkad/getParamInfo",{'random':Math.random(),'serverName':getServerName()},function(data){
+		$.getJSON("lkad/getParamInfo",{'random':Math.random(),'serverName':getServerName()},function(data){
 			if(data != null && data != 'null'){
 				$(".secondary").each(function(){
 					try{
@@ -695,7 +695,7 @@ $(function(){
 			var bool = confirm("您确定要删除接口标签信息吗？");
 			if(bool){
 				$.ajax({
-					url:"/lkad/delParamInfo",
+					url:"lkad/delParamInfo",
 				    type:"post",
 				    dataType:"text",
 				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
@@ -720,7 +720,7 @@ $(function(){
 				$('#modalconfirm').off(); //解除所有绑定事件
 				modal.style.display = "none";
 				$.ajax({
-					url:"/lkad/addParamInfo",
+					url:"lkad/addParamInfo",
 				    type:"post",
 				    dataType:"text",
 				    data:{"value":value,"type":type,"url":methodurl,"modaltype":modaltype,"content":modalcontent,'random':Math.random(),'serverName':getServerName()},
@@ -1854,6 +1854,7 @@ function buildMenu(doc,tVersion,num) {
 		}
 		var num2 = 1;
     	for(var i = 0;i<methods.length;i++){
+    		num2++;
     		if(searchText != null && searchText != '' && methods[i].name.indexOf(searchText) < 0){
     			continue;
     		}
@@ -1877,7 +1878,6 @@ function buildMenu(doc,tVersion,num) {
     				"</div><div>"+buildParams(request,"req","loc_method",1,methods[i].contentType)+"</div>";
     		str2 +="<div>"+buildParams(respose,"resp","loc_method",1)+"</div><div class='leave-a-note'></div></div>";
     		$(".right-box").append(str2);
-    		num2++;
     	}
     	str+="</ul>";
     }

@@ -22,6 +22,12 @@
 
 ### 版本更新说明：
 
+#### lkadoc 1.3.4于2021年3月31日发布:
+
+1.增加泛形响应参数自动识别
+例如:自定义响应对象Result<T>,接口返回Result<User>或Result<List<User>>，其中Result和User对象都有@LKAModel，属性有@LKAProperty注解都可以自动扫描识别
+2.优化UI界面，修复一些已知的问题
+
 #### lkadoc 1.3.3于2021年3月29发布：
 
 1.修复SpringBoot项目加server.servlet.context-path前缀后静态资源及接口无法调试的问题
@@ -82,12 +88,12 @@ b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前�
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-annotations</artifactId>
-	<version>1.3.2</version>
+	<version>1.3.4</version>
 </dependency>
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.3.2</version>
+	<version>1.3.4</version>
 </dependency>
 ```
 其中lkadoc-annotations是单独的一个模块，如果工程只用到注解可以只添加lkadoc-annotations模块即可。lkadoc-api模块依赖lkadoc-annotations模块，当然工程只添加lkadoc-api模块的maven配置也会自动把lkadoc-annotations模块引入到当前工程。
@@ -105,7 +111,7 @@ b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前�
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.3.2</version>
+	<version>1.3.4</version>
 </dependency>
 <!--itextpdf包，把接口信息导出成PDF文档是基于itextpdf来实现的，所以要引入这个包-->
 <dependency>

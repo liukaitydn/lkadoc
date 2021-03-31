@@ -29,7 +29,7 @@ function leftMenu(){
 					if(flag){
 						const urlname = this.getAttribute("urlname")
 						let lis = `<li data="${indexFlag}" class='activeTab'>
-									<span>${urlname}</span>
+									<span class='tabName'>${urlname}</span>
 									<img src ='img/cuowu.png' data="${indexFlag}" class='delImg' >
 								   </li>`
 						$('#tabBox').append(lis);
@@ -1852,7 +1852,7 @@ function buildMenu(doc,tVersion,num) {
 		}else{
 			str +="<ul>"
 		}
-		var num2 = 1;
+		var num2 = 0;
     	for(var i = 0;i<methods.length;i++){
     		num2++;
     		if(searchText != null && searchText != '' && methods[i].name.indexOf(searchText) < 0){

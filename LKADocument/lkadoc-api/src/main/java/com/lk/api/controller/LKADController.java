@@ -62,7 +62,6 @@ import com.lk.api.domain.ParamModel;
 import com.lk.api.domain.PropertyModel;
 import com.lk.api.domain.ResposeModel;
 import com.lk.api.domain.TypeModel;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /**
  * 	文档信息处理类
@@ -488,25 +487,39 @@ public class LKADController {
 						Class<?> returnType = method.getReturnType();
 						if(returnType != null && !"void".equals(returnType.getName())) {
 							boolean bool2 = false;
-							if(returnType.equals(List.class) || returnType.equals(Set.class)) {//list集合
+							boolean isParentArray = false;
+							Class<?> proType = null;
+							Class<?> parentProType = null;
+							if(returnType.isArray()) {//数组
+								// 获取数组元素的类型
+								proType = returnType.getComponentType();
+								isParentArray = true;
+							}else {
 								//当前集合的泛型类型
 								Type genericReturnType = method.getGenericReturnType();
 								if(genericReturnType instanceof ParameterizedType) {
 			                        ParameterizedType pt = (ParameterizedType) genericReturnType;
 			                        //得到泛型里的class类型对象
 									try {
-										returnType = (Class<?>)pt.getActualTypeArguments()[0];
+										proType = (Class<?>)pt.getActualTypeArguments()[0];
+										if(returnType.getSimpleName().equals("List") || returnType.getSimpleName().equals("Set")) {
+											isParentArray = true;
+										}
 									} catch (Exception e) {
-										//啥也不干
+										try {
+											ParameterizedType pt2 =(ParameterizedType)pt.getActualTypeArguments()[0];
+											proType = (Class<?>)pt2.getActualTypeArguments()[0];
+											parentProType = (Class<?>)pt2.getRawType();
+										} catch (Exception e1) {
+											//最多判断两层,两层以上待定
+										}
 									}
 								}
 							}
-							if(returnType.isArray()) {//数组
-								// 获取数组元素的类型
-								returnType = returnType.getComponentType();					                    
-							}
-							if(returnType.isAnnotationPresent(LKAModel.class) || returnType.isAnnotationPresent(ApiModel.class)){
-
+							if(isParentArray || returnType.isAnnotationPresent(LKAModel.class) || returnType.isAnnotationPresent(ApiModel.class)){
+								if(isParentArray) {
+									returnType = proType;
+								}
 								// 获取model描述信息
 								ModelModel modelModel = new ModelModel();
 								modelModel.setValue(returnType.getSimpleName());
@@ -566,10 +579,15 @@ public class LKADController {
 											break;
 										}
 										if(!bool) {
+											Class<?> type = field.getType();
+											if(proType != null) {
+												if("Object".equals(type.getSimpleName())) {
+													type = proType;
+												}
+											}
 											if (!field.isAnnotationPresent(LKAProperty.class) && 
 													!field.isAnnotationPresent(ApiModelProperty.class)) {
 												if(sconAll) {
-													Class<?> type = field.getType();
 													PropertyModel propertyModel = new PropertyModel();
 													int isArray = isObj(type);
 													type = getGenericType(type, field);
@@ -586,7 +604,11 @@ public class LKADController {
 										            }
 										            String name = field.getName();
 										            propertyModel.setArray(false);
-										            if(isArray == 2 || isArray == 4) {
+										            if(isObj(type) == 2 || 
+															isObj(type) == 4 || 
+															(field.getType().getSimpleName().equals("Object") && 
+																	parentProType != null && (parentProType.getSimpleName().equals("List") || 
+																			parentProType.getSimpleName().equals("Set")))) {
 										            	propertyModel.setArray(true);
 														propertyModel.setDataType(propertyModel.getDataType()+"[]");
 													}
@@ -610,7 +632,6 @@ public class LKADController {
 												}
 											}else {
 												PropertyModel propertyModel = null;
-												Class<?> type = field.getType();
 												Class<?> ptype = getGenericType(type, field);
 												if(field.isAnnotationPresent(LKAProperty.class)){
 													LKAProperty property = field.getAnnotation(LKAProperty.class);
@@ -633,7 +654,11 @@ public class LKADController {
 														}
 													}
 													propertyModel.setArray(false);
-													if(isObj(type) == 2 || isObj(type) == 4 ) {
+													if(isObj(type) == 2 || 
+															isObj(type) == 4 || 
+															(field.getType().getSimpleName().equals("Object") && 
+																	parentProType != null && (parentProType.getSimpleName().equals("List") || 
+																			parentProType.getSimpleName().equals("Set")))) {
 														propertyModel.setArray(true);
 													}
 													propertyModel.setValue(pValue);
@@ -672,7 +697,11 @@ public class LKADController {
 														}
 													}
 													propertyModel.setArray(false);
-													if(isObj(type) == 2 || isObj(type) == 4 ) {
+													if(isObj(type) == 2 || 
+															isObj(type) == 4 || 
+															(field.getType().getSimpleName().equals("Object") && 
+																	parentProType != null && (parentProType.getSimpleName().equals("List") || 
+																			parentProType.getSimpleName().equals("Set")))) {
 														propertyModel.setArray(true);
 													}
 													propertyModel.setValue(pValue);
@@ -724,7 +753,11 @@ public class LKADController {
 				                    if (genericType instanceof ParameterizedType) {
 				                        ParameterizedType pt = (ParameterizedType) genericType;
 				                        //得到泛型里的class类型对象
-				                        argument = (Class<?>)pt.getActualTypeArguments()[0];
+				                        try {
+											argument = (Class<?>)pt.getActualTypeArguments()[0];
+										} catch (Exception e) {
+											//continue;
+										}
 				                    }
 								}
 								if(type.isArray()) {//数组
@@ -1590,7 +1623,11 @@ public class LKADController {
 					                    if (genericType instanceof ParameterizedType) {
 					                        ParameterizedType pt = (ParameterizedType) genericType;
 					                        //得到泛型里的class类型对象
-					                        type = (Class<?>)pt.getActualTypeArguments()[0];
+					                        try {
+												type = (Class<?>)pt.getActualTypeArguments()[0];
+											} catch (Exception e) {
+												//continue;
+											}
 					                    }
 									}else if(type.isArray()) {//数组
 										isArray = true;
@@ -3893,9 +3930,18 @@ public class LKADController {
 			        type = Object.class;
 			    }
 			    if (genericType instanceof ParameterizedType) {
-			        ParameterizedType pt = (ParameterizedType) genericType;
-			        //得到泛型里的class类型对象
-			        type = (Class<?>)pt.getActualTypeArguments()[0];
+			    	ParameterizedType pt = (ParameterizedType) genericType;
+			        try {
+						//得到泛型里的class类型对象
+						type = (Class<?>)pt.getActualTypeArguments()[0];
+					} catch (Exception e) {
+						try {
+							ParameterizedType pt2 =(ParameterizedType)pt.getActualTypeArguments()[0];
+							type = (Class<?>)pt2.getRawType();
+						} catch (Exception e1) {
+							
+						}
+					}
 			    }
 			}else if(type.isArray()) {//数组
 				// 获取数组元素的类型

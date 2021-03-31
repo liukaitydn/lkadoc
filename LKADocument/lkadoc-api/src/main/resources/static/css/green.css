@@ -54,22 +54,21 @@ body {
 }
 
 a:link{
-        color:#f8f8f8;
-        /* text-decoration: none; */ 
+   color:red;
+   text-decoration: none;
    	}
 a:visited{
-   	color:yellow;
-   	/* text-decoration: underline;  */
-	}
+   	color:red;
+   	text-decoration: underline;
+}
 a:hover{
-    	color:blue;
-    	/* text-decoration: none; */ 
+   	color:blue;
+   	text-decoration: none; 
 	}
-a:actived{
+a:active{
      color:#f8f8f8;
-    /*  text-decoration: none;  */
-  }
-
+    text-decoration: none;
+ }
 .close-resposeData{
 	text-align:left;
 }
@@ -117,19 +116,9 @@ height:100px;
 }
 #right-box-id >div{
 	position:relative;
-	padding-top:20px;
+	/* padding-top:20px; */
 	width:99%;
 }
-/* #right-box-id >div>div:nth-of-type(1){
-	position:fixed;
-	left:365px;
-	top:180px;
-	top:210px;
-	background:#fff;
-	width:100%;
-	z-index:9999;
-} */
-
 
 #right-box-id >div  .method-ul{ 
 	padding:0 !important;  
@@ -166,7 +155,11 @@ height:100px;
   	border-radius:2px;
   	cursor:pointer;
   	font-size:14px;
-  	font-weight:700;
+  	font-family: 黑体;
+  	font-weight:400;
+  	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .obtain:hover{
 	background-color:#e3ffd3;
@@ -302,7 +295,7 @@ h5{
 
 
 .method-table{
-	/* margin-top:-20px; */
+	margin-top:-10px;
 }
 table.hovertable {
 	font-size:12px;
@@ -595,23 +588,10 @@ font-size: 16px; /* 字体大小 */
 	font-weight:700;
 	margin-right:20px;
 }
-.copyText{ /* 按钮美化 */
-border-width: 0px; /* 边框宽度 */
-border-radius: 3px; /* 边框半径 */
-background-color:#3385ff; 
-cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
-outline: none; /* 不显示轮廓线 */
-font-family: Microsoft YaHei; /* 设置字体 */
-color: #f8f8f8; /* 字体颜色 */
-font-size: 12px; /* 字体大小 */
-	font-weight:400;
-	margin-left:10px;
-}
 
 input[disabled]{
 	color:#000;opacity:1;background-color:#fff;
 }
-
 
 .parentParam td{
 	color:#888;
@@ -641,16 +621,54 @@ input[disabled]{
 #menu #open .navBox ul li:hover{
     background-color: #e3ffd3;
 }
-
 #tabBox{
-	background: #e3ffd3;
+	/* position: fixed; */
+    left: 250px;
+    width:100%;
+    /* z-index: 9999; */
+    margin:0;
+    /* display:flex; */
+    list-style: none;
+    padding-left:0;
+    background-color: #e3ffd3;
+    overflow:auto;
+}
+#tabBox>li{
+	float:left;
+	padding:5px 35px 5px 15px;
+	cursor:pointer;
+	height:30px;
+	line-height:22px;
+	border-radius: 5px 5px 0 0;
+    border-bottom: 0;
+    margin-right: 5px;
+    font-size:13px;
+    position:relative;
+   /*  overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; */
+}
+#tabBox>.activeTab{
+	background:#fff;
+	color:#333;
+}
+#tabBox>li>.delImg{
+	position:absolute;
+	right:10px;
+	top:50%;
+	margin-top:-8px;
+	width:16px;
+	height:16px;
 }
 
-
-
-
-
-
+.copyText{ /* 按钮美化 */
+	position:absolute;
+	border-width: 0px; /* 边框宽度 */
+	cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+	outline: none; /* 不显示轮廓线 */
+	color: #888; /* 字体颜色 */
+	margin-left:10px;
+}
 
 
 

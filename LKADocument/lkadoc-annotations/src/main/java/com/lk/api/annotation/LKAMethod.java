@@ -38,4 +38,6 @@ public @interface LKAMethod {
 	boolean download() default false;
 	/*是否需要token验证*/
 	boolean token() default true;
+	/*接口排序号*/
+	int order() default 1000000;
 }

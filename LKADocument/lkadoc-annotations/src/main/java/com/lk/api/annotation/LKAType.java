@@ -22,9 +22,8 @@ public @interface LKAType {
 	String value()  default "";
 	/*类描述*/
 	String description() default "";
-	
 	/*是否隐藏**/
 	boolean hidden() default false;
-	
-	//String version() default "v1.0";
+	/*类排序号*/
+	int order() default 1000000;
 }

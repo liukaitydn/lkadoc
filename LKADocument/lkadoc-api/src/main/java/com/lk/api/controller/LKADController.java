@@ -13,18 +13,29 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -111,6 +122,7 @@ public class LKADController {
 	 * @param type 类型
 	 * @return Object 对象
 	 */
+	@SuppressWarnings("rawtypes")
 	@GetMapping("getServerApi")
 	public Object getServerApi(String path,String contentType,String headerJson,String queryData,String type) {
 		Map<String, Object> headerMap = JsonUtils.toMap(headerJson);
@@ -250,9 +262,11 @@ public class LKADController {
 		}
 		//排序算法
 		List<TypeModel> typeModels = scanType(bpk.split(","));
+		//类排序
 		Collections.sort(typeModels);
 		for (TypeModel typeModel : typeModels) {
 			List<MethodModel> methods = typeModel.getMethodModels();
+			//方法排序
 			Collections.sort(methods);
 			for (MethodModel method : methods) {
 				List<ResposeModel> ResposeModels = method.getRespose();
@@ -369,21 +383,15 @@ public class LKADController {
 				if(cls.isAnnotationPresent(LKAType.class)) {
 					LKAType lkaType = cls.getAnnotation(LKAType.class);
 					if(lkaType.hidden())continue;
-					String cName = lkaType.value();
-					String cDescription = lkaType.description();
-					//String cVersion = lkaType.version();
-					typeModel.setName(cName);
-					typeModel.setDescription(cDescription);
-					//typeModel.setVersion(cVersion);
+					typeModel.setName(lkaType.value());
+					typeModel.setDescription(lkaType.description());
+					typeModel.setOrder(lkaType.order());
 				}else {
 					Api api = cls.getAnnotation(Api.class);
 					if(api.hidden())continue;
-					String cName = api.tags();
-					String cDescription = api.description();
-					//String cVersion = api.version();
-					typeModel.setName(cName);
-					typeModel.setDescription(cDescription);
-					//typeModel.setVersion(cVersion);
+					typeModel.setName(api.tags());
+					typeModel.setDescription(api.description());
+					typeModel.setOrder(api.order());
 				}
 				// 获取类描述信息
 				typeModel.setValue(cls.getSimpleName());
@@ -400,10 +408,8 @@ public class LKADController {
 							LKAMethod lkaMethod = method.getAnnotation(LKAMethod.class);
 							if(lkaMethod.hidden())continue;
 							// 获取方法描述信息
-							String mName = lkaMethod.value();
-							String mDescription = lkaMethod.description();
-							methodModel.setName(mName);
-							methodModel.setDescription(mDescription);
+							methodModel.setName(lkaMethod.value());
+							methodModel.setDescription(lkaMethod.description());
 							methodModel.setValue(method.getName());
 							methodModel.setUrl("该API未设置请求路径");
 							methodModel.setVersion(lkaMethod.version());
@@ -414,14 +420,13 @@ public class LKADController {
 							methodModel.setUpdateTime(lkaMethod.updateTime());
 							methodModel.setDownload(lkaMethod.download());
 							methodModel.setToken(lkaMethod.token());
+							methodModel.setOrder(lkaMethod.order());
 						}else {
 							ApiOperation lkaMethod  = method.getAnnotation(ApiOperation.class);
 							if(lkaMethod.hidden())continue;
 							// 获取方法描述信息
-							String mName = lkaMethod.value();
-							String mDescription = lkaMethod.notes();
-							methodModel.setName(mName);
-							methodModel.setDescription(mDescription);
+							methodModel.setName(lkaMethod.value());
+							methodModel.setDescription(lkaMethod.notes());
 							methodModel.setValue(method.getName());
 							methodModel.setUrl("该API未设置请求路径");
 							methodModel.setVersion(lkaMethod.version());
@@ -432,6 +437,7 @@ public class LKADController {
 							methodModel.setUpdateTime(lkaMethod.updateTime());
 							methodModel.setDownload(lkaMethod.download());
 							methodModel.setToken(lkaMethod.token());
+							methodModel.setOrder(lkaMethod.order());
 						}
 						
 						for (Map<String, Object> map : methodURLs) {
@@ -448,11 +454,6 @@ public class LKADController {
 									if (url != null && requestType == null) {
 										requestType = "通用";
 									}
-									//获取项目前缀
-									/*String contextPath = applicationContext.getServletContext().getContextPath();
-									if(contextPath != null && !"".equals(contextPath)) {
-										url = contextPath+url;
-									}*/
 									methodModel.setUrl(url.toString());
 									methodModel.setRequestType(requestType.toString());
 								}else {
@@ -502,7 +503,15 @@ public class LKADController {
 			                        //得到泛型里的class类型对象
 									try {
 										proType = (Class<?>)pt.getActualTypeArguments()[0];
-										if(returnType.getSimpleName().equals("List") || returnType.getSimpleName().equals("Set")) {
+										if(returnType.getSimpleName().equals("List") || 
+											returnType.getSimpleName().equals("Set") ||
+											returnType.getSimpleName().equals("ArrayList") ||
+											returnType.getSimpleName().equals("LinkedList") ||
+											returnType.getSimpleName().equals("Vector") ||
+											returnType.getSimpleName().equals("SortedSet") ||
+											returnType.getSimpleName().equals("HashSet") ||
+											returnType.getSimpleName().equals("TreeSet") ||
+											returnType.getSimpleName().equals("LinkedHashSet")) {
 											isParentArray = true;
 										}
 									} catch (Exception e) {
@@ -607,8 +616,17 @@ public class LKADController {
 										            if(isObj(type) == 2 || 
 															isObj(type) == 4 || 
 															(field.getType().getSimpleName().equals("Object") && 
-																	parentProType != null && (parentProType.getSimpleName().equals("List") || 
-																			parentProType.getSimpleName().equals("Set")))) {
+																	parentProType != null && 
+																	(parentProType.getSimpleName().equals("List") || 
+																	 parentProType.getSimpleName().equals("Set") ||
+																	 parentProType.getSimpleName().equals("ArrayList") ||
+																	 parentProType.getSimpleName().equals("LinkedList") ||
+																	 parentProType.getSimpleName().equals("Vector") ||
+																	 parentProType.getSimpleName().equals("SortedSet") ||
+																	 parentProType.getSimpleName().equals("HashSet") ||
+																	 parentProType.getSimpleName().equals("TreeSet") ||
+																	 parentProType.getSimpleName().equals("LinkedHashSet")
+																	 ))) {
 										            	propertyModel.setArray(true);
 														propertyModel.setDataType(propertyModel.getDataType()+"[]");
 													}
@@ -657,8 +675,17 @@ public class LKADController {
 													if(isObj(type) == 2 || 
 															isObj(type) == 4 || 
 															(field.getType().getSimpleName().equals("Object") && 
-																	parentProType != null && (parentProType.getSimpleName().equals("List") || 
-																			parentProType.getSimpleName().equals("Set")))) {
+																	parentProType != null && 
+																	(parentProType.getSimpleName().equals("List") || 
+																	 parentProType.getSimpleName().equals("Set") ||
+																	 parentProType.getSimpleName().equals("ArrayList") ||
+																	 parentProType.getSimpleName().equals("LinkedList") ||
+																	 parentProType.getSimpleName().equals("Vector") ||
+																	 parentProType.getSimpleName().equals("SortedSet") ||
+																	 parentProType.getSimpleName().equals("HashSet") ||
+																	 parentProType.getSimpleName().equals("TreeSet") ||
+																	 parentProType.getSimpleName().equals("LinkedHashSet")
+																			))) {
 														propertyModel.setArray(true);
 													}
 													propertyModel.setValue(pValue);
@@ -700,8 +727,17 @@ public class LKADController {
 													if(isObj(type) == 2 || 
 															isObj(type) == 4 || 
 															(field.getType().getSimpleName().equals("Object") && 
-																	parentProType != null && (parentProType.getSimpleName().equals("List") || 
-																			parentProType.getSimpleName().equals("Set")))) {
+																	parentProType != null && 
+																	(parentProType.getSimpleName().equals("List") || 
+																	 parentProType.getSimpleName().equals("Set") ||
+																	 parentProType.getSimpleName().equals("ArrayList") ||
+																	 parentProType.getSimpleName().equals("LinkedList") ||
+																	 parentProType.getSimpleName().equals("Vector") ||
+																	 parentProType.getSimpleName().equals("SortedSet") ||
+																	 parentProType.getSimpleName().equals("HashSet") ||
+																	 parentProType.getSimpleName().equals("TreeSet") ||
+																	 parentProType.getSimpleName().equals("LinkedHashSet")
+																	 ))) {
 														propertyModel.setArray(true);
 													}
 													propertyModel.setValue(pValue);
@@ -743,7 +779,15 @@ public class LKADController {
 								Class<?> argument = parameterTypes[i];
 								Class<?> type = parameters[i].getType();
 								boolean isArray = false;
-								if(type.equals(List.class)) { //list集合
+								if(type.equals(List.class) || 
+						        		type.equals(Set.class) || 
+						        		type.equals(ArrayList.class) || 
+						        		type.equals(LinkedList.class) ||
+						        		type.equals(Vector.class) ||
+						        		type.equals(SortedSet.class) ||
+						        		type.equals(HashSet.class) ||
+						        		type.equals(TreeSet.class) ||
+						        		type.equals(LinkedHashSet.class)) { //集合
 									isArray = true;
 									// 当前集合的泛型类型
 				                    Type genericType = parameters[i].getParameterizedType();
@@ -1613,7 +1657,15 @@ public class LKADController {
 									ParamModel paramModel = new ParamModel();
 									Class<?> type = parameters[i].getType();
 									boolean isArray = false;
-									if(type.equals(List.class) || type.equals(Set.class)) { //list集合
+									if(type.equals(List.class) || 
+							        		type.equals(Set.class) || 
+							        		type.equals(ArrayList.class) || 
+							        		type.equals(LinkedList.class) ||
+							        		type.equals(Vector.class) ||
+							        		type.equals(SortedSet.class) ||
+							        		type.equals(HashSet.class) ||
+							        		type.equals(TreeSet.class) ||
+							        		type.equals(LinkedHashSet.class)) { //list集合
 										isArray = true;
 										// 当前集合的泛型类型
 					                    Type genericType = parameters[i].getParameterizedType();
@@ -1764,380 +1816,387 @@ public class LKADController {
 										if(resp.names()!= null && resp.names().length>0) {
 											String[] names = resp.names();
 											for (int i = 0;i<names.length;i++) {
-												String[] descriptions = resp.descriptions();
-												Class<?>[] dataTypes = resp.dataTypes();
-												boolean[] arrays = resp.isArrays();
-												String[] values = resp.values();
-												String[] parentNames = resp.parentNames();
-												String[] parentDescriptions = resp.parentDescriptions();
-												boolean[] parentIsArrays = resp.parentIsArrays();
-												String[] parentValues = resp.parentValues();
-												String[] grandpaNames = resp.grandpaNames();
-												String[] grandpaDescriptions = resp.grandpaDescriptions();
-												boolean[] grandpaIsArrays = resp.grandpaIsArrays();
-												String[] grandpaValues = resp.grandpaValues();
-												
-												
-												ResposeModel resposeModel = new ResposeModel();
-												resposeModel.setValue(names[i]);
-												
-												if(descriptions!=null && descriptions.length > 0) {
-													try {
-														resposeModel.setDescription(descriptions[i]);
-													} catch (Exception e) {
-														resposeModel.setDescription(descriptions[0]);
+												try {
+													String[] descriptions = resp.descriptions();
+													Class<?>[] dataTypes = resp.dataTypes();
+													boolean[] arrays = resp.isArrays();
+													String[] values = resp.values();
+													String[] parentNames = resp.parentNames();
+													String[] parentDescriptions = resp.parentDescriptions();
+													boolean[] parentIsArrays = resp.parentIsArrays();
+													String[] parentValues = resp.parentValues();
+													String[] grandpaNames = resp.grandpaNames();
+													String[] grandpaDescriptions = resp.grandpaDescriptions();
+													boolean[] grandpaIsArrays = resp.grandpaIsArrays();
+													String[] grandpaValues = resp.grandpaValues();
+													
+													
+													ResposeModel resposeModel = new ResposeModel();
+													resposeModel.setValue(names[i]);
+													
+													if(descriptions!=null && descriptions.length > 0) {
+														try {
+															resposeModel.setDescription(descriptions[i]);
+														} catch (Exception e) {
+															resposeModel.setDescription(descriptions[0]);
+														}
+													}else {
+														resposeModel.setDescription(resp.description());
 													}
-												}else {
-													resposeModel.setDescription(resp.description());
-												}
-												
-												if(values!=null && values.length > 0) {
-													try {
-														resposeModel.setName(values[i]);
-													} catch (Exception e) {
-														resposeModel.setName(values[0]);
+													
+													if(values!=null && values.length > 0) {
+														try {
+															resposeModel.setName(values[i]);
+														} catch (Exception e) {
+															resposeModel.setName(values[0]);
+														}
+													}else {
+														resposeModel.setName(resp.value());
 													}
-												}else {
-													resposeModel.setName(resp.value());
-												}
-												
-												if(dataTypes!=null && dataTypes.length > 0) {
-													try {
-														resposeModel.setDataType(dataTypes[i].getSimpleName());
-													} catch (Exception e) {
-														resposeModel.setDataType(dataTypes[0].getSimpleName());
+													
+													if(dataTypes!=null && dataTypes.length > 0) {
+														try {
+															resposeModel.setDataType(dataTypes[i].getSimpleName());
+														} catch (Exception e) {
+															resposeModel.setDataType(dataTypes[0].getSimpleName());
+														}
+													}else {
+														resposeModel.setDataType(resp.dataType().getSimpleName());
 													}
-												}else {
-													resposeModel.setDataType(resp.dataType().getSimpleName());
-												}
-												
-												if(arrays!=null && arrays.length > 0) {
-													try {
-														resposeModel.setArray(arrays[i]);
-													} catch (Exception e) {
-														resposeModel.setArray(arrays[0]);
+													
+													if(arrays!=null && arrays.length > 0) {
+														try {
+															resposeModel.setArray(arrays[i]);
+														} catch (Exception e) {
+															resposeModel.setArray(arrays[0]);
+														}
+													}else {
+														resposeModel.setArray(resp.isArray());
 													}
-												}else {
-													resposeModel.setArray(resp.isArray());
-												}
-												
-												if(parentNames!=null && parentNames.length > 0) {
-													try {
-														//###################父参######################
-														boolean bl = true;
-														for (ResposeModel res: respose) {
-															if(res.getValue().equals(parentNames[i])) {
-																bl = false;
-																break;
-															}
-															if(res.getModelModel()!=null) {
-																List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-																if(propertyModels != null && propertyModels.size()>0) {
-																	Iterator<PropertyModel> iterator = propertyModels.iterator();
-																	while(iterator.hasNext()) {
-																		PropertyModel pm = iterator.next();
-																		if(pm.getValue() != null && pm.getValue().equals(parentNames[i])) {
-																			iterator.remove();
-																			break;
+													
+													if(parentNames!=null && parentNames.length > 0) {
+														try {
+															//###################父参######################
+															boolean bl = true;
+															for (ResposeModel res: respose) {
+																if(res.getValue().equals(parentNames[i])) {
+																	bl = false;
+																	break;
+																}
+																if(res.getModelModel()!=null) {
+																	List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+																	if(propertyModels != null && propertyModels.size()>0) {
+																		Iterator<PropertyModel> iterator = propertyModels.iterator();
+																		while(iterator.hasNext()) {
+																			PropertyModel pm = iterator.next();
+																			if(pm.getValue() != null && pm.getValue().equals(parentNames[i])) {
+																				iterator.remove();
+																				break;
+																			}
 																		}
 																	}
 																}
 															}
+															if(bl) {
+																ResposeModel pn = new ResposeModel();
+																pn.setValue(parentNames[i]);
+																if(parentValues != null && parentValues.length>0) {
+																	try {
+																		pn.setName(parentValues[i]);
+																	} catch (Exception e) {
+																		pn.setName(parentValues[0]);
+																	}
+																}else {
+																	pn.setName(resp.parentValue());
+																}
+																if(parentDescriptions != null && parentDescriptions.length>0) {
+																	try {
+																		pn.setDescription(parentDescriptions[i]);
+																	} catch (Exception e) {
+																		pn.setDescription(parentDescriptions[0]);
+																	}
+																}else {
+																	pn.setDescription(resp.parentDescription());
+																}
+																if(parentIsArrays != null && parentIsArrays.length>0) {
+																	try {
+																		pn.setArray(parentIsArrays[i]);
+																	} catch (Exception e) {
+																		pn.setArray(parentIsArrays[0]);
+																	}
+																}else {
+																	pn.setArray(resp.parentIsArray());
+																}
+																if(grandpaNames!=null && grandpaNames.length>0) {
+																	try {
+																		pn.setParentName(grandpaNames[i]);
+																	} catch (Exception e) {
+																		pn.setParentName(grandpaNames[0]);
+																	}
+																}else {
+																	if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
+																		pn.setParentName(resp.grandpaName());
+																	}
+																}
+																respose.add(pn);
+															}
+															resposeModel.setParentName(parentNames[i]);
+														} catch (Exception e) {
+															//###################父参######################
+															boolean bl = true;
+															for (ResposeModel res: respose) {
+																if(res.getValue().equals(parentNames[0])) {
+																	bl = false;
+																	break;
+																}
+																if(res.getModelModel()!=null) {
+																	List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+																	if(propertyModels != null && propertyModels.size()>0) {
+																		Iterator<PropertyModel> iterator = propertyModels.iterator();
+																		while(iterator.hasNext()) {
+																			PropertyModel pm = iterator.next();
+																			if(pm.getValue() != null && pm.getValue().equals(parentNames[0])) {
+																				iterator.remove();
+																				break;
+																			}
+																		}
+																	}
+																}
+															}
+															if(bl) {
+																ResposeModel pn = new ResposeModel();
+																pn.setValue(parentNames[0]);
+																if(parentValues != null && parentValues.length>0) {
+																	try {
+																		pn.setName(parentValues[i]);
+																	} catch (Exception e1) {
+																		pn.setName(parentValues[0]);
+																	}
+																}else {
+																	pn.setName(resp.parentValue());
+																}
+																if(parentDescriptions != null && parentDescriptions.length>0) {
+																	try {
+																		pn.setDescription(parentDescriptions[i]);
+																	} catch (Exception e1) {
+																		pn.setDescription(parentDescriptions[0]);
+																	}
+																}else {
+																	pn.setDescription(resp.parentDescription());
+																}
+																if(parentIsArrays != null && parentIsArrays.length>0) {
+																	try {
+																		pn.setArray(parentIsArrays[i]);
+																	} catch (Exception e1) {
+																		pn.setArray(parentIsArrays[0]);
+																	}
+																}else {
+																	pn.setArray(resp.parentIsArray());
+																}
+																if(grandpaNames!=null && grandpaNames.length>0) {
+																	try {
+																		pn.setParentName(grandpaNames[i]);
+																	} catch (Exception e1) {
+																		pn.setParentName(grandpaNames[0]);
+																	}
+																}else {
+																	if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
+																		pn.setParentName(resp.grandpaName());
+																	}
+																}
+																respose.add(pn);
+															}
+															resposeModel.setParentName(parentNames[0]);
 														}
-														if(bl) {
-															ResposeModel pn = new ResposeModel();
-															pn.setValue(parentNames[i]);
-															if(parentValues != null && parentValues.length>0) {
-																try {
-																	pn.setName(parentValues[i]);
-																} catch (Exception e) {
-																	pn.setName(parentValues[0]);
+													}else {
+														//###################父参######################
+														if(resp.parentName()!=null && !"".equals(resp.parentName())) {
+															boolean bl = true;
+															for (ResposeModel res: respose) {
+																if(res.getValue().equals(resp.parentName())) {
+																	bl = false;
+																	break;
 																}
-															}else {
+																if(res.getModelModel()!=null) {
+																	List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+																	if(propertyModels != null && propertyModels.size()>0) {
+																		Iterator<PropertyModel> iterator = propertyModels.iterator();
+																		while(iterator.hasNext()) {
+																			PropertyModel pm = iterator.next();
+																			if(pm.getValue() != null && pm.getValue().equals(resp.parentName())) {
+																				iterator.remove();
+																				break;
+																			}
+																		}
+																	}
+																}
+															}
+															if(bl) {
+																ResposeModel pn = new ResposeModel();
+																pn.setValue(resp.parentName());
 																pn.setName(resp.parentValue());
-															}
-															if(parentDescriptions != null && parentDescriptions.length>0) {
-																try {
-																	pn.setDescription(parentDescriptions[i]);
-																} catch (Exception e) {
-																	pn.setDescription(parentDescriptions[0]);
-																}
-															}else {
 																pn.setDescription(resp.parentDescription());
-															}
-															if(parentIsArrays != null && parentIsArrays.length>0) {
-																try {
-																	pn.setArray(parentIsArrays[i]);
-																} catch (Exception e) {
-																	pn.setArray(parentIsArrays[0]);
-																}
-															}else {
 																pn.setArray(resp.parentIsArray());
-															}
-															if(grandpaNames!=null && grandpaNames.length>0) {
-																try {
-																	pn.setParentName(grandpaNames[i]);
-																} catch (Exception e) {
-																	pn.setParentName(grandpaNames[0]);
-																}
-															}else {
 																if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
 																	pn.setParentName(resp.grandpaName());
 																}
-															}
-															respose.add(pn);
-														}
-														resposeModel.setParentName(parentNames[i]);
-													} catch (Exception e) {
-														//###################父参######################
-														boolean bl = true;
-														for (ResposeModel res: respose) {
-															if(res.getValue().equals(parentNames[0])) {
-																bl = false;
-																break;
-															}
-															if(res.getModelModel()!=null) {
-																List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-																if(propertyModels != null && propertyModels.size()>0) {
-																	Iterator<PropertyModel> iterator = propertyModels.iterator();
-																	while(iterator.hasNext()) {
-																		PropertyModel pm = iterator.next();
-																		if(pm.getValue() != null && pm.getValue().equals(parentNames[0])) {
-																			iterator.remove();
-																			break;
-																		}
-																	}
-																}
+																respose.add(pn);
 															}
 														}
-														if(bl) {
-															ResposeModel pn = new ResposeModel();
-															pn.setValue(parentNames[0]);
-															if(parentValues != null && parentValues.length>0) {
-																try {
-																	pn.setName(parentValues[i]);
-																} catch (Exception e1) {
-																	pn.setName(parentValues[0]);
-																}
-															}else {
-																pn.setName(resp.parentValue());
-															}
-															if(parentDescriptions != null && parentDescriptions.length>0) {
-																try {
-																	pn.setDescription(parentDescriptions[i]);
-																} catch (Exception e1) {
-																	pn.setDescription(parentDescriptions[0]);
-																}
-															}else {
-																pn.setDescription(resp.parentDescription());
-															}
-															if(parentIsArrays != null && parentIsArrays.length>0) {
-																try {
-																	pn.setArray(parentIsArrays[i]);
-																} catch (Exception e1) {
-																	pn.setArray(parentIsArrays[0]);
-																}
-															}else {
-																pn.setArray(resp.parentIsArray());
-															}
-															if(grandpaNames!=null && grandpaNames.length>0) {
-																try {
-																	pn.setParentName(grandpaNames[i]);
-																} catch (Exception e1) {
-																	pn.setParentName(grandpaNames[0]);
-																}
-															}else {
-																if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
-																	pn.setParentName(resp.grandpaName());
-																}
-															}
-															respose.add(pn);
-														}
-														resposeModel.setParentName(parentNames[0]);
+														resposeModel.setParentName(resp.parentName());
 													}
-												}else {
-													//###################父参######################
-													if(resp.parentName()!=null && !"".equals(resp.parentName())) {
-														boolean bl = true;
-														for (ResposeModel res: respose) {
-															if(res.getValue().equals(resp.parentName())) {
-																bl = false;
-																break;
-															}
-															if(res.getModelModel()!=null) {
-																List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-																if(propertyModels != null && propertyModels.size()>0) {
-																	Iterator<PropertyModel> iterator = propertyModels.iterator();
-																	while(iterator.hasNext()) {
-																		PropertyModel pm = iterator.next();
-																		if(pm.getValue() != null && pm.getValue().equals(resp.parentName())) {
-																			iterator.remove();
-																			break;
-																		}
-																	}
-																}
-															}
-														}
-														if(bl) {
-															ResposeModel pn = new ResposeModel();
-															pn.setValue(resp.parentName());
-															pn.setName(resp.parentValue());
-															pn.setDescription(resp.parentDescription());
-															pn.setArray(resp.parentIsArray());
-															if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
-																pn.setParentName(resp.grandpaName());
-															}
-															respose.add(pn);
-														}
-													}
-													resposeModel.setParentName(resp.parentName());
-												}
-												
-												//###################爷参######################
-												if(grandpaNames != null && grandpaNames.length>0) {
-													try {
-														boolean b1 = true;
-														for (ResposeModel res: respose) {
-															if(res.getValue().equals(grandpaNames[i])) {
-																b1 = false;
-																break;
-															}
-															if(res.getModelModel()!=null) {
-																List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-																if(propertyModels != null && propertyModels.size()>0) {
-																	Iterator<PropertyModel> iterator = propertyModels.iterator();
-																	while(iterator.hasNext()) {
-																		PropertyModel pm = iterator.next();
-																		if(pm.getValue() != null && pm.getValue().equals(grandpaNames[i])) {
-																			iterator.remove();
-																			break;
-																		}
-																	}
-																}
-															}
-														}
-														if(b1) {
-															ResposeModel pn = new ResposeModel();
-															pn.setValue(grandpaNames[i]);
-															if(grandpaValues != null && grandpaValues.length>0) {
-																try {
-																	pn.setName(grandpaValues[i]);
-																} catch (Exception e1) {
-																	pn.setName(grandpaValues[0]);
-																}
-															}else {
-																pn.setName(resp.grandpaValue());
-															}
-															if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
-																try {
-																	pn.setDescription(grandpaDescriptions[i]);
-																} catch (Exception e1) {
-																	pn.setDescription(grandpaDescriptions[0]);
-																}
-															}else {
-																pn.setDescription(resp.grandpaDescription());
-															}
-															if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
-																try {
-																	pn.setArray(grandpaIsArrays[i]);
-																} catch (Exception e1) {
-																	pn.setArray(grandpaIsArrays[0]);
-																}
-															}else {
-																pn.setArray(resp.grandpaIsArray());
-															}
-															respose.add(pn);
-														}
-													} catch (Exception e) {
-														boolean b1 = true;
-														for (ResposeModel res: respose) {
-															if(res.getValue().equals(grandpaNames[0])) {
-																b1 = false;
-																break;
-															}
-															if(res.getModelModel()!=null) {
-																List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-																if(propertyModels != null && propertyModels.size()>0) {
-																	Iterator<PropertyModel> iterator = propertyModels.iterator();
-																	while(iterator.hasNext()) {
-																		PropertyModel pm = iterator.next();
-																		if(pm.getValue() != null && pm.getValue().equals(grandpaNames[0])) {
-																			iterator.remove();
-																			break;
-																		}
-																	}
-																}
-															}
-														}
-														if(b1) {
-															ResposeModel pn = new ResposeModel();
-															pn.setValue(grandpaNames[0]);
-															if(grandpaValues != null && grandpaValues.length>0) {
-																try {
-																	pn.setName(grandpaValues[i]);
-																} catch (Exception e1) {
-																	pn.setName(grandpaValues[0]);
-																}
-															}else {
-																pn.setName(resp.grandpaValue());
-															}
-															if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
-																try {
-																	pn.setDescription(grandpaDescriptions[i]);
-																} catch (Exception e1) {
-																	pn.setDescription(grandpaDescriptions[0]);
-																}
-															}else {
-																pn.setDescription(resp.grandpaDescription());
-															}
-															if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
-																try {
-																	pn.setArray(grandpaIsArrays[i]);
-																} catch (Exception e1) {
-																	pn.setArray(grandpaIsArrays[0]);
-																}
-															}else {
-																pn.setArray(resp.grandpaIsArray());
-															}
-															respose.add(pn);
-														}
-													}
-												}else {
+													
 													//###################爷参######################
-													if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
-														boolean b1 = true;
-														for (ResposeModel res: respose) {
-															if(res.getValue().equals(resp.grandpaName())) {
-																b1 = false;
-																break;
-															}
-															if(res.getModelModel()!=null) {
-																List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-																if(propertyModels != null && propertyModels.size()>0) {
-																	Iterator<PropertyModel> iterator = propertyModels.iterator();
-																	while(iterator.hasNext()) {
-																		PropertyModel pm = iterator.next();
-																		if(pm.getValue() != null && pm.getValue().equals(resp.grandpaName())) {
-																			iterator.remove();
-																			break;
+													if(grandpaNames != null && grandpaNames.length>0) {
+														try {
+															boolean b1 = true;
+															for (ResposeModel res: respose) {
+																if(res.getValue().equals(grandpaNames[i])) {
+																	b1 = false;
+																	break;
+																}
+																if(res.getModelModel()!=null) {
+																	List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+																	if(propertyModels != null && propertyModels.size()>0) {
+																		Iterator<PropertyModel> iterator = propertyModels.iterator();
+																		while(iterator.hasNext()) {
+																			PropertyModel pm = iterator.next();
+																			if(pm.getValue() != null && pm.getValue().equals(grandpaNames[i])) {
+																				iterator.remove();
+																				break;
+																			}
 																		}
 																	}
 																}
 															}
+															if(b1) {
+																ResposeModel pn = new ResposeModel();
+																pn.setValue(grandpaNames[i]);
+																if(grandpaValues != null && grandpaValues.length>0) {
+																	try {
+																		pn.setName(grandpaValues[i]);
+																	} catch (Exception e1) {
+																		pn.setName(grandpaValues[0]);
+																	}
+																}else {
+																	pn.setName(resp.grandpaValue());
+																}
+																if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
+																	try {
+																		pn.setDescription(grandpaDescriptions[i]);
+																	} catch (Exception e1) {
+																		pn.setDescription(grandpaDescriptions[0]);
+																	}
+																}else {
+																	pn.setDescription(resp.grandpaDescription());
+																}
+																if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
+																	try {
+																		pn.setArray(grandpaIsArrays[i]);
+																	} catch (Exception e1) {
+																		pn.setArray(grandpaIsArrays[0]);
+																	}
+																}else {
+																	pn.setArray(resp.grandpaIsArray());
+																}
+																respose.add(pn);
+															}
+														} catch (Exception e) {
+															boolean b1 = true;
+															for (ResposeModel res: respose) {
+																if(res.getValue().equals(grandpaNames[0])) {
+																	b1 = false;
+																	break;
+																}
+																if(res.getModelModel()!=null) {
+																	List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+																	if(propertyModels != null && propertyModels.size()>0) {
+																		Iterator<PropertyModel> iterator = propertyModels.iterator();
+																		while(iterator.hasNext()) {
+																			PropertyModel pm = iterator.next();
+																			if(pm.getValue() != null && pm.getValue().equals(grandpaNames[0])) {
+																				iterator.remove();
+																				break;
+																			}
+																		}
+																	}
+																}
+															}
+															if(b1) {
+																ResposeModel pn = new ResposeModel();
+																pn.setValue(grandpaNames[0]);
+																if(grandpaValues != null && grandpaValues.length>0) {
+																	try {
+																		pn.setName(grandpaValues[i]);
+																	} catch (Exception e1) {
+																		pn.setName(grandpaValues[0]);
+																	}
+																}else {
+																	pn.setName(resp.grandpaValue());
+																}
+																if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
+																	try {
+																		pn.setDescription(grandpaDescriptions[i]);
+																	} catch (Exception e1) {
+																		pn.setDescription(grandpaDescriptions[0]);
+																	}
+																}else {
+																	pn.setDescription(resp.grandpaDescription());
+																}
+																if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
+																	try {
+																		pn.setArray(grandpaIsArrays[i]);
+																	} catch (Exception e1) {
+																		pn.setArray(grandpaIsArrays[0]);
+																	}
+																}else {
+																	pn.setArray(resp.grandpaIsArray());
+																}
+																respose.add(pn);
+															}
 														}
-														if(b1) {
-															ResposeModel pn = new ResposeModel();
-															pn.setValue(resp.grandpaName());
-															pn.setName(resp.grandpaValue());
-															pn.setDescription(resp.grandpaDescription());
-															pn.setArray(resp.grandpaIsArray());
-															respose.add(pn);
+													}else {
+														//###################爷参######################
+														if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
+															boolean b1 = true;
+															for (ResposeModel res: respose) {
+																if(res.getValue().equals(resp.grandpaName())) {
+																	b1 = false;
+																	break;
+																}
+																if(res.getModelModel()!=null) {
+																	List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+																	if(propertyModels != null && propertyModels.size()>0) {
+																		Iterator<PropertyModel> iterator = propertyModels.iterator();
+																		while(iterator.hasNext()) {
+																			PropertyModel pm = iterator.next();
+																			if(pm.getValue() != null && pm.getValue().equals(resp.grandpaName())) {
+																				iterator.remove();
+																				break;
+																			}
+																		}
+																	}
+																}
+															}
+															if(b1) {
+																ResposeModel pn = new ResposeModel();
+																pn.setValue(resp.grandpaName());
+																pn.setName(resp.grandpaValue());
+																pn.setDescription(resp.grandpaDescription());
+																pn.setArray(resp.grandpaIsArray());
+																respose.add(pn);
+															}
 														}
+														//###################结束######################
 													}
-													//###################结束######################
-												}
 
-												respose.add(resposeModel);
+													respose.add(resposeModel);
+												} catch (Exception e) {
+													ResposeModel resposeModel = new ResposeModel();
+													resposeModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
+													resposeModel.setValue("该接口响应参数描述异常！");
+													respose.add(resposeModel);
+												}
 											}
 										}else {
 											ResposeModel resposeModel = new ResposeModel();
@@ -2304,380 +2363,387 @@ public class LKADController {
 								if(resp.names()!= null && resp.names().length>0) {
 									String[] names = resp.names();
 									for (int i = 0;i<names.length;i++) {
-										String[] descriptions = resp.descriptions();
-										Class<?>[] dataTypes = resp.dataTypes();
-										boolean[] arrays = resp.isArrays();
-										String[] values = resp.values();
-										String[] parentNames = resp.parentNames();
-										String[] parentDescriptions = resp.parentDescriptions();
-										boolean[] parentIsArrays = resp.parentIsArrays();
-										String[] parentValues = resp.parentValues();
-										String[] grandpaNames = resp.grandpaNames();
-										String[] grandpaDescriptions = resp.grandpaDescriptions();
-										boolean[] grandpaIsArrays = resp.grandpaIsArrays();
-										String[] grandpaValues = resp.grandpaValues();
-										
-										
-										ResposeModel resposeModel = new ResposeModel();
-										resposeModel.setValue(names[i]);
-										
-										if(descriptions!=null && descriptions.length > 0) {
-											try {
-												resposeModel.setDescription(descriptions[i]);
-											} catch (Exception e) {
-												resposeModel.setDescription(descriptions[0]);
+										try {
+											String[] descriptions = resp.descriptions();
+											Class<?>[] dataTypes = resp.dataTypes();
+											boolean[] arrays = resp.isArrays();
+											String[] values = resp.values();
+											String[] parentNames = resp.parentNames();
+											String[] parentDescriptions = resp.parentDescriptions();
+											boolean[] parentIsArrays = resp.parentIsArrays();
+											String[] parentValues = resp.parentValues();
+											String[] grandpaNames = resp.grandpaNames();
+											String[] grandpaDescriptions = resp.grandpaDescriptions();
+											boolean[] grandpaIsArrays = resp.grandpaIsArrays();
+											String[] grandpaValues = resp.grandpaValues();
+											
+											
+											ResposeModel resposeModel = new ResposeModel();
+											resposeModel.setValue(names[i]);
+											
+											if(descriptions!=null && descriptions.length > 0) {
+												try {
+													resposeModel.setDescription(descriptions[i]);
+												} catch (Exception e) {
+													resposeModel.setDescription(descriptions[0]);
+												}
+											}else {
+												resposeModel.setDescription(resp.description());
 											}
-										}else {
-											resposeModel.setDescription(resp.description());
-										}
-										
-										if(values!=null && values.length > 0) {
-											try {
-												resposeModel.setName(values[i]);
-											} catch (Exception e) {
-												resposeModel.setName(values[0]);
+											
+											if(values!=null && values.length > 0) {
+												try {
+													resposeModel.setName(values[i]);
+												} catch (Exception e) {
+													resposeModel.setName(values[0]);
+												}
+											}else {
+												resposeModel.setName(resp.value());
 											}
-										}else {
-											resposeModel.setName(resp.value());
-										}
-										
-										if(dataTypes!=null && dataTypes.length > 0) {
-											try {
-												resposeModel.setDataType(dataTypes[i].getSimpleName());
-											} catch (Exception e) {
-												resposeModel.setDataType(dataTypes[0].getSimpleName());
+											
+											if(dataTypes!=null && dataTypes.length > 0) {
+												try {
+													resposeModel.setDataType(dataTypes[i].getSimpleName());
+												} catch (Exception e) {
+													resposeModel.setDataType(dataTypes[0].getSimpleName());
+												}
+											}else {
+												resposeModel.setDataType(resp.dataType().getSimpleName());
 											}
-										}else {
-											resposeModel.setDataType(resp.dataType().getSimpleName());
-										}
-										
-										if(arrays!=null && arrays.length > 0) {
-											try {
-												resposeModel.setArray(arrays[i]);
-											} catch (Exception e) {
-												resposeModel.setArray(arrays[0]);
+											
+											if(arrays!=null && arrays.length > 0) {
+												try {
+													resposeModel.setArray(arrays[i]);
+												} catch (Exception e) {
+													resposeModel.setArray(arrays[0]);
+												}
+											}else {
+												resposeModel.setArray(resp.isArray());
 											}
-										}else {
-											resposeModel.setArray(resp.isArray());
-										}
-										
-										if(parentNames!=null && parentNames.length > 0) {
-											try {
-												//###################父参######################
-												boolean bl = true;
-												for (ResposeModel res: respose) {
-													if(res.getValue().equals(parentNames[i])) {
-														bl = false;
-														break;
-													}
-													if(res.getModelModel()!=null) {
-														List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-														if(propertyModels != null && propertyModels.size()>0) {
-															Iterator<PropertyModel> iterator = propertyModels.iterator();
-															while(iterator.hasNext()) {
-																PropertyModel pm = iterator.next();
-																if(pm.getValue() != null && pm.getValue().equals(parentNames[i])) {
-																	iterator.remove();
-																	break;
+											
+											if(parentNames!=null && parentNames.length > 0) {
+												try {
+													//###################父参######################
+													boolean bl = true;
+													for (ResposeModel res: respose) {
+														if(res.getValue().equals(parentNames[i])) {
+															bl = false;
+															break;
+														}
+														if(res.getModelModel()!=null) {
+															List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+															if(propertyModels != null && propertyModels.size()>0) {
+																Iterator<PropertyModel> iterator = propertyModels.iterator();
+																while(iterator.hasNext()) {
+																	PropertyModel pm = iterator.next();
+																	if(pm.getValue() != null && pm.getValue().equals(parentNames[i])) {
+																		iterator.remove();
+																		break;
+																	}
 																}
 															}
 														}
 													}
+													if(bl) {
+														ResposeModel pn = new ResposeModel();
+														pn.setValue(parentNames[i]);
+														if(parentValues != null && parentValues.length>0) {
+															try {
+																pn.setName(parentValues[i]);
+															} catch (Exception e) {
+																pn.setName(parentValues[0]);
+															}
+														}else {
+															pn.setName(resp.parentValue());
+														}
+														if(parentDescriptions != null && parentDescriptions.length>0) {
+															try {
+																pn.setDescription(parentDescriptions[i]);
+															} catch (Exception e) {
+																pn.setDescription(parentDescriptions[0]);
+															}
+														}else {
+															pn.setDescription(resp.parentDescription());
+														}
+														if(parentIsArrays != null && parentIsArrays.length>0) {
+															try {
+																pn.setArray(parentIsArrays[i]);
+															} catch (Exception e) {
+																pn.setArray(parentIsArrays[0]);
+															}
+														}else {
+															pn.setArray(resp.parentIsArray());
+														}
+														if(grandpaNames!=null && grandpaNames.length>0) {
+															try {
+																pn.setParentName(grandpaNames[i]);
+															} catch (Exception e) {
+																pn.setParentName(grandpaNames[0]);
+															}
+														}else {
+															if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
+																pn.setParentName(resp.grandpaName());
+															}
+														}
+														respose.add(pn);
+													}
+													resposeModel.setParentName(parentNames[i]);
+												} catch (Exception e) {
+													//###################父参######################
+													boolean bl = true;
+													for (ResposeModel res: respose) {
+														if(res.getValue().equals(parentNames[0])) {
+															bl = false;
+															break;
+														}
+														if(res.getModelModel()!=null) {
+															List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+															if(propertyModels != null && propertyModels.size()>0) {
+																Iterator<PropertyModel> iterator = propertyModels.iterator();
+																while(iterator.hasNext()) {
+																	PropertyModel pm = iterator.next();
+																	if(pm.getValue() != null && pm.getValue().equals(parentNames[0])) {
+																		iterator.remove();
+																		break;
+																	}
+																}
+															}
+														}
+													}
+													if(bl) {
+														ResposeModel pn = new ResposeModel();
+														pn.setValue(parentNames[0]);
+														if(parentValues != null && parentValues.length>0) {
+															try {
+																pn.setName(parentValues[i]);
+															} catch (Exception e1) {
+																pn.setName(parentValues[0]);
+															}
+														}else {
+															pn.setName(resp.parentValue());
+														}
+														if(parentDescriptions != null && parentDescriptions.length>0) {
+															try {
+																pn.setDescription(parentDescriptions[i]);
+															} catch (Exception e1) {
+																pn.setDescription(parentDescriptions[0]);
+															}
+														}else {
+															pn.setDescription(resp.parentDescription());
+														}
+														if(parentIsArrays != null && parentIsArrays.length>0) {
+															try {
+																pn.setArray(parentIsArrays[i]);
+															} catch (Exception e1) {
+																pn.setArray(parentIsArrays[0]);
+															}
+														}else {
+															pn.setArray(resp.parentIsArray());
+														}
+														if(grandpaNames!=null && grandpaNames.length>0) {
+															try {
+																pn.setParentName(grandpaNames[i]);
+															} catch (Exception e1) {
+																pn.setParentName(grandpaNames[0]);
+															}
+														}else {
+															if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
+																pn.setParentName(resp.grandpaName());
+															}
+														}
+														respose.add(pn);
+													}
+													resposeModel.setParentName(parentNames[0]);
 												}
-												if(bl) {
-													ResposeModel pn = new ResposeModel();
-													pn.setValue(parentNames[i]);
-													if(parentValues != null && parentValues.length>0) {
-														try {
-															pn.setName(parentValues[i]);
-														} catch (Exception e) {
-															pn.setName(parentValues[0]);
+											}else {
+												//###################父参######################
+												if(resp.parentName()!=null && !"".equals(resp.parentName())) {
+													boolean bl = true;
+													for (ResposeModel res: respose) {
+														if(res.getValue().equals(resp.parentName())) {
+															bl = false;
+															break;
 														}
-													}else {
+														if(res.getModelModel()!=null) {
+															List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+															if(propertyModels != null && propertyModels.size()>0) {
+																Iterator<PropertyModel> iterator = propertyModels.iterator();
+																while(iterator.hasNext()) {
+																	PropertyModel pm = iterator.next();
+																	if(pm.getValue() != null && pm.getValue().equals(resp.parentName())) {
+																		iterator.remove();
+																		break;
+																	}
+																}
+															}
+														}
+													}
+													if(bl) {
+														ResposeModel pn = new ResposeModel();
+														pn.setValue(resp.parentName());
 														pn.setName(resp.parentValue());
-													}
-													if(parentDescriptions != null && parentDescriptions.length>0) {
-														try {
-															pn.setDescription(parentDescriptions[i]);
-														} catch (Exception e) {
-															pn.setDescription(parentDescriptions[0]);
-														}
-													}else {
 														pn.setDescription(resp.parentDescription());
-													}
-													if(parentIsArrays != null && parentIsArrays.length>0) {
-														try {
-															pn.setArray(parentIsArrays[i]);
-														} catch (Exception e) {
-															pn.setArray(parentIsArrays[0]);
-														}
-													}else {
 														pn.setArray(resp.parentIsArray());
-													}
-													if(grandpaNames!=null && grandpaNames.length>0) {
-														try {
-															pn.setParentName(grandpaNames[i]);
-														} catch (Exception e) {
-															pn.setParentName(grandpaNames[0]);
-														}
-													}else {
 														if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
 															pn.setParentName(resp.grandpaName());
 														}
-													}
-													respose.add(pn);
-												}
-												resposeModel.setParentName(parentNames[i]);
-											} catch (Exception e) {
-												//###################父参######################
-												boolean bl = true;
-												for (ResposeModel res: respose) {
-													if(res.getValue().equals(parentNames[0])) {
-														bl = false;
-														break;
-													}
-													if(res.getModelModel()!=null) {
-														List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-														if(propertyModels != null && propertyModels.size()>0) {
-															Iterator<PropertyModel> iterator = propertyModels.iterator();
-															while(iterator.hasNext()) {
-																PropertyModel pm = iterator.next();
-																if(pm.getValue() != null && pm.getValue().equals(parentNames[0])) {
-																	iterator.remove();
-																	break;
-																}
-															}
-														}
+														respose.add(pn);
 													}
 												}
-												if(bl) {
-													ResposeModel pn = new ResposeModel();
-													pn.setValue(parentNames[0]);
-													if(parentValues != null && parentValues.length>0) {
-														try {
-															pn.setName(parentValues[i]);
-														} catch (Exception e1) {
-															pn.setName(parentValues[0]);
-														}
-													}else {
-														pn.setName(resp.parentValue());
-													}
-													if(parentDescriptions != null && parentDescriptions.length>0) {
-														try {
-															pn.setDescription(parentDescriptions[i]);
-														} catch (Exception e1) {
-															pn.setDescription(parentDescriptions[0]);
-														}
-													}else {
-														pn.setDescription(resp.parentDescription());
-													}
-													if(parentIsArrays != null && parentIsArrays.length>0) {
-														try {
-															pn.setArray(parentIsArrays[i]);
-														} catch (Exception e1) {
-															pn.setArray(parentIsArrays[0]);
-														}
-													}else {
-														pn.setArray(resp.parentIsArray());
-													}
-													if(grandpaNames!=null && grandpaNames.length>0) {
-														try {
-															pn.setParentName(grandpaNames[i]);
-														} catch (Exception e1) {
-															pn.setParentName(grandpaNames[0]);
-														}
-													}else {
-														if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
-															pn.setParentName(resp.grandpaName());
-														}
-													}
-													respose.add(pn);
-												}
-												resposeModel.setParentName(parentNames[0]);
+												resposeModel.setParentName(resp.parentName());
 											}
-										}else {
-											//###################父参######################
-											if(resp.parentName()!=null && !"".equals(resp.parentName())) {
-												boolean bl = true;
-												for (ResposeModel res: respose) {
-													if(res.getValue().equals(resp.parentName())) {
-														bl = false;
-														break;
-													}
-													if(res.getModelModel()!=null) {
-														List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-														if(propertyModels != null && propertyModels.size()>0) {
-															Iterator<PropertyModel> iterator = propertyModels.iterator();
-															while(iterator.hasNext()) {
-																PropertyModel pm = iterator.next();
-																if(pm.getValue() != null && pm.getValue().equals(resp.parentName())) {
-																	iterator.remove();
-																	break;
-																}
-															}
-														}
-													}
-												}
-												if(bl) {
-													ResposeModel pn = new ResposeModel();
-													pn.setValue(resp.parentName());
-													pn.setName(resp.parentValue());
-													pn.setDescription(resp.parentDescription());
-													pn.setArray(resp.parentIsArray());
-													if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
-														pn.setParentName(resp.grandpaName());
-													}
-													respose.add(pn);
-												}
-											}
-											resposeModel.setParentName(resp.parentName());
-										}
-										
-										//###################爷参######################
-										if(grandpaNames != null && grandpaNames.length>0) {
-											try {
-												boolean b1 = true;
-												for (ResposeModel res: respose) {
-													if(res.getValue().equals(grandpaNames[i])) {
-														b1 = false;
-														break;
-													}
-													if(res.getModelModel()!=null) {
-														List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-														if(propertyModels != null && propertyModels.size()>0) {
-															Iterator<PropertyModel> iterator = propertyModels.iterator();
-															while(iterator.hasNext()) {
-																PropertyModel pm = iterator.next();
-																if(pm.getValue() != null && pm.getValue().equals(grandpaNames[i])) {
-																	iterator.remove();
-																	break;
-																}
-															}
-														}
-													}
-												}
-												if(b1) {
-													ResposeModel pn = new ResposeModel();
-													pn.setValue(grandpaNames[i]);
-													if(grandpaValues != null && grandpaValues.length>0) {
-														try {
-															pn.setName(grandpaValues[i]);
-														} catch (Exception e1) {
-															pn.setName(grandpaValues[0]);
-														}
-													}else {
-														pn.setName(resp.grandpaValue());
-													}
-													if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
-														try {
-															pn.setDescription(grandpaDescriptions[i]);
-														} catch (Exception e1) {
-															pn.setDescription(grandpaDescriptions[0]);
-														}
-													}else {
-														pn.setDescription(resp.grandpaDescription());
-													}
-													if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
-														try {
-															pn.setArray(grandpaIsArrays[i]);
-														} catch (Exception e1) {
-															pn.setArray(grandpaIsArrays[0]);
-														}
-													}else {
-														pn.setArray(resp.grandpaIsArray());
-													}
-													respose.add(pn);
-												}
-											} catch (Exception e) {
-												boolean b1 = true;
-												for (ResposeModel res: respose) {
-													if(res.getValue().equals(grandpaNames[0])) {
-														b1 = false;
-														break;
-													}
-													if(res.getModelModel()!=null) {
-														List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-														if(propertyModels != null && propertyModels.size()>0) {
-															Iterator<PropertyModel> iterator = propertyModels.iterator();
-															while(iterator.hasNext()) {
-																PropertyModel pm = iterator.next();
-																if(pm.getValue() != null && pm.getValue().equals(grandpaNames[0])) {
-																	iterator.remove();
-																	break;
-																}
-															}
-														}
-													}
-												}
-												if(b1) {
-													ResposeModel pn = new ResposeModel();
-													pn.setValue(grandpaNames[0]);
-													if(grandpaValues != null && grandpaValues.length>0) {
-														try {
-															pn.setName(grandpaValues[i]);
-														} catch (Exception e1) {
-															pn.setName(grandpaValues[0]);
-														}
-													}else {
-														pn.setName(resp.grandpaValue());
-													}
-													if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
-														try {
-															pn.setDescription(grandpaDescriptions[i]);
-														} catch (Exception e1) {
-															pn.setDescription(grandpaDescriptions[0]);
-														}
-													}else {
-														pn.setDescription(resp.grandpaDescription());
-													}
-													if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
-														try {
-															pn.setArray(grandpaIsArrays[i]);
-														} catch (Exception e1) {
-															pn.setArray(grandpaIsArrays[0]);
-														}
-													}else {
-														pn.setArray(resp.grandpaIsArray());
-													}
-													respose.add(pn);
-												}
-											}
-										}else {
+											
 											//###################爷参######################
-											if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
-												boolean b1 = true;
-												for (ResposeModel res: respose) {
-													if(res.getValue().equals(resp.grandpaName())) {
-														b1 = false;
-														break;
-													}
-													if(res.getModelModel()!=null) {
-														List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
-														if(propertyModels != null && propertyModels.size()>0) {
-															Iterator<PropertyModel> iterator = propertyModels.iterator();
-															while(iterator.hasNext()) {
-																PropertyModel pm = iterator.next();
-																if(pm.getValue() != null && pm.getValue().equals(resp.grandpaName())) {
-																	iterator.remove();
-																	break;
+											if(grandpaNames != null && grandpaNames.length>0) {
+												try {
+													boolean b1 = true;
+													for (ResposeModel res: respose) {
+														if(res.getValue().equals(grandpaNames[i])) {
+															b1 = false;
+															break;
+														}
+														if(res.getModelModel()!=null) {
+															List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+															if(propertyModels != null && propertyModels.size()>0) {
+																Iterator<PropertyModel> iterator = propertyModels.iterator();
+																while(iterator.hasNext()) {
+																	PropertyModel pm = iterator.next();
+																	if(pm.getValue() != null && pm.getValue().equals(grandpaNames[i])) {
+																		iterator.remove();
+																		break;
+																	}
 																}
 															}
 														}
 													}
+													if(b1) {
+														ResposeModel pn = new ResposeModel();
+														pn.setValue(grandpaNames[i]);
+														if(grandpaValues != null && grandpaValues.length>0) {
+															try {
+																pn.setName(grandpaValues[i]);
+															} catch (Exception e1) {
+																pn.setName(grandpaValues[0]);
+															}
+														}else {
+															pn.setName(resp.grandpaValue());
+														}
+														if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
+															try {
+																pn.setDescription(grandpaDescriptions[i]);
+															} catch (Exception e1) {
+																pn.setDescription(grandpaDescriptions[0]);
+															}
+														}else {
+															pn.setDescription(resp.grandpaDescription());
+														}
+														if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
+															try {
+																pn.setArray(grandpaIsArrays[i]);
+															} catch (Exception e1) {
+																pn.setArray(grandpaIsArrays[0]);
+															}
+														}else {
+															pn.setArray(resp.grandpaIsArray());
+														}
+														respose.add(pn);
+													}
+												} catch (Exception e) {
+													boolean b1 = true;
+													for (ResposeModel res: respose) {
+														if(res.getValue().equals(grandpaNames[0])) {
+															b1 = false;
+															break;
+														}
+														if(res.getModelModel()!=null) {
+															List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+															if(propertyModels != null && propertyModels.size()>0) {
+																Iterator<PropertyModel> iterator = propertyModels.iterator();
+																while(iterator.hasNext()) {
+																	PropertyModel pm = iterator.next();
+																	if(pm.getValue() != null && pm.getValue().equals(grandpaNames[0])) {
+																		iterator.remove();
+																		break;
+																	}
+																}
+															}
+														}
+													}
+													if(b1) {
+														ResposeModel pn = new ResposeModel();
+														pn.setValue(grandpaNames[0]);
+														if(grandpaValues != null && grandpaValues.length>0) {
+															try {
+																pn.setName(grandpaValues[i]);
+															} catch (Exception e1) {
+																pn.setName(grandpaValues[0]);
+															}
+														}else {
+															pn.setName(resp.grandpaValue());
+														}
+														if(grandpaDescriptions != null && grandpaDescriptions.length>0) {
+															try {
+																pn.setDescription(grandpaDescriptions[i]);
+															} catch (Exception e1) {
+																pn.setDescription(grandpaDescriptions[0]);
+															}
+														}else {
+															pn.setDescription(resp.grandpaDescription());
+														}
+														if(grandpaIsArrays != null && grandpaIsArrays.length>0) {
+															try {
+																pn.setArray(grandpaIsArrays[i]);
+															} catch (Exception e1) {
+																pn.setArray(grandpaIsArrays[0]);
+															}
+														}else {
+															pn.setArray(resp.grandpaIsArray());
+														}
+														respose.add(pn);
+													}
 												}
-												if(b1) {
-													ResposeModel pn = new ResposeModel();
-													pn.setValue(resp.grandpaName());
-													pn.setName(resp.grandpaValue());
-													pn.setDescription(resp.grandpaDescription());
-													pn.setArray(resp.grandpaIsArray());
-													respose.add(pn);
+											}else {
+												//###################爷参######################
+												if(resp.grandpaName()!=null && !"".equals(resp.grandpaName())) {
+													boolean b1 = true;
+													for (ResposeModel res: respose) {
+														if(res.getValue().equals(resp.grandpaName())) {
+															b1 = false;
+															break;
+														}
+														if(res.getModelModel()!=null) {
+															List<PropertyModel> propertyModels = res.getModelModel().getPropertyModels();
+															if(propertyModels != null && propertyModels.size()>0) {
+																Iterator<PropertyModel> iterator = propertyModels.iterator();
+																while(iterator.hasNext()) {
+																	PropertyModel pm = iterator.next();
+																	if(pm.getValue() != null && pm.getValue().equals(resp.grandpaName())) {
+																		iterator.remove();
+																		break;
+																	}
+																}
+															}
+														}
+													}
+													if(b1) {
+														ResposeModel pn = new ResposeModel();
+														pn.setValue(resp.grandpaName());
+														pn.setName(resp.grandpaValue());
+														pn.setDescription(resp.grandpaDescription());
+														pn.setArray(resp.grandpaIsArray());
+														respose.add(pn);
+													}
 												}
+												//###################结束######################
 											}
-											//###################结束######################
-										}
 
-										respose.add(resposeModel);
+											respose.add(resposeModel);
+										} catch (Exception e) {
+											ResposeModel resposeModel = new ResposeModel();
+											resposeModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
+											resposeModel.setValue("该接口响应参数描述异常！");
+											respose.add(resposeModel);
+										}
 									}
 								}else {
 									ResposeModel resposeModel = new ResposeModel();
@@ -2770,9 +2836,6 @@ public class LKADController {
 				}
 			}
 		}
-		
-		//类排序
-		Collections.sort(typeModels);
 		return typeModels;
 	}
 	
@@ -2963,7 +3026,16 @@ public class LKADController {
 								propertyModel.setDataType("Object");
 							}
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -2995,7 +3067,16 @@ public class LKADController {
 							}
 							propertyModel.setParamType("query");
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3042,7 +3123,16 @@ public class LKADController {
 								propertyModel.setDataType("Object");
 							}
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3073,7 +3163,16 @@ public class LKADController {
 							}
 							propertyModel.setParamType("query");
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3226,7 +3325,16 @@ public class LKADController {
 								propertyModel = new PropertyModel();
 							}
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3258,7 +3366,16 @@ public class LKADController {
 							}
 							propertyModel.setParamType("query");
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3305,7 +3422,16 @@ public class LKADController {
 								propertyModel.setDataType("Object");
 							}
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3336,7 +3462,16 @@ public class LKADController {
 							}
 							propertyModel.setParamType("query");
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3493,7 +3628,16 @@ public class LKADController {
 								propertyModel.setDataType("Object");
 							}
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3524,7 +3668,16 @@ public class LKADController {
 							}
 							propertyModel.setParamType("query");
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3571,7 +3724,16 @@ public class LKADController {
 								propertyModel.setDataType("Object");
 							}
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3602,7 +3764,16 @@ public class LKADController {
 							}
 							propertyModel.setParamType("query");
 							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || pType.equals(List.class) || pType.equals(Set.class))) {
+							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
+									pType.equals(List.class) || 
+									pType.equals(Set.class) || 
+									pType.equals(ArrayList.class) || 
+									pType.equals(LinkedList.class) ||
+									pType.equals(Vector.class) ||
+									pType.equals(SortedSet.class) ||
+									pType.equals(HashSet.class) ||
+									pType.equals(TreeSet.class) ||
+									pType.equals(LinkedHashSet.class))) {
 								propertyModel.setArray(true);
 							}
 							propertyModel.setValue(pValue);
@@ -3903,11 +4074,28 @@ public class LKADController {
         	return 0;
         }else if(type.equals(String.class) || type.equals(BigDecimal.class)){
         	return 0;
-        }else if(type.equals(Date.class) || type.equals(java.sql.Date.class)){
+        }else if(type.equals(Date.class) || 
+        		type.equals(java.sql.Date.class) || 
+        		type.equals(LocalDate.class) ||
+        		type.equals(LocalDateTime.class)){
         	return 0;
-        }else if(type.equals(Map.class)) {
+        }else if(type.equals(Map.class) ||
+        		type.equals(HashMap.class) ||
+        		type.equals(LinkedHashMap.class) ||
+        		type.equals(TreeMap.class) ||
+        		type.equals(Hashtable.class) ||
+        		type.equals(ConcurrentHashMap.class)
+        		) {
         	return 1;
-        }else if(type.equals(List.class) || type.equals(Set.class)) {
+        }else if(type.equals(List.class) || 
+        		type.equals(Set.class) || 
+        		type.equals(ArrayList.class) || 
+        		type.equals(LinkedList.class) ||
+        		type.equals(Vector.class) ||
+        		type.equals(SortedSet.class) ||
+        		type.equals(HashSet.class) ||
+        		type.equals(TreeSet.class) ||
+        		type.equals(LinkedHashSet.class)) {
         	return 2;
         }else if(type.isArray()) {
         	return 4;
@@ -3923,7 +4111,15 @@ public class LKADController {
      */
     public Class<?> getGenericType(Class<?> type,Field field){
 	    try {
-			if(type.equals(List.class) || type.equals(Set.class)) { //list集合
+			if(type.equals(List.class) || 
+	        		type.equals(Set.class) || 
+	        		type.equals(ArrayList.class) || 
+	        		type.equals(LinkedList.class) ||
+	        		type.equals(Vector.class) ||
+	        		type.equals(SortedSet.class) ||
+	        		type.equals(HashSet.class) ||
+	        		type.equals(TreeSet.class) ||
+	        		type.equals(LinkedHashSet.class)) { //集合
 				// 当前集合的泛型类型
 			    Type genericType = field.getGenericType();
 			    if (null == genericType) {

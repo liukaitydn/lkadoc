@@ -14,6 +14,7 @@ public class TypeModel implements Comparable<TypeModel>{
 	List<MethodModel> methodModels = new ArrayList<MethodModel>();
 	private String value;
 	private String version;
+	private int order;
 	
 	/**
      * 将对象按名称典序升序排序
@@ -22,10 +23,20 @@ public class TypeModel implements Comparable<TypeModel>{
      */
     @Override
     public int compareTo(TypeModel o) {
-    	//按照中文名称排序
-    	return Collator.getInstance(Locale.CHINA).compare(this.name, o.getName());
+    	//先按名称排序
+    	if(o.getOrder()==1000000 && this.getOrder()==1000000)
+    		return Collator.getInstance(Locale.CHINA).compare(this.name, o.getName());
+    	//再按order排序
+    	return this.getOrder()-o.getOrder();
     }
-    
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
 	public String getVersion() {
 		return version;
 	}

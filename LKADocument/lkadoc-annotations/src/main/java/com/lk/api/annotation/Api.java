@@ -22,8 +22,9 @@ public @interface Api {
 	String tags()  default "";
 	/*类描述*/
 	String description() default "";
-	
 	/*是否隐藏*/
 	boolean hidden() default false;
+	/*类排序号*/
+	int order() default 1000000;
 	
 }

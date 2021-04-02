@@ -26,7 +26,6 @@ public @interface ApiOperation {
 	String version() default "暂无";
 	/*contentType类型*/
 	String contentType() default "application/x-www-form-urlencoded";
-	
 	/*是否隐藏*/
 	boolean hidden() default false;
 	/*作者*/
@@ -39,4 +38,6 @@ public @interface ApiOperation {
 	boolean download() default false;
 	/*是否需要token验证*/
 	boolean token() default true;
+	/*接口排序号*/
+	int order() default 1000000;
 }

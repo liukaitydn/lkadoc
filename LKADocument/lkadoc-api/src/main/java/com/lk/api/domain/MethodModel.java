@@ -20,6 +20,7 @@ public class MethodModel implements Comparable<MethodModel>{
 	private String updateTime;
 	private boolean download;
 	private boolean token;
+	private int order;
 	
 	/**
      * 将对象按名称典序升序排序
@@ -28,11 +29,23 @@ public class MethodModel implements Comparable<MethodModel>{
      */
     @Override
     public int compareTo(MethodModel o) {
-        //按照中文名称排序
-    	return Collator.getInstance(Locale.CHINA).compare(this.name, o.getName());
-
+    	//先按名称排序
+    	if(o.getOrder()==1000000 && this.getOrder()==1000000)
+    		return Collator.getInstance(Locale.CHINA).compare(this.name, o.getName());
+    	//再按order排序
+    	return this.getOrder()-o.getOrder();
     }
 	
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
+
+
 	public boolean isToken() {
 		return token;
 	}

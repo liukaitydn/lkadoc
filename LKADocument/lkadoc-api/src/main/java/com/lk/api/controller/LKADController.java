@@ -105,8 +105,8 @@ public class LKADController {
 	@Value("${lkad.version:}")
 	private String version;
 	/* 入参翻译开关 */
-	@Value("${lkad.enToCn:false}")
-	private Boolean enToCn;
+	/*@Value("${lkad.enToCn:false}")
+	private Boolean enToCn;*/
 	/* 扫描所有参数 */
 	@Value("${lkad.sconAll:false}")
 	private Boolean sconAll;
@@ -234,7 +234,7 @@ public class LKADController {
 					Class<? extends Object> bootClass = obj.getClass();
 					LKADocument annotation = bootClass.getAnnotation(LKADocument.class);
 					bpk = annotation.basePackages();
-					enToCn = annotation.enToCn();
+					//enToCn = annotation.enToCn();
 					sconAll = annotation.sconAll();
 					if("".equals(bpk)) {
 						bool = false;
@@ -1078,8 +1078,8 @@ public class LKADController {
 													}
 												} catch (Exception e) {
 													ParamModel paramModel = new ParamModel();
-													paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
-													paramModel.setValue("该接口参数异常！");
+													paramModel.setName("<span style='color:red;'>"+e.getClass().getSimpleName()+":"+e.getMessage()+"</span>");
+													paramModel.setValue("<span style='color:red;'>该接口参数异常！</span>");
 													request.add(paramModel);
 												}
 											}
@@ -1259,8 +1259,8 @@ public class LKADController {
 													}
 												} catch (Exception e) {
 													ParamModel paramModel = new ParamModel();
-													paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
-													paramModel.setValue("该接口参数异常！");
+													paramModel.setName("<span style='color:red;'>"+e.getClass().getSimpleName()+":"+e.getMessage()+"</span>");
+													paramModel.setValue("<span style='color:red;'>该接口参数异常！</span>");
 													request.add(paramModel);
 												}
 											}
@@ -1451,8 +1451,8 @@ public class LKADController {
 											}
 										} catch (Exception e) {
 											ParamModel paramModel = new ParamModel();
-											paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
-											paramModel.setValue("该接口参数异常！");
+											paramModel.setName("<span style='color:red;'>"+e.getClass().getSimpleName()+":"+e.getMessage()+"</span>");
+											paramModel.setValue("<span style='color:red;'>该接口参数异常！</span>");
 											request.add(paramModel);
 										}
 									}
@@ -1643,8 +1643,8 @@ public class LKADController {
 											}
 										} catch (Exception e) {
 											ParamModel paramModel = new ParamModel();
-											paramModel.setName(e.getClass().getSimpleName()+":"+e.getMessage());
-											paramModel.setValue("该接口参数异常！");
+											paramModel.setName("<span style='color:red;'>"+e.getClass().getSimpleName()+":"+e.getMessage()+"</span>");
+											paramModel.setValue("<span style='color:red;'>该接口参数异常！</span>");
 											request.add(paramModel);
 										}
 									}
@@ -2830,7 +2830,7 @@ public class LKADController {
 						methodModels.add(methodModel);
 					}
 					//方法排序
-					Collections.sort(methodModels);
+					//Collections.sort(methodModels);
 					typeModel.setMethodModels(methodModels);
 					typeModels.add(typeModel);
 				}
@@ -3821,8 +3821,8 @@ public class LKADController {
 			Map<Object, Object> map = getParamInfo(serverName);
 			if(map != null) {
 				for (Entry<Object, Object> entry : map.entrySet()) {
-					if(entry.getKey().equals(url+"A."+type+"."+value)) {
-						delParamInfo(value,type,url+"A",serverName);
+					if(entry.getKey().equals(url+"."+type+"."+value)) {
+						delParamInfo(value,type,url,serverName);
 					}
 				}
 			}
@@ -3833,10 +3833,6 @@ public class LKADController {
         try {
 			outStream = new FileOutputStream(file,true); 
 			Properties prop= new Properties();
-			if("5".equals(modaltype)) {
-				value = value.replace("[]","");
-				url=url+"A";
-			}
 			prop.setProperty(url+"."+type+"."+value,modaltype+"-"+content);
 			prop.store(outStream, null);
 			return "操作成功";
@@ -3986,29 +3982,33 @@ public class LKADController {
         return rs;
     }
     
+    
+    private Set<Map.Entry<Object, Object>> entrySet = null;
     public String enToCn(String url,Integer type,String name) {
-    	
-    	
-    	File file = new File("lkadParamInfo.properties");
 		FileInputStream inStream = null;
         try {
-        	inStream = new FileInputStream(file); 
-            Properties prop = new Properties();
-            prop.load(inStream);
-            Set<Map.Entry<Object, Object>> entrySet = prop.entrySet();//返回的属性键值对实体
-            for (Map.Entry<Object, Object> entry : entrySet) {
-            	if(entry.getKey().equals(url+"A."+type+"."+name)) {
-            		String value = entry.getValue().toString();
-            		String[] split = value.split("-");
-            		if("5".equals(split[0])) {
-            			String str = "";
-            			for (int i = 1;i<split.length;i++) {
-							str+=split[i];
-						}
-            			return str;
-            		}
-            	}
-            }
+        	if(entrySet == null) {
+	        	File file = new File("lkadParamInfo.properties");
+	        	inStream = new FileInputStream(file); 
+	            Properties prop = new Properties();
+	            prop.load(inStream);
+	            entrySet = prop.entrySet();//返回的属性键值对实体
+        	}
+        	if(entrySet != null) {
+	            for (Map.Entry<Object, Object> entry : entrySet) {
+	            	if(entry.getKey().equals(url+"."+type+"."+name)) {
+	            		String value = entry.getValue().toString();
+	            		String[] split = value.split("-");
+	            		if("5".equals(split[0])) {
+	            			String str = "";
+	            			for (int i = 1;i<split.length;i++) {
+								str+=split[i];
+							}
+	            			return str;
+	            		}
+	            	}
+	            }
+        	}
         } catch (Exception e) {
            // e.printStackTrace();
         } finally {
@@ -4021,9 +4021,8 @@ public class LKADController {
         	}
         }       
     	
-    	
-    	
-    	if(enToCn) { //开启入参翻译
+        //有道翻译入口已关闭
+    	/*if(enToCn) { //开启入参翻译
 			try {
 				RestTemplate restTemplate = new RestTemplate();
 				String data = "http://fanyi.youdao.com/translate?&doctype=json&type=EN2ZH_CN&i="+toHump(name);
@@ -4046,7 +4045,7 @@ public class LKADController {
 			} catch (Exception e1) {
 				return name;
 			}
-		}
+		}*/
     	return name;
     }
     

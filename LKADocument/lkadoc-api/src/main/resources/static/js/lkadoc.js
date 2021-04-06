@@ -231,7 +231,6 @@ $(function(){
 	$.contextMenu({
         selector: '.activeTab', 
         callback: function(key, options) {
-            var m = "clicked: " + key;
             let tabBoxs =  $('#tabBox>li')
             if(key == 'now'){ //关闭当前页
             	var num = $(".activeTab").attr("data");
@@ -276,16 +275,148 @@ $(function(){
     		} 
         },
         items: {
-            /*"edit": {name: "Edit", icon: "edit"},
-            "cut": {name: "Cut", icon: "cut"},
-            "copy": {name: "Copy", icon: "copy"},
-            "paste": {name: "Paste", icon: "paste"},
-            "delete": {name: "Delete", icon: "delete"},
-            "sep1": "---------",
-            "quit": {name: "Quit", icon: "quit"}*/
         	"now": {name: "关闭当前页", icon: ""},
         	"other": {name: "关闭其它页", icon: ""},
         	"all": {name: "全部关闭", icon: ""},
+        	"sep1": "---------",
+        	"quit": {name: "退出", icon: function(){
+                return 'context-menu-icon context-menu-icon-quit';
+            }}
+        }
+    });
+	
+	//右键菜单
+	$.contextMenu({
+        selector: '.addinfo', 
+        callback: function(key,t) {
+        	let value = $(this).text();
+    		let type = $(this).parents(".hovertable").find(".reqcls").length > 0 ?1:2;
+    		let methodurl = $(this).parents(".hovertable").parent().parent().find(".method-URL").html();
+    		let content = methodurl+"."+type+"."+value;
+    		var tr = this;
+    		if(key == 'add'){ //添加高亮样式
+            	var tit = $(this).attr("add");
+            	if(tit == 1){
+    				$.ajax({
+    					url:"lkad/delParamInfo",
+    				    type:"post",
+    				    dataType:"text",
+    				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
+    				    success:function(data){
+    				    	$(tr).css("color","#000").css("text-shadow","none");
+							$(tr).removeAttr("add");
+							$(tr).attr("title",'右键可修改参数状态');
+    				    },
+    				    error:function(){
+    				    	alert("连接服务器异常");
+    				    }
+    				})
+        		}else{
+        			let modaltype = 1;
+			    	let modalcontent = '高亮状态';
+					$.ajax({
+						url:"lkad/addParamInfo",
+					    type:"post",
+					    dataType:"text",
+					    data:{"value":value,"type":type,"url":methodurl,"modaltype":modaltype,"content":modalcontent,'random':Math.random(),'serverName':getServerName()},
+					    success:function(data){
+					    	getParamInfo();
+					    },
+					    error:function(){
+					    	alert("连接服务器异常");
+					    }
+					})
+				}
+            }
+    		
+            if(key == 'del'){ //添加删除标签
+            	var tit = $(this).attr("del");
+            	if(tit == 3){
+    				$.ajax({
+    					url:"lkad/delParamInfo",
+    				    type:"post",
+    				    dataType:"text",
+    				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
+    				    success:function(data){
+    				    	$(tr).css("text-decoration","none");
+							$(tr).removeAttr("del");
+							$(tr).attr("title",'右键可修改参数状态');
+    				    },
+    				    error:function(){
+    				    	alert("连接服务器异常");
+    				    }
+    				})
+        		}else{
+        			let modaltype = 3;
+			    	let modalcontent = '删除状态，参数不会传输到服务器';
+					$.ajax({
+						url:"lkad/addParamInfo",
+					    type:"post",
+					    dataType:"text",
+					    data:{"value":value,"type":type,"url":methodurl,"modaltype":modaltype,"content":modalcontent,'random':Math.random(),'serverName':getServerName()},
+					    success:function(data){
+					    	getParamInfo();
+					    },
+					    error:function(){
+					    	alert("连接服务器异常");
+					    }
+					})
+				}
+            }
+            if(key == 'diy'){ //修改作用
+            	var tit = $(this).attr("diy");
+            	var oldName = $(this).attr("oldName");
+            	if(value.lastIndexOf('.') != -1){
+    	    		value = value.substring(value.lastIndexOf('.')+1);
+    	    	}
+    	    	if(value.lastIndexOf('[]') != -1){
+    	    		value = value.substring(0,value.lastIndexOf('[]'));
+    	    	}
+            	if(tit == 5){
+    				$.ajax({
+    					url:"lkad/delParamInfo",
+    				    type:"post",
+    				    dataType:"text",
+    				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
+    				    success:function(data){
+    				    	getParamInfo();
+    				    	$(tr).next().html(oldName);
+							$(tr).removeAttr("diy");
+							$(tr).removeAttr("oldName");
+    				    },
+    				    error:function(){
+    				    	alert("连接服务器异常");
+    				    }
+    				})
+        		}else{
+        			let modaltype = 5;
+			    	let modalcontent = prompt("请输入作用","");
+			    	if(modalcontent==""){
+			    		return;
+			    	}
+					$.ajax({
+						url:"lkad/addParamInfo",
+					    type:"post",
+					    dataType:"text",
+					    data:{"value":value,"type":type,"url":methodurl,"modaltype":modaltype,"content":modalcontent,'random':Math.random(),'serverName':getServerName()},
+					    success:function(data){
+					    	getParamInfo();
+					    },
+					    error:function(){
+					    	alert("连接服务器异常");
+					    }
+					})
+				}
+            }
+        },
+        items: {
+        	"add": {name:"高亮状态", icon:""},
+        	"del": {name:"删除状态", icon:""},
+        	"diy": {name:"自定义作用", icon:""},
+        	"sep1": "---------",
+        	"quit": {name: "退出", icon: function(){
+                return 'context-menu-icon context-menu-icon-quit';
+            }}
         }
     });
 	
@@ -521,20 +652,33 @@ $(function(){
 							//匹配上，设置样式
 							$(this).attr("title",arrs[1]);
 							if(arrs[0] == 1){
-								$(this).css("color","#a00");
-							}else if(arrs[0] == 2){
-								$(this).css("color","#0a0");
+								$(this).css("color","#f00");
+								$(this).css("text-shadow","1px 1px 1px #000");
+								$(this).attr("add","1");
 							}else if(arrs[0] == 3){
-								$(this).css("color","#555").css("text-decoration","line-through");
-							}else if(arrs[0] == 4){
-								$(this).css("color","#3385ff");
+								$(this).css("text-decoration","line-through");
+								$(this).attr("del","3");
+							}else if(arrs[0] == 5){
+								$(this).attr("diy","5");
+								$(this).attr("oldName",$(this).next().text());
+								$(this).next().html(arrs[1]);
 							}else{
-								$(this).css("color","#000").css("text-decoration","none");
-								$(this).attr("title",'双击可添加参数标签信息');
+								/*$(this).css("color","#000").css("text-decoration","none");
+								$(this).css("text-shadow","none");
+								$(this).attr("title",'右键可修改参数状态');
+								$(this).removeAttr("add");
+								$(this).removeAttr("update");
+								$(this).removeAttr("del");
+								$(this).removeAttr("diy");*/
 							}
 						}else{
-							$(this).css("color","#000").css("text-decoration","none");
-							$(this).attr("title",'双击可添加参数标签信息');
+							/*$(this).css("color","#000").css("text-decoration","none");
+							$(this).css("text-shadow","none");
+							$(this).attr("title",'右键可修改参数状态');
+							$(this).removeAttr("add");
+							$(this).removeAttr("update");
+							$(this).removeAttr("del");
+							$(this).removeAttr("diy");*/
 						}
 					}catch(e){
 						return false;
@@ -546,7 +690,7 @@ $(function(){
 	getParamInfo();
 	
 	//双击属性弹出窗体
-	$(".right-box").off('dblclick','.addinfo');
+/*	$(".right-box").off('dblclick','.addinfo');
 	$(".right-box").on("dblclick",".addinfo",function(){
 		var tit = $(this).attr("title");
 		//获取要保存的属性
@@ -636,12 +780,12 @@ $(function(){
 		        }
 		    }
 		}
-	})
+	})*/
 	
 	
 	/*************************接口标签设置***************************/
 	//设置高亮参数判断
-	function getParamInfo2(){
+/*	function getParamInfo2(){
 		$.getJSON("lkad/getParamInfo",{'random':Math.random(),'serverName':getServerName()},function(data){
 			if(data != null && data != 'null'){
 				$(".secondary").each(function(){
@@ -678,10 +822,10 @@ $(function(){
 			}
 		});
 	}
-	getParamInfo2();
+	getParamInfo2();*/
 	
 	//双击属性弹出窗体
-	$(".navBox").off("dblclick",".secondary");
+/*	$(".navBox").off("dblclick",".secondary");
 	$(".navBox").on("dblclick",".secondary",function(){
 		var tit = $(this).attr("title");
 		//获取要保存的属性
@@ -761,7 +905,7 @@ $(function(){
 		        }
 		    }
 		}
-	})
+	})*/
 	/****************************************************************/
 	
 	
@@ -1864,7 +2008,7 @@ function buildMenu(doc,tVersion,num) {
     		var updateTime = methods[i].updateTime;
     		var mVersion = methods[i].version;
     		var imgName = mVersion == tVersion?"file2.gif":"file.gif";
-    		str += "<li data='"+met_index+"' urlname='"+methods[i].name+"' class='secondary' title='双击可添加接口标签信息'>" +
+    		str += "<li data='"+met_index+"' urlname='"+methods[i].name+"' class='secondary' title=''>" +
     				"<input type='hidden' value='"+methods[i].name+"-"+methods[i].url+"'>" +
     				"<h5><img src='img/"+imgName+"' height='10px' width='10px'><span>"+num+"."+num2+"."+methods[i].name+"</span></h5></li>";
     		var request = methods[i].request;
@@ -1919,7 +2063,7 @@ function buildParams(doc,type,loc,flag,contentType){
 				if(type=="req" || type=="param"){
 					str+=buildParams(arr,"param",val,2);
 				}else{
-					str+="<tr class='parentParam'><td class='addinfo' title='双击可添加参数标签信息'>"+val+"</td><td>"+name+"</td><td>"+description+"</td><td></td></tr>"
+					str+="<tr class='parentParam'><td class='addinfo' title='右键可添加参数状态'>"+val+"</td><td>"+name+"</td><td>"+description+"</td><td></td></tr>"
 					str+=buildParams(arr,"resp",val,2);
 				}
 			}else{
@@ -1932,22 +2076,22 @@ function buildParams(doc,type,loc,flag,contentType){
 						str+=buildParams(model.propertyModels,"resps",val,3);
 					}
 					if(type=="params"){
-						str+="<tr class='parentParam'><td class='paramValue addinfo' title='双击可添加参数标签信息'>"+val+"</td><td class='paramInfo'>"+name+"</td><td>"+description+"</td><td class='dataType paramType testData'></td><td></td><td colspan='2'></td></tr>"								
+						str+="<tr class='parentParam'><td class='paramValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='paramInfo'>"+name+"</td><td>"+description+"</td><td class='dataType paramType testData'></td><td></td><td colspan='2'></td></tr>"								
 						str+=buildParams(model.propertyModels,"params",val,2);
 					}else if(type=="resps"){
-						str+="<tr class='parentParam'><td class='addinfo' title='双击可添加参数标签信息'>"+val+"</td><td>"+name+"</td><td>"+description+"</td><td></td></tr>"
+						str+="<tr class='parentParam'><td class='addinfo' title='右键可修改参数状态'>"+val+"</td><td>"+name+"</td><td>"+description+"</td><td></td></tr>"
 						str+=buildParams(model.propertyModels,"resps",val,2);
 					}
 				}else{
 					var val = array != null && (array==true || array=='true')?value+'[]':value;
 					if(type=="req" || type=="param" || type=="params"){
-						str+="<tr><td class='paramValue addinfo' title='双击可添加参数标签信息'>"+val+"</td><td class='paramInfo'>"+name+"</td><td class='isRequired'>"+
+						str+="<tr><td class='paramValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='paramInfo'>"+name+"</td><td class='isRequired'>"+
 						(required==true?'yes':'no')+"</td><td class='dataType'>"+dataType+"</td><td class='paramType'>"+paramType+"</td><td>"+
 						(dataType=='MultipartFile'?"<form class='upload' enctype='multipart/form-data'>"+"<input type='file' class='testData' name='"+value+"'>"+"</form>":
 							dataType=='MultipartFile[]'?"<form class='upload' enctype='multipart/form-data'>"+"<input type='hidden' value='"+value+"' class='fileValue'><input type='file' class='testData' name='"+value+"'><input type='button' class='subFile' value='-'><input type='button' class='addFile' value='+'></form>":"<input class='testData tdcss' type='"+(dataType=='Date'?'date':'text')+"' value='"+testData+"'>"+
 						(dataType==null?"":dataType.indexOf('[]')==-1?"":"<input type='button' class='subtract' value='-'><input type='button' class='add' value='+'>")+"</td><td>"+description+"</td></tr>")
 					}else{
-						str+="<tr><td class='respValue addinfo' title='双击可添加参数标签信息'>"+val+"</td><td class='respInfo'>"+name+"</td><td class='respType'>"+dataType+"</td><td>"+description+"</td></tr>"
+						str+="<tr><td class='respValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='respInfo'>"+name+"</td><td class='respType'>"+dataType+"</td><td>"+description+"</td></tr>"
 					}
 				}
 			}

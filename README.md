@@ -22,6 +22,17 @@
 
 ### 版本更新说明：
 
+#### lkadoc 1.3.5于2021年4月6日发布：
+1.新增排序功能，@LKATtype、@LKAMethod注解增加order属性，值越小排序越靠前
+2.新增常用类型自动识别：LocalDate、LocalDateTime、BigDecimal、Vector、TreeSet等常用集合
+3.取消自动翻译功能，删除@LKADocument注解的enToCn属性（影响性能，并且大批量翻译容易被有道后台拉黑名单）
+4.取消双击属性弹窗添加标签功能，改为右键菜单操作
+5.增加属性右键菜单功能，主要包括（添加高亮状态，添加删除状态，添加自定义作用）应用场景：
+	a.在修改老接口时，可以给新增的字段或删除的字段添加高亮或删除状态，方便前端同事快速定位接口字段调整
+	b.处于删除状态的字段在调试接口时不会传参到后台，方便接口的全方位调试
+	c.当@LKADocument的sconAll=true时，会把接口的所有参数扫描出来，部分没有加@LKAProperty和@LKAParam注	解的参数并没有设置作用描述之类的信息，那么就可以通过“自定义作用”动态的添加该参数的作用，当然也可以修改已	经设置好的作用。
+	d.如果想取消高亮、删除或自定义作用的话，右键再点击相应的操作即可。
+
 #### lkadoc 1.3.4于2021年3月31日发布:
 
 1.增加泛形响应参数自动识别
@@ -1057,16 +1068,7 @@ public ApiResult getObj() {
 
 # 6. 辅助功能
 
-## 6.1 自定义接口或属性标签
-&emsp;&emsp;如果我们要对某个特定的接口或属性增加一些说明信息，例如某个接口新增加了一个属性或修改了某个属性等等，这时我们可以在UI界面给接口或属性增加相应的标签即可。
-如果想删除该标签，就在接口或属性名称上再次双击就可以删除了。
-
-
-![](https://img-blog.csdnimg.cn/20200731155046949.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-![](https://img-blog.csdnimg.cn/20200731155103181.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 6.2 导出PDF或MarkDown文档
+## 6.1 导出PDF或MarkDown文档
 &emsp;&emsp;如果需提供接口文档给第三方进行对接，可以使用Lkadoc的导出功能，Lkadoc支持导出标准化格式的PDF或MarkDown接口文档，功能非常强大，能满足大部分场景需求。（目前只支持导出本地项目的接口）
 &emsp;&emsp;导出PDF文档前需要检查系统是否存在simsun.ttc字体，如果系统没有这个字体的话，导出PDF文档中文不能正确显示。 windows系统字体路径：C:/Windows/fonts/simsun.ttc
 linux系统字体路径：/usr/share/fonts/win/simsun.ttc
@@ -1081,23 +1083,13 @@ PDF效果截图：
 ![MD效果图](https://img-blog.csdnimg.cn/20200805180546345.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
 
 
-## 6.3 多项目聚合
+## 6.2 多项目聚合
 &emsp;&emsp;当我们在使用微服务或多个子项目时，我们可以把多个项目的接口文档信息聚合到一个UI界面，只需要在@LKADocument注解配置serverNames属性即可：
 &emsp;&emsp;serverNames="租房系统-192.168.0.77:9010,缴费系统-192.168.0.77:8888"
 &emsp;&emsp;多个项目之间用英文“,”号隔开，“-”符号左右是项目名称，右边是项目地址，也可以是域名，这样我们就可以在UI界面自由的在当前项目和配置好的其它项目切换接口信息了。
 
 切换项目后的效果图：
 ![](https://img-blog.csdnimg.cn/20200731155208356.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 6.4 UI风格切换
-
-```
-如果你对某一种UI界面颜色腻了，Lkadoc还支持切换不同风格的颜色，满足你不安分的心。
-```
-
-切换风格效果图：
-
-![](https://img-blog.csdnimg.cn/20200731155224937.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
 
 # 7. 数据校验
 

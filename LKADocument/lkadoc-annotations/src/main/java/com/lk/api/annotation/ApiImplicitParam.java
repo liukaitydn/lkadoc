@@ -61,13 +61,13 @@ public @interface ApiImplicitParam {
 	boolean[] isArrays() default{};
 	
 	/*数据校验规则*/
-	String[] valids() default{};
+	//String[] valids() default{};
 	/*数据校验消息*/
-	String[] msgs() default{};
+	//String[] msgs() default{};
 	/*数值范围*/
-	String range() default "";
+	//String range() default "";
 	/*集合大小限制*/
-	String size() default "";
+	//String size() default "";
 	/*字符串大小限制*/
-	String length() default "";
+	//String length() default "";
 }

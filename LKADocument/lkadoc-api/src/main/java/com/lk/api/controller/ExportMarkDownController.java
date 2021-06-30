@@ -60,7 +60,7 @@ public class ExportMarkDownController {
 		Map<String,String> result = new HashMap<String, String>();
 		
 		//获取数据
-		Map<String, Object> data = lkadController.loadLKADocument(serverName);
+		Map<String, Object> data = lkadController.loadLKADocument(serverName,"",0);
 		
 		//创建文件
 		String projectName = data.get("projectName").toString();

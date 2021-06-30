@@ -37,6 +37,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.Spring;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -110,6 +112,9 @@ public class LKADController {
 	/* 扫描所有参数 */
 	@Value("${lkad.sconAll:false}")
 	private Boolean sconAll;
+	/*项目接口文档密码*/
+	@Value("${lkad.password:}")
+	private String password;
 
 	private int reqNum = 0,respNum = 0,proNum = 0;
 	
@@ -198,21 +203,49 @@ public class LKADController {
 	}
 	
 	/**
+	 * 判断是否需要密码
+	 * @return
+	 */
+	@GetMapping("isPwd")
+	public int isPwd() {
+		if("".equals(basePackages)) {
+			Map<String, Object> beans = applicationContext.getBeansWithAnnotation(LKADocument.class);
+			boolean bool = false;
+			if(beans != null && beans.size()>0) {
+				Set<String> keySet = beans.keySet();
+				for (String key : keySet) {
+					Object obj = beans.get(key);
+					Class<? extends Object> bootClass = obj.getClass();
+					LKADocument annotation = bootClass.getAnnotation(LKADocument.class);
+					password = annotation.password();
+				}
+			}
+		}
+		if(password == null || "".equals(password)) return 0;
+		else return 1;
+	}
+	
+	/**
 	 * 	加载接口文档所有信息
 	 * @param serverName 服务器名称
 	 * @return Map 集合
 	 * @throws Exception 异常
 	 */
 	@GetMapping("doc")
-	public Map<String, Object> loadLKADocument(String serverName) throws Exception {
-		
-		if(serverName != null && !"".equals(serverName)) {
-			RestTemplate restTemplate = new RestTemplate();
-			Map forObject = restTemplate.getForObject(serverName+"/lkad/doc", Map.class);
-			return forObject;
-		}
+	public Map<String, Object> loadLKADocument(String serverName,String pwd,int type) throws Exception {
 		String bpk = "";
 		Map<String, Object> map = new HashMap<String, Object>();
+		if(serverName != null && !"".equals(serverName)) {
+			RestTemplate restTemplate = new RestTemplate();
+			try {
+				map = restTemplate.getForObject(serverName+"/lkad/doc?pwd="+pwd+"&type="+type, Map.class);
+				return map;
+			} catch (Exception e) {
+				map.put("error",serverName+"服务器连接失败！");
+				return map;
+			}
+		}
+		
 		if(!"".equals(basePackages)) {
 			bpk = basePackages;
 			map.put("projectName", projectName);
@@ -245,6 +278,7 @@ public class LKADController {
 					map.put("serverNames", annotation.serverNames());
 					map.put("enabled", annotation.enabled()?"yes":"no");
 					map.put("version",annotation.version());
+					password = annotation.password();
 					if(!annotation.enabled()) {
 						bpk = "";
 						map.put("error", "Lkadoc接口文档功能已关闭");
@@ -260,15 +294,26 @@ public class LKADController {
 				return map;
 			}
 		}
+		
+		//密码判断
+		if(password != null && !"".equals(password) && type == 1) {
+			if(!password.equals(pwd)) {
+				bpk = "";
+				map.put("error", "密码不正确，您无权操作文档");
+				return map;
+			}
+		}
+		
 		//排序算法
 		List<TypeModel> typeModels = scanType(bpk.split(","));
 		//类排序
 		Collections.sort(typeModels);
+		List<MethodModel> tempMethod = new ArrayList<>();
 		for (TypeModel typeModel : typeModels) {
 			List<MethodModel> methods = typeModel.getMethodModels();
-			//方法排序
-			Collections.sort(methods);
-			for (MethodModel method : methods) {
+			Iterator<MethodModel> iterator = methods.iterator();
+			while(iterator.hasNext()) {
+				MethodModel method = iterator.next();
 				List<ResposeModel> ResposeModels = method.getRespose();
 				List<ResposeModel> rms = new ArrayList<ResposeModel>();
 				List<ResposeModel> rms2 = new ArrayList<ResposeModel>();
@@ -282,7 +327,26 @@ public class LKADController {
 				int n = 0;
 				sortResposeModel(rms,rms2,n);
 				method.setRespose(rms);
+				if(!"".equals(method.getDirectory())) {
+					tempMethod.add(method);
+					iterator.remove();
+				}
 			}
+		}
+		
+		//目录转移
+		for (TypeModel typeModel : typeModels) {
+			Iterator<MethodModel> iterator = tempMethod.iterator();
+			while(iterator.hasNext()) {
+				MethodModel methodModel = iterator.next();
+				if(typeModel.getName().equals(methodModel.getDirectory())) {
+					List<MethodModel> methodModels = typeModel.getMethodModels();
+					methodModels.add(methodModel);
+					iterator.remove();
+				}
+			}
+			//方法排序
+			Collections.sort(typeModel.getMethodModels());
 		}
 		map.put("apiDoc",typeModels);
 		return map;
@@ -421,6 +485,7 @@ public class LKADController {
 							methodModel.setDownload(lkaMethod.download());
 							methodModel.setToken(lkaMethod.token());
 							methodModel.setOrder(lkaMethod.order());
+							methodModel.setDirectory(lkaMethod.directory());
 						}else {
 							ApiOperation lkaMethod  = method.getAnnotation(ApiOperation.class);
 							if(lkaMethod.hidden())continue;
@@ -438,6 +503,7 @@ public class LKADController {
 							methodModel.setDownload(lkaMethod.download());
 							methodModel.setToken(lkaMethod.token());
 							methodModel.setOrder(lkaMethod.order());
+							methodModel.setDirectory(lkaMethod.directory());
 						}
 						
 						for (Map<String, Object> map : methodURLs) {
@@ -2829,10 +2895,18 @@ public class LKADController {
 						methodModel.setRespose(respose);
 						methodModels.add(methodModel);
 					}
-					//方法排序
-					//Collections.sort(methodModels);
 					typeModel.setMethodModels(methodModels);
-					typeModels.add(typeModel);
+					//目录合并
+					boolean mergeBool = false;
+					for (TypeModel tm : typeModels) {
+						if(tm.getName().equals(typeModel.getName())) {
+							List<MethodModel> mms = typeModel.getMethodModels();
+							tm.getMethodModels().addAll(mms);
+							mergeBool = true;
+							break;
+						}
+					}
+					if(!mergeBool) typeModels.add(typeModel);
 				}
 			}
 		}

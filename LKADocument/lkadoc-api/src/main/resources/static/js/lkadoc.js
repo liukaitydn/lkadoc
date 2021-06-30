@@ -303,7 +303,7 @@ $(function(){
     				    dataType:"text",
     				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
     				    success:function(data){
-    				    	$(tr).css("color","#000").css("text-shadow","none");
+    				    	$(tr).css("color","#8b99b1").css("text-shadow","none");
 							$(tr).removeAttr("add");
 							$(tr).attr("title",'右键可修改参数状态');
     				    },
@@ -448,13 +448,30 @@ $(function(){
 		bindResize(document.getElementById('line'));
 	})
 	
-	function reloadDoc(serverName){
+	function reloadDoc(serverName,type){
+		let password = "";
+		if(type == 1){
+			$.ajax({
+			    url:"lkad/isPwd",
+			    type:"get",
+			    dataType:"json",
+			    async:false,
+			    data:{"serverName":serverName,"pwd":password,"type":type},
+			    success:function(data){
+			    	if(data == 1){
+						//需要密码
+						password = prompt("请输入密码","");
+					}
+			    }
+			})
+		}
+		
 		$.ajax({
 		    url:"lkad/doc",
 		    type:"get",
 		    dataType:"json",
 		    async:false,
-		    data:{"serverName":serverName},
+		    data:{"serverName":serverName,"pwd":password,"type":type},
 		    success:function(data){
 		    	$(".navBox").html('');
 		    	if(data != null){
@@ -476,7 +493,7 @@ $(function(){
 									var ips = data.serverNames.split(",");
 									if(ips.length > 0){
 										for(var i = 0;i<ips.length;i++){
-											var arrips = ips[i].split("-");
+											var arrips = ips[i].split("^");
 											if(arrips.length < 2){
 												$("#changeProject").append('<option value="'+ips[i]+'">'+ips[i]+'</option>');
 											}else{
@@ -506,25 +523,25 @@ $(function(){
 		    }
 		});
 		
-		$(".isRequired").each(function(){
-		if($(this).html() == 'yes'){
-			$(this).css("color","#f00");
+		/*$(".isRequired").each(function(){
+		if($(this).html() == '是'){
+			$(this).css("color","#6fb4ce");
 		}
-		})
+		})*/
 		
 		
 		$(".paramType").each(function(){
 			if($(this).html() == 'header'){
-				$(this).css("color","#f00");
+				$(this).css("color","#f1f1f1");
 			}
 			if($(this).html() == 'path'){
-				$(this).css("color","#0f0");
+				$(this).css("color","#6fb4ce");
 			}
 		})
 		
 		$(".method-URL").each(function(){
 			if($(this).html() == '该API未设置请求路径'){
-				$(this).css("color","#f00");
+				$(this).css("color","#red");
 			}
 		})
 	}
@@ -543,7 +560,7 @@ $(function(){
 	
 	//搜索接口名称
 	$("#search-button").click(function(){
-		reloadDoc(getServerName());
+		reloadDoc(getServerName(),0);
 		indexFlag=null
 		$("#tabBox>li").hide();
 		$(".method-table").hide();
@@ -551,15 +568,15 @@ $(function(){
 	});
 	
 	//切换项目
-	$("#changeProject").change(function(){
-		reloadDoc(getServerName());
+	$("#changeProjectButton").click(function(){
+		reloadDoc(getServerName(),1);
 		indexFlag=null
 		$("#tabBox>li").hide();
 		$(".method-table").hide();
 		$(".welcome").show();
 	});
 	
-	reloadDoc('');
+	reloadDoc('',1);
 	
 	//导出PDF，MD文档
 	$("#exportPdf").click(function(){
@@ -652,8 +669,8 @@ $(function(){
 							//匹配上，设置样式
 							$(this).attr("title",arrs[1]);
 							if(arrs[0] == 1){
-								$(this).css("color","#f00");
-								$(this).css("text-shadow","1px 1px 1px #000");
+								$(this).css("color","#fff");
+								$(this).css("text-shadow","1px 1px 1px #fff");
 								$(this).attr("add","1");
 							}else if(arrs[0] == 3){
 								$(this).css("text-decoration","line-through");
@@ -688,227 +705,7 @@ $(function(){
 		});
 	}
 	getParamInfo();
-	
-	//双击属性弹出窗体
-/*	$(".right-box").off('dblclick','.addinfo');
-	$(".right-box").on("dblclick",".addinfo",function(){
-		var tit = $(this).attr("title");
-		//获取要保存的属性
-		//let value = $(this).html();
-		let value = this.firstChild.nodeValue;
-		let type = $(this).parents(".hovertable").find(".reqcls").length > 0 ?1:2;
-		let methodurl = $(this).parents(".hovertable").parent().parent().find(".method-URL").html();
-		let content = methodurl+"."+type+"."+value;
-		//console.log(content);
-		if(tit != '双击可添加参数标签信息'){
-			var bool = confirm("您确定要删除参数标签信息吗？");
-			if(bool){
-				$.ajax({
-					url:"lkad/delParamInfo",
-				    type:"post",
-				    dataType:"text",
-				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
-				    success:function(data){
-				    	getParamInfo();
-						alert(data);
-				    },
-				    error:function(){
-				    	alert("连接服务器异常");
-				    }
-				})
-			}
-		}else{
-			//获取弹窗元素
-			let modal = document.getElementById("simpleModal");
-		    
-		    modal.style.display = "block";
-		    
-		    $("#modalconfirm").click(function(){
-		    	let modaltype = $("#modaltype").val();
-		    	let modalcontent = $("#modaltext").val();
-		    	if(modaltype == 5){
-			    	if(value.lastIndexOf('.') != -1){
-			    		value = value.substring(value.lastIndexOf('.')+1);
-			    	}
-			    	console.log(value);
-			    	if(value.lastIndexOf('[]') != -1){
-			    		value = value.substring(0,value.lastIndexOf('[]'));
-			    	}
-			    	console.log(value);
-		    	}
-				$('#modalconfirm').off(); //解除所有绑定事件
-				modal.style.display = "none";
-				$.ajax({
-					url:"lkad/addParamInfo",
-				    type:"post",
-				    dataType:"text",
-				    data:{"value":value,"type":type,"url":methodurl,"modaltype":modaltype,"content":modalcontent,'random':Math.random(),'serverName':getServerName()},
-				    success:function(data){
-				    	getParamInfo();
-						alert(data);
-				    },
-				    error:function(){
-				    	alert("连接服务器异常");
-				    }
-				})
-		    });
-		    
-		    //获取关闭弹窗按钮元素
-		    let closeBtn = document.getElementsByClassName("closeBtn")[0];
-		 
-		    //监听关闭弹窗事件
-		    closeBtn.addEventListener("click",closeModal);
-		 
-		    //监听window关闭弹窗事件
-		    window.addEventListener("click",outsideClick);
-		 
-		    //关闭弹框事件
-		    function closeModal () {
-		        modal.style.display = "none";
-		        $('#modalconfirm').off(); //解除所有绑定事件
-		    }
-		    $("#modalcancel").click(function(){
-		    	 modal.style.display = "none";
-		    	 $('#modalconfirm').off(); //解除所有绑定事件
-		    });
-		    
-		    //outsideClick
-		    function outsideClick (e) {
-		        if(e.target == modal){
-		            modal.style.display = "none";
-		            $('#modalconfirm').off(); //解除所有绑定事件
-		        }
-		    }
-		}
-	})*/
-	
-	
-	/*************************接口标签设置***************************/
-	//设置高亮参数判断
-/*	function getParamInfo2(){
-		$.getJSON("lkad/getParamInfo",{'random':Math.random(),'serverName':getServerName()},function(data){
-			if(data != null && data != 'null'){
-				$(".secondary").each(function(){
-					try{
-						let value = $(this).find("input").val();
-						let type = 3;
-						let methodurl = "method-api";
-						let content = methodurl+"."+type+"."+value;
-						let str = data[content];
-						if(str != null && str.length>0){
-							var arrs = str.split("-");
-							//匹配上，设置样式
-							$(this).attr("title",arrs[1]);
-							if(arrs[0] == 1){
-								$(this).css("color","#a00");
-							}else if(arrs[0] == 2){
-								$(this).css("color","#0a0");
-							}else if(arrs[0] == 3){
-								$(this).css("color","#555").css("text-decoration","line-through");
-							}else if(arrs[0] == 4){
-								$(this).css("color","#3385ff");
-							}else{
-								$(this).css("color","#000").css("text-decoration","none");
-								$(this).attr("title",'双击可添加接口标签信息');
-							}
-						}else{
-							$(this).css("color","#000").css("text-decoration","none");
-							$(this).attr("title",'双击可添加接口标签信息');
-						}
-					}catch(e){
-						return false;
-					}
-				})
-			}
-		});
-	}
-	getParamInfo2();*/
-	
-	//双击属性弹出窗体
-/*	$(".navBox").off("dblclick",".secondary");
-	$(".navBox").on("dblclick",".secondary",function(){
-		var tit = $(this).attr("title");
-		//获取要保存的属性
-		//let value = $(this).html();
-		let value = $(this).find("input").val();
-		let type = 3;
-		let methodurl = "method-api";
-		let content = methodurl+"."+type+"."+value;
-		//console.log(content);
-		if(tit != '双击可添加接口标签信息'){
-			var bool = confirm("您确定要删除接口标签信息吗？");
-			if(bool){
-				$.ajax({
-					url:"lkad/delParamInfo",
-				    type:"post",
-				    dataType:"text",
-				    data:{"value":value,"type":type,"url":methodurl,'random':Math.random(),'serverName':getServerName()},
-				    success:function(data){
-				    	getParamInfo2();
-						alert(data);
-				    },
-				    error:function(){
-				    	alert("连接服务器异常");
-				    }
-				})
-			}
-		}else{
-			//获取弹窗元素
-			let modal = document.getElementById("simpleModal");
-		    
-		    modal.style.display = "block";
-		    
-		    $("#modalconfirm").click(function(){
-		    	let modaltype = $("#modaltype").val();
-		    	let modalcontent = $("#modaltext").val();
-				$('#modalconfirm').off(); //解除所有绑定事件
-				modal.style.display = "none";
-				$.ajax({
-					url:"lkad/addParamInfo",
-				    type:"post",
-				    dataType:"text",
-				    data:{"value":value,"type":type,"url":methodurl,"modaltype":modaltype,"content":modalcontent,'random':Math.random(),'serverName':getServerName()},
-				    success:function(data){
-				    	getParamInfo2();
-						alert(data);
-				    },
-				    error:function(){
-				    	alert("连接服务器异常");
-				    }
-				})
-		    });
-		    
-		    //获取关闭弹窗按钮元素
-		    let closeBtn = document.getElementsByClassName("closeBtn")[0];
-		 
-		    //监听关闭弹窗事件
-		    closeBtn.addEventListener("click",closeModal);
-		 
-		    //监听window关闭弹窗事件
-		    window.addEventListener("click",outsideClick);
-		 
-		    //关闭弹框事件
-		    function closeModal () {
-		        modal.style.display = "none";
-		        $('#modalconfirm').off(); //解除所有绑定事件
-		    }
-		    $("#modalcancel").click(function(){
-		    	 modal.style.display = "none";
-		    	 $('#modalconfirm').off(); //解除所有绑定事件
-		    });
-		    
-		    //outsideClick
-		    function outsideClick (e) {
-		        if(e.target == modal){
-		            modal.style.display = "none";
-		            $('#modalconfirm').off(); //解除所有绑定事件
-		        }
-		    }
-		}
-	})*/
-	/****************************************************************/
-	
-	
+
 	// 加载令牌
 	$(".headerKey").val($.cookie('tokenKey'));
 	$(".headerValue").val($.cookie('tokenValue'));
@@ -916,8 +713,6 @@ $(function(){
 	
 	$(".navBox").on("click","h3",function(){
 		$(this).next().toggle()
-		//$(".method-table").hide();
-		//$(".welcome").show();
 		if($(this).find("div").attr('class')=='d4'){
 			$(this).find("div").removeClass("d4");
 			$(this).find("div").addClass("d3");
@@ -980,24 +775,24 @@ $(function(){
 	$(".right-box").on("change",".ImplementWay",function(){
 		if($(this).val() == 'async'){
 			$(this).parent().find('.timeNumber').attr("disabled",true).attr("type","text");
-			$(this).parent().find('.timeNumber').css("backgroundColor","#ccc")
+			$(this).parent().find('.timeNumber').css("backgroundColor","#333")
 			$(this).parent().find('.timeNumber').val(1);
 		}else{
 			$(this).parent().find('.timeNumber').attr("disabled",false).attr("type","number");
-			$(this).parent().find('.timeNumber').css("backgroundColor","#fff")
+			$(this).parent().find('.timeNumber').css("backgroundColor","#8b99b1")
 		}
 	})
 	
 	
 	$(".saveToken").click(function(){
-		if($(this).val()=='edit'){
-			$(this).val('save');
+		if($(this).val()=='修改'){
+			$(this).val('锁定');
 			$(".headerKey").attr('disabled',false);
 			$(".headerKey").attr('type','text');
 			$(".headerValue").attr('disabled',false);
 			$(".headerValue").attr('type','text');
-		}else if($(this).val()=='save'){
-			$(this).val('edit');
+		}else if($(this).val()=='锁定'){
+			$(this).val('修改');
 			$(".headerKey").attr('disabled',true);
 			$(".headerKey").attr('type','password');
 			$(".headerValue").attr('disabled',true);
@@ -1135,7 +930,7 @@ $(function(){
 			headerJson['Content-Type']="application/x-www-form-urlencoded";
 		}
 		// 请求头令牌设置
-		if(token == 'authorize token'){
+		if(token == 'token：是'){
 			var tokenKey = $(".headerKey").val();
 			var tokenValue = $(".headerValue").val();
 			if(tokenKey != null && tokenValue != null && tokenKey != "" && tokenValue != ""){
@@ -1319,6 +1114,9 @@ $(function(){
 					    			collapsed:false,
 					    			withQuotes:false
 					    	}
+					    	if(data == null || data == ''){
+					    		data = '该接口无返回信息！';
+					    	}
 					    	if(conutNumber.val()==1){
 					    		try{
 						    		resposeData.jsonViewer(JSON.parse(data),options);
@@ -1368,15 +1166,15 @@ $(function(){
 				}
 			}else{
 				if(download == 'true'){
-					resposeData.html('<span style="color:red">暂时不支持远程项目下载调试！</span>')
+					resposeData.html('<span style="color:#6fb4ce">暂时不支持远程项目下载调试！</span>')
 					return;
 				}
 				if(fileInput != null && fileInput.length > 0){
-					resposeData.html('<span style="color:red">暂时不支持远程项目上传调试！</span>')
+					resposeData.html('<span style="color:#6fb4ce">暂时不支持远程项目上传调试！</span>')
 					return;
 				}
 				if(tl){
-					resposeData.html('<span style="color:red">暂时不支持远程项目数组传参调试！</span>')
+					resposeData.html('<span style="color:#6fb4ce">暂时不支持远程项目数组传参调试！</span>')
 					return;
 				}
 				$.ajax({
@@ -1395,6 +1193,9 @@ $(function(){
 				    	var options = {
 				    			collapsed:false,
 				    			withQuotes:false
+				    	}
+				    	if(data == null || data == ''){
+				    		data = '该接口无返回信息！';
 				    	}
 				    	if(conutNumber.val()==1){
 				    		try{
@@ -1987,7 +1788,7 @@ function buildMenu(doc,tVersion,num) {
 			}
 		}
 	}
-	var cImgName = vbool?"file2.gif":"file.gif";
+	var cImgName = vbool?"xinxin.png":"file.gif";
 	var searchText = $("#search-text").val();
 	var str = "<h3 class='obtain'><img src='img/"+cImgName+"' height='12px' width='12px'><span>"+num+"."+doc.name+"</span>&nbsp;&nbsp;<span class='docDescription'>"+doc.description+"</span></h3>";
 	if(methods != null && methods.length>0){
@@ -2007,15 +1808,15 @@ function buildMenu(doc,tVersion,num) {
     		var createTime = methods[i].createTime;
     		var updateTime = methods[i].updateTime;
     		var mVersion = methods[i].version;
-    		var imgName = mVersion == tVersion?"file2.gif":"file.gif";
+    		var imgName = mVersion == tVersion?"xinxin.png":"file.gif";
     		str += "<li data='"+met_index+"' urlname='"+methods[i].name+"' class='secondary' title=''>" +
     				"<input type='hidden' value='"+methods[i].name+"-"+methods[i].url+"'>" +
     				"<h5><img src='img/"+imgName+"' height='10px' width='10px'><span>"+num+"."+num2+"."+methods[i].name+"</span></h5></li>";
     		var request = methods[i].request;
     		var respose = methods[i].respose;
-    		var str2 ="<div id='method_"+met_index+"' class='method-table' hidden='hidden'><div>" +
+    		var str2 ="<div id='method_"+met_index+"' class='method-table' hidden='hidden'><div class='div-method-ul'>" +
     				"<ul class='method-ul'>" +
-    				"<li><span class='method-name-pdf'>"+methods[i].name+"</span>&nbsp;&nbsp;<span class='docDescription'>"+methods[i].description+"</span>&nbsp;&nbsp;<span>"+methods[i].version+"</span>&nbsp;&nbsp;<span style='color:red' class='method-token'>"+(methods[i].token==true?"authorize token":"")+"</span><span style='color:red'>&nbsp;&nbsp;"+(methods[i].contentType=="application/json" && methods[i].requestType=="GET"?"注意：ContentType为application/json传参时只支持post、put、delete请求！":"")+"</span></li>"+
+    				"<li><span class='method-name-pdf'>"+methods[i].name+"</span>&nbsp;&nbsp;<span class='docDescription'>"+methods[i].description+"</span>&nbsp;&nbsp;<span>version："+methods[i].version+"</span>&nbsp;&nbsp;<span class='method-token'>token："+(methods[i].token==true?"是":"否")+"</span><span>&nbsp;&nbsp;"+(methods[i].contentType=="application/json" && methods[i].requestType=="GET"?"注意：ContentType为application/json传参时只支持post、put、delete请求！":"")+"</span></li>"+
     				"<li class='method-requestParamInfo'><span>Method Type：</span><span class='method-requestType'>"+methods[i].requestType+"</span>&nbsp;&nbsp;&nbsp;<span><b>Content Type：</b></span><span class='content-TYPE'>"+methods[i].contentType+"</span></span>&nbsp;&nbsp;&nbsp;<span><b>URL：</b></span><span class='method-URL'>"+methods[i].url+"</li>"+
     				"<li class='method-requestParamInfo'><span></span><span><b>Author：</b>"+(methods[i].author==null || methods[i].author==''?'未设置':methods[i].author)+"&nbsp;&nbsp;&nbsp;<b>CreateTime：</b>"+(createTime==null || createTime==''?'未设置':createTime)+"&nbsp;&nbsp;&nbsp;<b>UpdateTime：</b>"+(updateTime==null || updateTime==''?'未设置':updateTime)+"</span><span><input class='method-download' type='hidden' value='"+methods[i].download+"'></span></li>"+
     				"</ul>"+
@@ -2086,10 +1887,10 @@ function buildParams(doc,type,loc,flag,contentType){
 					var val = array != null && (array==true || array=='true')?value+'[]':value;
 					if(type=="req" || type=="param" || type=="params"){
 						str+="<tr><td class='paramValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='paramInfo'>"+name+"</td><td class='isRequired'>"+
-						(required==true?'yes':'no')+"</td><td class='dataType'>"+dataType+"</td><td class='paramType'>"+paramType+"</td><td>"+
+						(required==true?'是':'否')+"</td><td class='dataType'>"+dataType+"</td><td class='paramType'>"+paramType+"</td><td>"+
 						(dataType=='MultipartFile'?"<form class='upload' enctype='multipart/form-data'>"+"<input type='file' class='testData' name='"+value+"'>"+"</form>":
 							dataType=='MultipartFile[]'?"<form class='upload' enctype='multipart/form-data'>"+"<input type='hidden' value='"+value+"' class='fileValue'><input type='file' class='testData' name='"+value+"'><input type='button' class='subFile' value='-'><input type='button' class='addFile' value='+'></form>":"<input class='testData tdcss' type='"+(dataType=='Date'?'date':'text')+"' value='"+testData+"'>"+
-						(dataType==null?"":dataType.indexOf('[]')==-1?"":"<input type='button' class='subtract' value='-'><input type='button' class='add' value='+'>")+"</td><td>"+description+"</td></tr>")
+						(dataType==null?"":dataType.indexOf('[]')==-1?"":"<input type='button' class='subtract' value='-'><input type='button' class='add' value='+'>")+"</td>")+"<td>"+description+"</td></tr>"
 					}else{
 						str+="<tr><td class='respValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='respInfo'>"+name+"</td><td class='respType'>"+dataType+"</td><td>"+description+"</td></tr>"
 					}
@@ -2102,13 +1903,13 @@ function buildParams(doc,type,loc,flag,contentType){
 				str+="<tr class='testSend'><td colspan='7'>"+
 				"<input type='button' class='testSendButton' value='执行接口'>&nbsp;&nbsp;"+
 				"执行次数：<input type='number' class='conutNumber' value='1'>&nbsp;&nbsp;" +
-				"时间间隔(ms)：<input class='timeNumber' disabled='true' style='background-color:#ccc' type='number' value='1'>&nbsp;&nbsp;"+
+				"时间间隔(ms)：<input class='timeNumber' disabled='true' style='background-color:#333' type='number' value='1'>&nbsp;&nbsp;"+
 				"执行方式：<select class='ImplementWay'><option value='async'>异步</option><option value='sync'>同步</option></select>"+
 				"<label><input type='checkbox' class='app-traditional' value='1'>阻止深度序列化</label>&nbsp;&nbsp;"+
 				"<input type='button' class='request-json' value='树状展示请求参数'>&nbsp;&nbsp;"+
 				"<input type='button' class='switch-resp-json' value='树状展示响应参数'>"+
 				"</td></tr>"
-				str+="<tr><td colspan='7' class='close-resposeData' align='center'><a style='font-size:12;color:blue;cursor:pointer'>打开调试窗口</a>" +
+				str+="<tr><td colspan='7' class='close-resposeData' align='center'><a style='font-size:12;color:#6fb4ce;cursor:pointer'>打开调试窗口</a>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status：</span><span class='request-status'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time：</span><span class='request-time'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successful：</span><span class='request-success'></span>" +
@@ -2120,17 +1921,17 @@ function buildParams(doc,type,loc,flag,contentType){
 		}
 	}else if(loc == "loc_method"){
 		if(type=="req" || type=="param"){
-			str+="<tr><td colspan='7' style='color:red'>该接口没有设置请求参数</td></tr>"
+			str+="<tr><td colspan='7' style='color:#8b99b1'>该接口没有设置请求参数</td></tr>"
 				str+="<tr class='testSend'><td colspan='7'>"+
 				"<input type='button' class='testSendButton' value='测试API请求'>&nbsp;&nbsp;"+
 				"执行次数：<input type='number' class='conutNumber' value='1'>&nbsp;&nbsp;" +
-				"时间间隔(ms)：<input class='timeNumber' disabled='true' style='background-color:#ccc' type='number' value='1'>&nbsp;&nbsp;"+
+				"时间间隔(ms)：<input class='timeNumber' disabled='true' style='background-color:#333' type='number' value='1'>&nbsp;&nbsp;"+
 				"执行方式：<select class='ImplementWay'><option value='async'>异步</option><option value='sync'>同步</option></select>&nbsp;&nbsp;"+
 				"<label><input type='checkbox' class='app-traditional' value='1'>阻止深度序列化</label>&nbsp;&nbsp;"+
 				"<input type='button' class='request-json' value='树状展示请求参数'>&nbsp;&nbsp;"+
 				"<input type='button' class='switch-resp-json' value='树状展示响应参数'>"+
 				"</td></tr>"
-				str+="<tr><td colspan='7' class='close-resposeData' align='center'><a style='font-size:12;color:blue;cursor:pointer'>打开调试窗口</a>" +
+				str+="<tr><td colspan='7' class='close-resposeData' align='center'><a style='font-size:12;color:#6fb4ce;cursor:pointer'>打开调试窗口</a>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status：</span><span class='request-status'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time：</span><span class='request-time'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successful：</span><span class='request-success'></span>" +
@@ -2139,7 +1940,7 @@ function buildParams(doc,type,loc,flag,contentType){
 						"</td></tr>"
 				str+="<tr><td colspan='7' class='resposeData' hidden='hidden'>暂无调试信息</td></tr>"
 		}else{
-			str+="<tr><td colspan='4' style='color:red'>该接口没有设置响应参数</td></tr>"
+			str+="<tr><td colspan='4' style='color:#8b99b1'>该接口没有设置响应参数</td></tr>"
 		}
 	}
 	if(loc == "loc_method"){
@@ -2162,3 +1963,4 @@ function filter(value,doc,arr){
 		}
 	}
 } 
+

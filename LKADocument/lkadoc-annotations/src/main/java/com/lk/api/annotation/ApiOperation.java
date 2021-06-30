@@ -40,4 +40,6 @@ public @interface ApiOperation {
 	boolean token() default true;
 	/*接口排序号*/
 	int order() default 1000000;
+	/*指定转移的目录*/
+	String directory() default "";
 }

@@ -63,7 +63,7 @@ public class DataCheckFilter implements Filter {
     
     
     
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) throws ServletException {/*
     	Map<String, Object> beans = applicationContext.getBeansWithAnnotation(LKADocument.class);
 		boolean bool = false;
 		if(beans != null && beans.size()>0) {
@@ -345,7 +345,7 @@ public class DataCheckFilter implements Filter {
 				}
 			}
 		}
-    }
+    */}
     
     
     

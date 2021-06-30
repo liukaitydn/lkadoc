@@ -23,7 +23,7 @@ import com.lk.api.filter.DataCheckFilter;
 @Target(ElementType.TYPE)
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Import({LKADController.class,ExportMarkDownController.class,ExportPDFController.class,DataCheckConfig.class,DataCheckFilter.class})
+@Import({LKADController.class,ExportMarkDownController.class,ExportPDFController.class/*,DataCheckConfig.class,DataCheckFilter.class*/})
 @ServletComponentScan
 public @interface LKADocument {
 	String basePackages() default "";
@@ -32,7 +32,8 @@ public @interface LKADocument {
 	String serverNames() default "";
 	String version() default "";
 	boolean enabled() default true;
-	boolean validation() default false;
+	//boolean validation() default false;
 	//boolean enToCn() default false;
 	boolean sconAll() default false;
+	String password() default "";
 }

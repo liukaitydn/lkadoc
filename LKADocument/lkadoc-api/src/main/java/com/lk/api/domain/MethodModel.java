@@ -21,6 +21,7 @@ public class MethodModel implements Comparable<MethodModel>{
 	private boolean download;
 	private boolean token;
 	private int order;
+	private String directory;
 	
 	/**
      * 将对象按名称典序升序排序
@@ -36,6 +37,14 @@ public class MethodModel implements Comparable<MethodModel>{
     	return this.getOrder()-o.getOrder();
     }
 	
+	public String getDirectory() {
+		return directory;
+	}
+
+	public void setDirectory(String directory) {
+		this.directory = directory;
+	}
+
 	public int getOrder() {
 		return order;
 	}

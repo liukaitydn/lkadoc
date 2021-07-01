@@ -36,9 +36,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.Spring;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -204,13 +201,12 @@ public class LKADController {
 	
 	/**
 	 * 判断是否需要密码
-	 * @return
+	 * @return int 1要、0不要
 	 */
 	@GetMapping("isPwd")
 	public int isPwd() {
 		if("".equals(basePackages)) {
 			Map<String, Object> beans = applicationContext.getBeansWithAnnotation(LKADocument.class);
-			boolean bool = false;
 			if(beans != null && beans.size()>0) {
 				Set<String> keySet = beans.keySet();
 				for (String key : keySet) {
@@ -228,9 +224,12 @@ public class LKADController {
 	/**
 	 * 	加载接口文档所有信息
 	 * @param serverName 服务器名称
+	 * @param pwd 密码
+	 * @param type 类型
 	 * @return Map 集合
 	 * @throws Exception 异常
 	 */
+	@SuppressWarnings("unchecked")
 	@GetMapping("doc")
 	public Map<String, Object> loadLKADocument(String serverName,String pwd,int type) throws Exception {
 		String bpk = "";
@@ -664,7 +663,7 @@ public class LKADController {
 													!field.isAnnotationPresent(ApiModelProperty.class)) {
 												if(sconAll) {
 													PropertyModel propertyModel = new PropertyModel();
-													int isArray = isObj(type);
+													//int isArray = isObj(type);
 													type = getGenericType(type, field);
 													
 													//判断数据类型
@@ -2964,6 +2963,7 @@ public class LKADController {
 	
 	/**
 	 * 	解析请求参数的LKAModel对象注解
+	 * @param url 位置
 	 * @param typeCls 类型
 	 * @param group 组名
 	 * @return ParamModel 对象
@@ -3264,8 +3264,10 @@ public class LKADController {
 
 	/**
 	 *	解析对象属性的PropertyModel对象注解
+	 * @param url 位置
 	 * @param typeCls 类型
 	 * @param group 组名
+	 * @param proType protype
 	 * @return PropertyModel 对象
 	 * @throws Exception 异常
 	 */
@@ -3564,7 +3566,7 @@ public class LKADController {
 
 	/**
 	 * 	解析响应参数的ResposeModel对象注解
-	 * 
+	 * @param url 位置
 	 * @param typeCls 类型
 	 * @param group 组名
 	 * @return ResposeModel 对象
@@ -3885,7 +3887,8 @@ public class LKADController {
 	        requestBody.add("content",content);
 	        HttpHeaders requestHeaders = new HttpHeaders();
 	        requestHeaders.add("Content-Type","application/x-www-form-urlencoded");
-	        HttpEntity<MultiValueMap> requestEntity = new HttpEntity<>(requestBody,requestHeaders);
+	        @SuppressWarnings("rawtypes")
+			HttpEntity<MultiValueMap> requestEntity = new HttpEntity<>(requestBody,requestHeaders);
 			ResponseEntity<String> exchange = restTemplate.exchange(serverName+"/lkad/addParamInfo",HttpMethod.POST,requestEntity,String.class);
 			return exchange.getBody();
 		}
@@ -3943,7 +3946,8 @@ public class LKADController {
 	        requestBody.add("url",url);
 	        HttpHeaders requestHeaders = new HttpHeaders();
 			requestHeaders.add("Content-Type","application/x-www-form-urlencoded");
-	        HttpEntity<MultiValueMap> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
+	        @SuppressWarnings("rawtypes")
+			HttpEntity<MultiValueMap> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
 			ResponseEntity<String> exchange = restTemplate.exchange(serverName+"/lkad/delParamInfo",HttpMethod.POST,requestEntity, String.class);
 			return exchange.getBody();
 		}
@@ -3985,12 +3989,13 @@ public class LKADController {
 	 * @param serverName 服务器名称
 	 * @return map 集合
 	 */
+	@SuppressWarnings("unchecked")
 	@GetMapping("getParamInfo")
 	public Map<Object, Object> getParamInfo(String serverName){
 		
 		if(serverName != null && !"".equals(serverName)) {
 			RestTemplate restTemplate = new RestTemplate();
-			Map forObject = restTemplate.getForObject(serverName+"/lkad/getParamInfo", Map.class);
+			Map<Object, Object> forObject = restTemplate.getForObject(serverName+"/lkad/getParamInfo", Map.class);
 			return forObject;
 		}
 		
@@ -4039,8 +4044,8 @@ public class LKADController {
     
     /**
      * 	骆峰拆分成多个单词
-     * @param str
-     * @return
+     * @param str 拆分字符串
+     * @return String 拆分后结果
      */
     public String toHump(String str) {
         String rs = "";
@@ -4125,8 +4130,8 @@ public class LKADController {
     
     /**
      * 	判断数据类型
-     * @param type
-     * @return
+     * @param type 类型
+     * @return int 类型标识
      */
     public int isObj(Class<?> type) {
     	if(type.equals(Integer.class) || type.equals(int.class)){
@@ -4178,9 +4183,9 @@ public class LKADController {
     
     /**
      * 	获取数组或list、set集合泛形类型
-     * @param type
-     * @param field
-     * @return
+     * @param type 类型
+     * @param field 属性
+     * @return Class 泛形类型
      */
     public Class<?> getGenericType(Class<?> type,Field field){
 	    try {

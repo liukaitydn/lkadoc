@@ -84,6 +84,7 @@ public class ExportPDFController {
 			result.put("msg","接口信息结构异常!");
 			return result;
 		}
+		@SuppressWarnings("rawtypes")
 		List typeModels = (List)object;
 		if(typeModels.size() == 0) {
 			result.put("code","500");
@@ -275,7 +276,7 @@ public class ExportPDFController {
 	      // 取得文件名。
 	      String filename = file.getName();
 	      // 取得文件的后缀名。
-	      String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+	      //String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
 
 	      // 以流的形式下载文件。
 	      InputStream fis = new BufferedInputStream(new FileInputStream(path));

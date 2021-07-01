@@ -177,23 +177,24 @@ public static Map<String,Object> toMap(String ori) {
 		return sb.toString();
 	}
 
-	public static void main(String args[]) {
+	/*public static void main(String args[]) {
 		String s = "{aaa:[{\"album\":\"jj\"},{album:jjser},{album:jjfghfgh}]}";
 		Map<String, Object> result = null;
-		long time = System.currentTimeMillis();
 		for (int i = 0; i <= 100000; i++) {
 			result = toMap(s);
 		}
+		@SuppressWarnings("rawtypes")
 		List list = (List) result.get("aaa");
 		List<UserAlbumRequest> listA = new ArrayList<UserAlbumRequest>();
 		for (Object o : list) {
+			@SuppressWarnings("unchecked")
 			Map<String, String> map = (Map<String, String>) o;
 			UserAlbumRequest re = new UserAlbumRequest();
 			re.setAlbum(map.get("album"));
 			listA.add(re);
 		}
 		System.out.println(list.get(0));
-	}
+	}*/
 }
 
 class UserAlbumRequest {

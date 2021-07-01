@@ -16,24 +16,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.itextpdf.text.Chapter;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.Section;
-import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.lk.api.domain.MethodModel;
 import com.lk.api.domain.ModelModel;
 import com.lk.api.domain.ParamModel;
@@ -55,6 +43,7 @@ public class ExportMarkDownController {
 	 * @return object 对象
 	 * @throws Exception 异常
 	 */
+	@SuppressWarnings("resource")
 	@PostMapping("exportMarkDown")
 	public Object exportPdf(String serverName,HttpServletResponse response) throws Exception {
 		Map<String,String> result = new HashMap<String, String>();
@@ -85,6 +74,7 @@ public class ExportMarkDownController {
 			result.put("msg","接口信息结构异常!");
 			return result;
 		}
+		@SuppressWarnings("rawtypes")
 		List typeModels = (List)object;
 		if(typeModels.size() == 0) {
 			result.put("code","500");
@@ -153,6 +143,7 @@ public class ExportMarkDownController {
 				//响应参数设置
 		        pw.println("##### 响应参数");
 				//创建表格
+				@SuppressWarnings("unused")
 				PdfPTable responseTable = new PdfPTable(4);
 				// 设置表格宽度比例为%100
 				List<ResposeModel> resposeModels = methodModel.getRespose();
@@ -190,7 +181,7 @@ public class ExportMarkDownController {
 	      // 取得文件名。
 	      String filename = file.getName();
 	      // 取得文件的后缀名。
-	      String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+	      //String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
 
 	      // 以流的形式下载文件。
 	      InputStream fis = new BufferedInputStream(new FileInputStream(path));

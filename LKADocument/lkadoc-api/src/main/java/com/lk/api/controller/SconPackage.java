@@ -145,7 +145,8 @@ public class SconPackage implements SconPackageInterface{
      * @throws IOException 异常
      */
     private List<String> readFromJarFile(String jarPath, String splashedPackageName) throws IOException {
-    	JarFile jarFile = new JarFile(new File(jarPath));
+    	@SuppressWarnings("resource")
+		JarFile jarFile = new JarFile(new File(jarPath));
         Enumeration<JarEntry> entries = jarFile.entries();
         List<String> nameList = new ArrayList<String>();
         while (entries.hasMoreElements()) {

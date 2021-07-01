@@ -1,26 +1,31 @@
-
 # 1. 前言
 &emsp;&emsp;lkadoc从推出以来，备受好评！因本人工作忙，一直没有时间推广，如果你有幸能看到这篇博客，同时又因为没有一款好的接口文档管理工具而苦恼，那么恭喜你，lkadoc刚好可以解决你的苦恼。在我没有开发lkadoc之前，一直都在用swagger来管理项目的接口，但是在使用过程中我发现swaager是一款只针对后端开发人员的一个接口调试工具，对前端和APP开发人员并不友好，在与前端人员对接口的时候，你如果只是丢个swagger接口文档地址给对方的话，保证会被骂的狗血喷头。这也是我为什么要开发lkadoc的原因，我就想从根本上去解决这个问题，能同时兼顾后端开发人员便利，也能对前端开发人员提供更加友好的接口文档界面。因为我本身只是一个java后端开发人员，对前端和UI这块知识确实有些欠缺，我在设计UI界面时首先得保证它的便捷性和友好度，其次再会去调整它的外观。我使终认为，东西好用才是王道，当然外观也很重要，只是我觉得来日方长嘛，总有一天我会把外观调成大家都喜欢的样子，但是在此之前你得保证它绝对的好用。
 
 
 # 2. 介绍
-&emsp;&emsp;lkadoc是一款开源的基于springBoot平台功能非常强大的接口文档生成工具。拥有自动生成接口文档信息、在线调试接口、导出PDF或MarkDown文档、字段数据校验等强大的接口文档管理功能。感谢您的使用与支持，希望它能够在工作中给您带来便利！如果觉得好用请推荐给您身边需要的朋友或同事。承诺终身免费，免费提供技术支持！如果您在使用过程中遇到问题或者有好的建议，加入群聊【lkadoc接口文档交流群(703811254)】。
-
-下面简单的对lkadoc特色功能介绍一下：
+&emsp;&emsp;lkadoc是一款开源的基于springBoot平台功能非常强大的接口文档生成工具。拥有自动生成接口文档信息、在线调试接口、导出PDF或MarkDown文档、字段数据校验等强大的接口文档管理功能。感谢您的使用与支持，希望它能够在工作中给您带来便利！如果觉得好用请推荐给您身边需要的朋友或同事。承诺终身免费，免费提供技术支持！
+点击链接加入群聊【lkadoc接口文档交流群(703811254)】：[https://jq.qq.com/?_wv=1027&k=sW2KAhJP](https://jq.qq.com/?_wv=1027&k=sW2KAhJP)
+项目开源地址：https://gitee.com/liuk168/lkadoc。下面简单的对lkadoc特色功能介绍一下：
     - 支持导出成PDF和MD格式的文档
-        - 支持在线调试API
-        - 支持对接口进行压力测试
-        - 支持多项目接口文档聚合展示
-        - 支持自动识别对象入参或出参，可实现接口零注解
-        - 支持任何复杂的对象参数结构，理论上支持最大10层的参数结构嵌套（防止嵌套出现死循环，做了10层限制）
-        - 支持一条注解描述“多个”参数，支持一条注解描述“多层”参数结构（大大简化注解数量）
-        - 支持JSON格式化展示请求参数和响应参数（参数结构一目了然，减少前后端沟通成本，减少失误）
-        - 支持版本控制新接口标记显示（方便定位新接口）
-        - 支持接口名称和参数添加标签（特殊说明可以加标签提示，减少前后端沟通成本）
-        - 支持对象属性分组（包括父类继承属性）
-        - 支持对请求参数进行数据校验（支持正则匹配、非空、非null、集合非空、字符串长度、数值范围等常用校验规则，如果关闭接口文档功能不会影响数据校验功能。）
+    - 支持在线调试API
+    - 支持对接口进行压力测试
+    - 支持多项目接口文档聚合展示
+    - 支持自动识别对象入参或出参，可实现接口零注解
+    - 支持任何复杂的对象参数结构，理论上支持最大10层的参数结构嵌套（防止嵌套出现死循环，做了10层限制）
+    - 支持一条注解描述“多个”参数，支持一条注解描述“多层”参数结构（大大简化注解数量）
+    - 支持JSON格式化展示请求参数和响应参数（参数结构一目了然，减少前后端沟通成本，减少失误）
+    - 支持版本控制新接口标记显示（方便定位新接口）
+    - 支持接口名称和参数添加标签（特殊说明可以加标签提示，减少前后端沟通成本）
+    - 支持对象属性分组（包括父类继承属性）
 
 ### 版本更新说明：
+##### lkadoc 1.3.6于2021年7月1日发布：
+1.优化UI界面风格
+2.新增查看文档可设置密码授权才能查看，通过@LKADocument注解password属性设置
+3.增加目录合功能，如果多个类的LKAType的value属性一样时会合并成一个目录;还可能通过@LKAMethod的directory属性指定目录
+4.去掉数据样验功能模块(入侵项目太深，所有其它风险情况，暂时去掉)
+5.优化兼容SpringBoot到最新版本
+![新版风格](https://img-blog.csdnimg.cn/20210701142613279.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
 
 #### lkadoc 1.3.5于2021年4月6日发布：
 1.新增排序功能，@LKATtype、@LKAMethod注解增加order属性，值越小排序越靠前
@@ -34,30 +39,23 @@
 	d.如果想取消高亮、删除或自定义作用的话，右键再点击相应的操作即可。
 
 #### lkadoc 1.3.4于2021年3月31日发布:
-
 1.增加泛形响应参数自动识别
 例如:自定义响应对象Result<T>,接口返回Result<User>或Result<List<User>>，其中Result和User对象都有@LKAModel，属性有@LKAProperty注解都可以自动扫描识别
 2.优化UI界面，修复一些已知的问题
-
 #### lkadoc 1.3.3于2021年3月29发布：
-
 1.修复SpringBoot项目加server.servlet.context-path前缀后静态资源及接口无法调试的问题
 2.远程服务器地址配置由原来的例如：serverNames=192.168.0.77:9010修改为serverNames=192.168.0.77:9010/，如果远程服务器项目也加了contextPath前缀则应该这样配置：serverNames=192.168.0.77:9010/前缀/
 注意：
 a.项目contextPath前缀不会显示在UI界面
 b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前缀，例如：127.0.0.1:8080/前缀/lkadoc.html
-
 #### lkadoc 1.3.2于2021年3月29日发布:
-
 1.修复UI界面在Firefox浏览器显示异常的问题
 2.优化接口入参异常提示
-
 #### lkadoc 1.3.1于2021年3月18日发布：
 1.UI界面增加搜索接口功能，接口前面增加序号，更方便定位接口
 2.优化导出MD格式样式
 3.优化UI界面样式，提供更多接口信息展示空间
 4.增加选项页右键操作，更方便在不同接口切换
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210318182704483.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
 
 #### lkadoc 1.2.10于2021年3月4日发布：
 1.@LKADocument注解增加sconAll属性控制是否自动扫描对象所有（未加@LKAProperty注解）属性，默认false，只扫描有@LKAProperty注解的属性
@@ -99,12 +97,12 @@ b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前�
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-annotations</artifactId>
-	<version>1.3.4</version>
+	<version>1.3.6</version>
 </dependency>
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.3.4</version>
+	<version>1.3.6</version>
 </dependency>
 ```
 其中lkadoc-annotations是单独的一个模块，如果工程只用到注解可以只添加lkadoc-annotations模块即可。lkadoc-api模块依赖lkadoc-annotations模块，当然工程只添加lkadoc-api模块的maven配置也会自动把lkadoc-annotations模块引入到当前工程。
@@ -112,29 +110,22 @@ b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前�
 #### lkadoc 1.2.1 于2020年8月5日发布(有bug，导出有问题，请使用1.2.2版)：
 1. 增加md格式文档导出
 2. 增加对父节点参数名称的复制功能
-3. 增加对父节点参数添加标签功能，如果父节点标签为删除标签，那么在调试该接口时不会把该父节点参数及所有子参数传到后台![lkdoc首页](https://img-blog.csdnimg.cn/20200805175608721.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+3. 增加对父节点参数添加标签功能，如果父节点标签为删除标签，那么在调试该接口时不会把该父节点参数及所有子参数传到后台
 # 3. 准备工作
 
-## 3.1 在SpringBoot项目中引入两个jar包
+## 3.1 在SpringBoot项目中引入jar包
 
 ```xml
 <!--Lkadoc包-->
 <dependency>
 	<groupId>com.github.liukaitydn</groupId>
 	<artifactId>lkadoc-api</artifactId>
-	<version>1.3.4</version>
+	<version>1.3.6</version>
 </dependency>
-<!--itextpdf包，把接口信息导出成PDF文档是基于itextpdf来实现的，所以要引入这个包-->
-<dependency>
-    <groupId>com.itextpdf</groupId>
-    <artifactId>itextpdf</artifactId>
-    <version>5.5.13</version>
-</dependency>
-```
 
 ## 3.2 在SpringBoot项目启动类上加上@LKADocument注解
 
-```java
+​```java
 @LKADocument
 @SpringBootApplication
 public class LKADemoApplication {
@@ -155,23 +146,21 @@ lkad:
 #项目描述（选配）
  description: 智能、便捷、高效
 #要聚合的项目地址，"-"前面是项目名称（可省略），后面是项目的地址（也可以用域名），多个用","号隔开，用来聚合其它项目的接口信息，可以在UI界面切换（选配）
- serverNames: 租房系统-192.168.0.77:9010,缴费系统-192.168.0.77:8888
+ serverNames: 租房系统-192.168.0.77:9010/,缴费系统-192.168.0.77:8888/
 #项目的版本号（选配）
  version: 1.0
 #接口文档启动开关,true是开启，false是禁用,默认为开启，此开关对数据校验没有影响（选配）
  enabled: true
 #可以为没有加@LKAProperty注解的属性自动翻译英文为中文展示（sconAll为true才会有效果）,默认为false
- enToCn: false 
-#控制是否自动扫描对象所有（未加@LKAProperty注解）属性，默认false，只扫描有@LKAProperty注解的属性
  sconAll: false
- #是否开始数据校验功能，默认为false
- validation: false
+ #设置查看接口文档所需的密码，默认不需要密码
+ password: ""
 ```
 
 或者在启动类注解@LKADocument上设置如下属性（和上面配置二选一即可,效果一模一样）
 
 ```java
-@LKADocument(basePackages="com.lkad.api",projectName="Lkadoc测试项目",description="智能、便捷、高效",version="1.0",serverNames="租房系统-192.168.0.77:9010,缴费系统-192.168.0.77:8888",enabled=true)
+@LKADocument(basePackages="com.lkad.api",projectName="Lkadoc测试项目",description="智能、便捷、高效",version="1.0",serverNames="租房系统-192.168.0.77:9010/,缴费系统-192.168.0.77:8888/",enabled=true,pssword="123")
 @SpringBootApplication
 public class LKADemoApplication {
     public static void main(String[] args) {
@@ -242,6 +231,8 @@ hidden:是否在UI界面隐藏该接口，默认为false（选配）
 version:接口版本号，如果项目版本号相同，在UI界面会标记为新接口（选配）
 download:是否是下载的方法，如果该接口涉及到下载文件必须设置成true，默认是false（选配）
 token:是否需要在接口文档UI界面显示authorize token标签，只标识该接口需要token验证，不会影响正常业务，默认是true（选配）
+order:排序，数字越少越靠前
+directory:指定上级目录（上级目录必须存在，不然不会展示在接口文档，默认当前类的目录）
 ```
 
 ### 4.2.1 LKAType和LKAMethod演示代码
@@ -1067,7 +1058,6 @@ public ApiResult getObj() {
 ![](https://img-blog.csdnimg.cn/20200731155031408.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
 
 # 6. 辅助功能
-
 ## 6.1 导出PDF或MarkDown文档
 &emsp;&emsp;如果需提供接口文档给第三方进行对接，可以使用Lkadoc的导出功能，Lkadoc支持导出标准化格式的PDF或MarkDown接口文档，功能非常强大，能满足大部分场景需求。（目前只支持导出本地项目的接口）
 &emsp;&emsp;导出PDF文档前需要检查系统是否存在simsun.ttc字体，如果系统没有这个字体的话，导出PDF文档中文不能正确显示。 windows系统字体路径：C:/Windows/fonts/simsun.ttc
@@ -1090,414 +1080,6 @@ PDF效果截图：
 
 切换项目后的效果图：
 ![](https://img-blog.csdnimg.cn/20200731155208356.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-# 7. 数据校验
-
-&emsp;&emsp;数据校验是Lkadoc 1.2.0版新增加的模块，基于过滤器和拦截器实现的功能，支持query、path、header入参校验，能满足大部分业务场景。数据校验与接口文档是完全独立的两个模块，当把接口文档功能模块关闭并不会影响数据校验模块。
-
-
-## 7.1 准备工作
-&emsp;&emsp;需要在@LKADocument注解(在application文件中配置无效)把validation属性设置成true，代表开启数据校验功能，默认是关闭状态。例:@LKADocument(validation=true)
-
-
-## 7.2 规则说明
-
-```yaml
-#数据校验主要是依靠@LKAProperty和@LKAParam注解的如下属性实现的
-#一条@LKAParam注解描述多个参数，那么只能给每个参数加一个校验规则
-#一条@LKAParam注解描述一个参数，那么可以给每个参数加多个校验规则
-
-valids:数据校验常用规则或正则匹配，一个参数可设置多个规则
-#valids可接收一个数字串数组，Lkadoc里面预置了一个校验常量类V，里面的常量有：
-    V.NOTNULL:对象、集合、数组、字符串、包装类不能为null，字符串可以为空
-    V.NOTBLANK:字符串不能为null也不能为空（一般只用在字符串）
-    V.NULL:对象、集合、数组、字符串、包装类必须为null
-    V.NOTEMPTY:集合、数组不能为null，元素个数不能为0；字符串不能为null也不能为空;对象不能为null
-    V.URL:参数必须是一个URL
-    V.EMAIL:参数必须是email格式
-    V.PAST:日期必须在当前日期的过去
-    V.FUTURE:日期必须在当前日期的未来
-    正则表达式:例如11位手机号-^[1]\\d{10}$
-
-msgs:数据校验消息，和valids规则一一对应，如果msgs没有设置，会有默认错误提示
-
-range:数值范围限制判断，包括整数和小数
-#例如: 
-#range="1-10^取值范围是1到10":"-"左边代表最小值，右边代表最大值，"^"右边代表提示消息。
-#range="*-10^取值不能大10":"-"左边如果是"*"号代表不限制最小值，右边代表最大值，"^"右边代表提示消息。
-#range="1-*":"-"左边代表最小值，右边如果是"*"号代表不限制最大值，如果后面没有"^"会有默认错误提示。
-
-size:集合、数组大小限制判断
-#用法和range一样
-
-length:字符串长度限制判断
-#用法和range一样
-```
-
-## 7.3 ValidDataException异常对象
-
-### 7.3.1 说明
-&emsp;&emsp;如果接口有参数数据校验不通过，Lkadoc会抛出一个ValidDataException异常，可通过该异常对象的getMessage()方法获取所有没有校验通过的错误提示信息字符串，多个会用“;”隔开。除此之外ValidDataException异常对象还可以通过getErrors()方法获取所有没有校验通过的错误信息的Map集合，key对应的是参数名称，value对应的是校验错误信息。大家可以很方便的定制化返回错误结果信息。
-
-
-### 7.3.2 在全局异常中处理校验信息
-
-```java
-package com.lkad;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.lk.api.exception.ValidDataException;
-
-/**
- * 注意事项:
- * 1.全局异常的包位置必须要在抛出异常接口位置的上层或同层
- * 2.全局异常的包位置必须要在启动类的下层或同层
- */
-@ControllerAdvice
-public class ExceptionController {
-    
-     /**
-     *     定义要捕获的异常可以多个 @ExceptionHandler({})
-     *  下面只是一个演示代码，仅供参考！
-     * @return 响应结果
-     */
-    @ExceptionHandler(ValidDataException.class)
-    @ResponseBody
-    public Map<String,Object> validExceptionHandler(ValidDataException e) {
-        Map<String, String> errors = e.getErrors();
-        Set<String> keySet = errors.keySet();
-        for (String key : keySet) {
-            String value = errors.get(key);
-            System.out.println(key+"-"+value);
-        }
-        Map<String,Object> map = new HashMap<String, Object>();
-        map.put("code",500);
-        map.put("message",e.getMessage());
-        return map;
-    }
-}
-```
-
-## 7.4 案例演示
-
-### 7.4.1 NOTNULL
-
-```
-1.支持对集合、数组、字符串、对象、包装类请求参数判断不能为null,否则抛出ValidDataException
-2.字符串可以为空串
-3.不支持path参数校验，因为如果path参数为null的话，会改变url地址
-4.如果没有设置msgs校验错误提示信息会有默认提示-xxx值不能为NULL。(xxx代表参数名称)
-```
-
-测试代码
-
-```java 
-package com.lkad.api;
-
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.lk.api.annotation.*;
-import com.lk.api.constant.V;
-
-@LKAType("数据校验功能演示")
-@RestController
-@RequestMapping("valids")
-public class ValidsController {
-    
-    /**没有加msgs校验提示信息，Lkadoc会有默认提示信息*/
-    @LKAMethod("NOTNULL")
-    @LKAParam(names= {"name","pwd","age"},values= {"用户名","密码","年龄"},valids= {V.NOTNULL,V.NOTNULL,V.NOTNULL})
-    @PostMapping("testNotNull")
-    public Map<String,Object> testNotNull(String name,String email,Integer age) {
-        Map<String,Object> map = new HashMap<String, Object>();
-        map.put("code",200);
-        map.put("msg","登录成功");
-        return map;
-    }
-}
-```
-
-效果图
-
-![](https://img-blog.csdnimg.cn/20200731155247422.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-全局异常在控制台打印的信息
-
-![](https://img-blog.csdnimg.cn/20200731155305550.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-### 7.4.2 NOTBLANK
-
-```
-1.支持对字符串参数判断不能为null也不能为空串,否则抛出ValidDataException
-2.不支持path参数校验，因为如果path参数为null的话，会改变url地址
-3.如果没有设置msgs校验错误提示信息会有默认提示-xxx值不能为空。(xxx代表参数名称)
-```
-
-测试代码
-
-```java
-/**在ValidsController类增加如下测试接口*/
-@LKAMethod("NOTBLANK")
-@LKAParams({
-    /**
-        注意：
-        1.name设置了msgs提示信息，默认提示信息会被msgs信息覆盖掉
-        2.@LKAParam只描述一个参数的话，支持设置多个校验规则
-    */
-    @LKAParam(name="name",value="用户名",valids= {V.NOTBLANK},msgs= {"用户名不能为空"}),
-    @LKAParam(name="pwd",value="密码",valids= {V.NOTBLANK}),
-    @LKAParam(name="age",value="年龄",dataType=Integer.class,valids= {V.NOTNULL})
-})
-@PostMapping("testNotBlank")
-public Map<String,Object> testNotBlank(String name,String email,Integer age) {
-    Map<String,Object> map = new HashMap<String, Object>();
-    map.put("code",200);
-    map.put("msg","登录成功");
-    return map;
-}
-```
-
-效果图
-
-![](https://img-blog.csdnimg.cn/20200731155327350.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-全局异常在控制台打印的信息
-
-![](https://img-blog.csdnimg.cn/20200731155411712.png)
-
-### 7.4.3 NULL
-
-```
-1.支持对集合、数组、字符串、对象、包装类请求参数判断只能为null。否则抛出ValidDataException
-2.如果没有设置msgs校验错误提示信息会有默认提示-xxx值只能为NULL。(xxx代表参数名称)
-```
-
-测试代码
-
-```java
-/**在ValidsController类增加如下测试接口*/
-@LKAMethod("NULL")
-@LKAParam(name= "age",value= "年龄",dataType=Integer.class,valids= {V.NULL})
-@PostMapping("testNull")
-public Map<String,Object> testNull(Integer age) {
-    Map<String,Object> map = new HashMap<String, Object>();
-    map.put("code",200);
-    map.put("msg","操作成功");
-    return map;
-}
-```
-
-效果图
-
-![](https://img-blog.csdnimg.cn/2020073115550815.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-全局异常在控制台打印的信息
-
-![](https://img-blog.csdnimg.cn/20200731155524471.png)
-
-### 7.4.4 NOTEMPTY
-
-```
-1.支持对集合、数组判断不能为null，元素个数不能为0；字符串不能为null也不能为空;对象、包装类不能为null。否则抛出ValidDataException
-2.如果没有设置msgs校验错误提示信息会有默认提示-xxx值不能为NULL/空。(xxx代表参数名称)
-```
-
-测试代码
-
-```java
-@LKAModel
-public class User {
-    @LKAProperty(value="用户ID",hidden=true)//hidden设置成true，该不会在UI界面展示
-    private Integer id;
-    @LKAProperty(value="用户名称^张三",valids= {V.NOTEMPTY})
-    private String name;
-    @LKAProperty(value="年龄^20",valids= {V.NOTEMPTY})
-    private String age;
-    @LKAProperty(value="角色对象",type=Role.class,valids= {V.NOTEMPTY})
-    private Role role;
-    @LKAProperty(value="用户爱好^运动",isArray=true,valids= {V.NOTEMPTY})
-    private String[] likes;
-    @LKAProperty(value="地址信息",isArray=true,type=Address.class,valids= {V.NOTEMPTY})
-    private List<Address> addresses;
-    ....get/set方法....
-}
-
-/**在ValidsController类增加如下测试接口*/
-@LKAMethod(value="NOTEMPTY",contentType=ContentType.JSON)
-@PostMapping("testNotEmpty")
-public Map<String,Object> testNotEmpty(@RequestBody User user) {
-    Map<String,Object> map = new HashMap<String, Object>();
-    map.put("code",200);
-    map.put("msg","操作成功");
-    return map;
-}
-```
-
-效果图
-
-![](https://img-blog.csdnimg.cn/20200731155546866.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-### 7.4.5 URL、EMAIL、PAST、FUTURE
-
-```
-1.URL:参数必须是一个URL，可以为null。否则抛出ValidDataException
-2.EMAIL:参数必须是email格式，可以为null。否则抛出ValidDataException
-3.PAST:日期必须在当前日期的过去，可以为null。否则抛出ValidDataException
-4.FUTURE:日期必须在当前日期的未来，可以为null。否则抛出ValidDataException
-```
-
-测试代码
-
-```java
-@LKAModel
-public class Emp {
-@LKAProperty(value="生日",valids= {V.PAST,V.NOTNULL},msgs= {"生日必须在过去","请填写生日信息"})
-    private Date birthday;
-    @LKAProperty(value="退休日期",valids= {V.FUTURE,V.NOTNULL})
-    private Date retirementDate;
-    @LKAProperty(value="个人主页",valids= {V.URL})
-    private String url;
-    @LKAProperty(value="邮箱",valids= {V.EMAIL})
-    private String email;
-    ....get/set方法....
-}
-
-/**在ValidsController类增加如下测试接口*/
-@LKAMethod(value="URL、EMAIL、PAST、FUTURE",contentType=ContentType.JSON)
-@PostMapping("testUEPF")
-public Map<String,Object> testUEPF(@RequestBody Emp emp) {
-    Map<String,Object> map = new HashMap<String, Object>();
-    map.put("code",200);
-    map.put("msg","操作成功");
-    return map;
-}
-```
-
-效果图
-
-![](https://img-blog.csdnimg.cn/2020073115561290.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-### 7.4.6 正则表达式
-&emsp;&emsp;Lkadoc还支持正则表达式的匹配，参数值可以为null。正则没有匹配上则抛出ValidDataException
-
-测试代码
-
-```java
-@LKAModel
-public class Emp {
-
-@LKAProperty(value="生日",valids= {V.PAST,V.NOTNULL},msgs= {"生日必须在过去","请填写生日信息"})
-    private Date birthday;
-    @LKAProperty(value="退休日期",valids= {V.FUTURE,V.NOTNULL})
-    private Date retirementDate;
-    @LKAProperty(value="个人主页",valids= {V.URL})
-    private String url;
-    @LKAProperty(value="邮箱",valids= {V.EMAIL})
-    private String email;
-    @LKAProperty(value="手机号",valids= {"^[1]\\d{10}$",V.NOTNULL},msgs= {"手机号必须是11位","手机号不能为null"})
-    private String mobile;
-    ....get/set方法....
-}
-
-@LKAMethod(value="URL、EMAIL、PAST、FUTURE",contentType=ContentType.JSON)
-@PostMapping("testUEPF")
-public Map<String,Object> testUEPF(@RequestBody Emp emp) {
-    Map<String,Object> map = new HashMap<String, Object>();
-    map.put("code",200);
-    map.put("msg","操作成功");
-    return map;
-}
-```
-
-效果图
-
-![](https://img-blog.csdnimg.cn/2020073115562816.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-### 7.4.7 range、size、length
-
-```
-range、size、length是单独的属性，可以和valids规则同时存在,参数可以为null
-range:数值范围限制判断，包括整数和小数
-#例如: 
-#range="1-10^取值范围是1到10":"-"左边代表最小值，右边代表最大值，"^"右边代表提示消息。
-#range="*-10^取值不能大10":"-"左边如果是"*"号代表不限制最小值，右边代表最大值，"^"右边代表提示消息。
-#range="1-*":"-"左边代表最小值，右边如果是"*"号代表不限制最大值，如果后面没有"^"会有默认错误提示。
-
-size:集合、数组大小限制判断
-#用法和range一样
-
-length:字符串长度限制判断
-#用法和range一样
-```
-
-测试代码
-
-```java
-@LKAModel
-public class Emp {
-    @LKAProperty(value="年龄",range="1-130^年龄取值必须在1到130之间")
-    private Integer age;
-    @LKAProperty(value="爱好",size="2-*^至少填写2个爱好")
-    private String[] like;
-    @LKAProperty(value="姓名",length="2-6")
-    private String name;
-    ....get/set方法....
-}
-
-@LKAMethod(value="range、size、length",contentType=ContentType.JSON)
-@PostMapping("testRSL")
-public Map<String,Object> testRSL(@RequestBody Emp emp) {
-    Map<String,Object> map = new HashMap<String, Object>();
-    map.put("code",200);
-    map.put("msg","登录成功");
-    return map;
-}
-```
-
-效果图
-
-![](https://img-blog.csdnimg.cn/20200731155738267.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-全局异常在控制台打印的信息
-
-![](https://img-blog.csdnimg.cn/20200731155753286.png)
-
-### 7.4.8 参数分组
-
-&emsp;&emsp;数据校验也支持参数分组，如要入参是一个对象，且对象设置了分组，那么只有组内属性才会进行数据校验。具体可参考高级应用里面的对象参数分组。
-
-
-```java
-@LKAModel
-public class Emp {
-    @LKAProperty(value="年龄",range="1-130^年龄取值必须在1到130之间",groups= {"testRSL"})
-    private Integer age;
-    @LKAProperty(value="爱好",size="2-*^至少填写2个爱好")
-    private String[] like;
-    @LKAProperty(value="姓名",length="2-6")
-    private String name;
-    ....get/set方法....
-}
-
-@LKAMethod(value="range、size、length",contentType=ContentType.JSON)
-@PostMapping("testRSL")
-public Map<String,Object> testRSL(@RequestBody @LKAGroup("testRSL") Emp emp) {
-    Map<String,Object> map = new HashMap<String, Object>();
-    map.put("code",200);
-    map.put("msg","登录成功");
-    return map;
-}
-```
-效果图
-![](https://img-blog.csdnimg.cn/20200731155815625.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
 
 项目开源地址：https://gitee.com/liuk168/lkadoc
 

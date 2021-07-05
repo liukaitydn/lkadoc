@@ -1,119 +1,36 @@
-# 1. 前言
-&emsp;&emsp;lkadoc从推出以来，备受好评！因本人工作忙，一直没有时间推广，如果你有幸能看到这篇博客，同时又因为没有一款好的接口文档管理工具而苦恼，那么恭喜你，lkadoc刚好可以解决你的苦恼。在我没有开发lkadoc之前，一直都在用swagger来管理项目的接口，但是在使用过程中我发现swaager是一款只针对后端开发人员的一个接口调试工具，对前端和APP开发人员并不友好，在与前端人员对接口的时候，你如果只是丢个swagger接口文档地址给对方的话，保证会被骂的狗血喷头。这也是我为什么要开发lkadoc的原因，我就想从根本上去解决这个问题，能同时兼顾后端开发人员便利，也能对前端开发人员提供更加友好的接口文档界面。因为我本身只是一个java后端开发人员，对前端和UI这块知识确实有些欠缺，我在设计UI界面时首先得保证它的便捷性和友好度，其次再会去调整它的外观。我使终认为，东西好用才是王道，当然外观也很重要，只是我觉得来日方长嘛，总有一天我会把外观调成大家都喜欢的样子，但是在此之前你得保证它绝对的好用。
+##  简介
 
+&emsp;&emsp;Lkadoc是一款开源的接口文档自动生成工具，基于SpringBoot平台，拥有非常强大的接口文档管理功能。为解决Java后台开发人员编写接口文档、调试接口而生。同时提供了简洁、大气、功能丰富的接口文档UI操作界面，方便后端与前端之间的接口对接。
 
-# 2. 介绍
-&emsp;&emsp;lkadoc是一款开源的基于springBoot平台功能非常强大的接口文档生成工具。拥有自动生成接口文档信息、在线调试接口、导出PDF或MarkDown文档、字段数据校验等强大的接口文档管理功能。感谢您的使用与支持，希望它能够在工作中给您带来便利！如果觉得好用请推荐给您身边需要的朋友或同事。承诺终身免费，免费提供技术支持！
-点击链接加入群聊【lkadoc接口文档交流群(703811254)】：[https://jq.qq.com/?_wv=1027&k=sW2KAhJP](https://jq.qq.com/?_wv=1027&k=sW2KAhJP)
-项目开源地址：https://gitee.com/liuk168/lkadoc。下面简单的对lkadoc特色功能介绍一下：
-    - 支持导出成PDF和MD格式的文档
-    - 支持在线调试API
-    - 支持对接口进行压力测试
-    - 支持多项目接口文档聚合展示
-    - 支持自动识别对象入参或出参，可实现接口零注解
-    - 支持任何复杂的对象参数结构，理论上支持最大10层的参数结构嵌套（防止嵌套出现死循环，做了10层限制）
-    - 支持一条注解描述“多个”参数，支持一条注解描述“多层”参数结构（大大简化注解数量）
-    - 支持JSON格式化展示请求参数和响应参数（参数结构一目了然，减少前后端沟通成本，减少失误）
-    - 支持版本控制新接口标记显示（方便定位新接口）
-    - 支持接口名称和参数添加标签（特殊说明可以加标签提示，减少前后端沟通成本）
-    - 支持对象属性分组（包括父类继承属性）
+#### 愿景
 
-### 版本更新说明：
-##### lkadoc 1.3.6于2021年7月1日发布：
-1.优化UI界面风格
-2.新增查看文档可设置密码授权才能查看，通过@LKADocument注解password属性设置
-3.增加目录合功能，如果多个类的LKAType的value属性一样时会合并成一个目录;还可能通过@LKAMethod的directory属性指定目录
-4.去掉数据样验功能模块(入侵项目太深，所有其它风险情况，暂时去掉)
-5.优化兼容SpringBoot到最新版本
-![新版风格](https://img-blog.csdnimg.cn/20210701142613279.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+&emsp;&emsp;我们愿成为java开发人员最好的基友，从手动编写接口文档的痛苦中解救出来，丢弃难用的Postman，工作效率从此翻倍，不再加班，有更多的时间陪伴家人。
 
-#### lkadoc 1.3.5于2021年4月6日发布：
-1.新增排序功能，@LKATtype、@LKAMethod注解增加order属性，值越小排序越靠前
-2.新增常用类型自动识别：LocalDate、LocalDateTime、BigDecimal、Vector、TreeSet等常用集合
-3.取消自动翻译功能，删除@LKADocument注解的enToCn属性（影响性能，并且大批量翻译容易被有道后台拉黑名单）
-4.取消双击属性弹窗添加标签功能，改为右键菜单操作
-5.增加属性右键菜单功能，主要包括（添加高亮状态，添加删除状态，添加自定义作用）应用场景：
-	a.在修改老接口时，可以给新增的字段或删除的字段添加高亮或删除状态，方便前端同事快速定位接口字段调整
-	b.处于删除状态的字段在调试接口时不会传参到后台，方便接口的全方位调试
-	c.当@LKADocument的sconAll=true时，会把接口的所有参数扫描出来，部分没有加@LKAProperty和@LKAParam注	解的参数并没有设置作用描述之类的信息，那么就可以通过“自定义作用”动态的添加该参数的作用，当然也可以修改已	经设置好的作用。
-	d.如果想取消高亮、删除或自定义作用的话，右键再点击相应的操作即可。
+## 特性
 
-#### lkadoc 1.3.4于2021年3月31日发布:
-1.增加泛形响应参数自动识别
-例如:自定义响应对象Result<T>,接口返回Result<User>或Result<List<User>>，其中Result和User对象都有@LKAModel，属性有@LKAProperty注解都可以自动扫描识别
-2.优化UI界面，修复一些已知的问题
-#### lkadoc 1.3.3于2021年3月29发布：
-1.修复SpringBoot项目加server.servlet.context-path前缀后静态资源及接口无法调试的问题
-2.远程服务器地址配置由原来的例如：serverNames=192.168.0.77:9010修改为serverNames=192.168.0.77:9010/，如果远程服务器项目也加了contextPath前缀则应该这样配置：serverNames=192.168.0.77:9010/前缀/
-注意：
-a.项目contextPath前缀不会显示在UI界面
-b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前缀，例如：127.0.0.1:8080/前缀/lkadoc.html
-#### lkadoc 1.3.2于2021年3月29日发布:
-1.修复UI界面在Firefox浏览器显示异常的问题
-2.优化接口入参异常提示
-#### lkadoc 1.3.1于2021年3月18日发布：
-1.UI界面增加搜索接口功能，接口前面增加序号，更方便定位接口
-2.优化导出MD格式样式
-3.优化UI界面样式，提供更多接口信息展示空间
-4.增加选项页右键操作，更方便在不同接口切换
+------
 
-#### lkadoc 1.2.10于2021年3月4日发布：
-1.@LKADocument注解增加sconAll属性控制是否自动扫描对象所有（未加@LKAProperty注解）属性，默认false，只扫描有@LKAProperty注解的属性
-2.优化UI界面接口名称排序显示，会把相同开头的API名称的接口显示在一起
-3.修复了一些已知的BUG
-4.1.2.7-1.2.9大家别用，有一个致命的BUG，会导至UI界面加载不了，识别不了日期类型，哈哈哈哈，其它1.2.6这个版本非常稳定，我用了大半年没有出问题，1.2.10刚发布，还待考验，哈哈哈哈。
-#### lkadoc 1.2.7于2020年12月5日发布：
-1.增加当参数没有加@LKAParam，@LKAProperty时，lkadoc可以自动扫描参数信息并展示在UI界面，如果在@LKADocument注解设置enToCn为true可以自动翻译英文为中文参数显示在作用一栏，如果对翻译不满意可以双击参数在弹出对话框中选择标签为作用可以自定义翻译结果（自动翻译需连外网）
-2.优化@LKAProperty注解属性，无需isArray来指定是否是集合，无需type来指定对象类型，lkadoc可以自动识别
-#### lkadoc 1.2.6于2020年11月17日发布：
- 1. 修复不同工程包名相同只能扫描其中一个工程的包路径的BUG
- 2. 修复因注解使用不规范报空指针的BUG
-#### lkadoc 1.2.5于2020年9月26日发布：
- 1. 修复数据校验时不能识接interface接口入参@LKAGroup注解的BUG
- 2. 修复报No content to map due to end-of-input错误信息的BUG
+- **无侵入**：引入它不会对现有项目产生影响。悄然降临，寂静无声。
 
-#### lkadoc 1.2.4于2020年9月24日发布：
-1. 修复项目在使用shiro等框架时application/json方式对象参数数据校验失效的BUG
-2. 修复map集合入参时在自动检测参数paramType类型报数组越界异常的BUG
-3. 优化一条注解描述多个参数时，如果哪个参数无需数据校验可在valids属性中用空字符串“”表示
-4. 优化入参value属性值前面加“n~”代表非必传参数。例如：
-```
-优化之前:
-   @LKAParam(values={"姓名","年龄"},testDatas={"张三","22"},requireds={true,false})
-   @LKAProperty(value="id主键",testData="1001",required=false)
-   优化之后:
-   @LKAParam(values={"姓名^张三","n~年龄^22"})
-   @LKAProperty(value="n~id主键^1001")
-```
+- **整合方便**：一个启动注解就可以完成所有配置。手到擒来，唾手可得。
+- **牛逼的注解**：一个注解可描述多个参数，多层参数结构，甚至能做到接口零注解。纵横天地，心随我意。
+- **狂拽的调试**：支持在线调试接口，同步、异步压力测试接口。丧心病狂，举世无双。
+- **酷炫的界面**：文档界面简洁大气，能同时满足前端和后端开发人员的审美观。参数的展示方式可以在表格和JSON格式间自由切换。
+- **强大的辅助**：支持文档聚合、文档下载、对象属性分组、新接口标记显示、动态修改参数状态(高亮、标记、说明)、全局绑定token等。
 
-#### lkadoc 1.2.3于2020年9月15日发布：
-1. 修复项目不能带中文路径的BUG
-2. 修复找不到文件路径报空指针的BUG
-3. 修复UI界面给父级节点添加标签异常BUG
-4. 增加LKAMethod注解token属性，用于标识该接口是否需要token授权验证
-5. 增加UI界面选项页功能
-6. 拆分lkadoc为api、annotation两个模块。可分别使用以下maven配置：
-```
-<dependency>
-	<groupId>com.github.liukaitydn</groupId>
-	<artifactId>lkadoc-annotations</artifactId>
-	<version>1.3.6</version>
-</dependency>
-<dependency>
-	<groupId>com.github.liukaitydn</groupId>
-	<artifactId>lkadoc-api</artifactId>
-	<version>1.3.6</version>
-</dependency>
-```
-其中lkadoc-annotations是单独的一个模块，如果工程只用到注解可以只添加lkadoc-annotations模块即可。lkadoc-api模块依赖lkadoc-annotations模块，当然工程只添加lkadoc-api模块的maven配置也会自动把lkadoc-annotations模块引入到当前工程。
-#### lkadoc 1.2.2 修复1.2.1不能导出pdf和md的功能
-#### lkadoc 1.2.1 于2020年8月5日发布(有bug，导出有问题，请使用1.2.2版)：
-1. 增加md格式文档导出
-2. 增加对父节点参数名称的复制功能
-3. 增加对父节点参数添加标签功能，如果父节点标签为删除标签，那么在调试该接口时不会把该父节点参数及所有子参数传到后台
-# 3. 准备工作
+#### 展示
 
-## 3.1 在SpringBoot项目中引入jar包
+**自动生成的接口文档UI页面**
+
+![新版风格](https://img-blog.csdnimg.cn/20210701142613279.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
+
+**接口调试页面**
+
+![](C:\Users\liukai\Desktop\lkadoc\教程图片\接口调试界面.png)
+
+## 快速入门
+
+#### 在SpringBoot项目中引入jar包
 
 ```xml
 <!--Lkadoc包-->
@@ -122,10 +39,11 @@ b.如果项目加contextPath前缀，访问UI界面地址也相应的加上前�
 	<artifactId>lkadoc-api</artifactId>
 	<version>1.3.6</version>
 </dependency>
+```
 
-## 3.2 在SpringBoot项目启动类上加上@LKADocument注解
+#### 在SpringBoot项目启动类上加上@LKADocument注解
 
-​```java
+```java
 @LKADocument
 @SpringBootApplication
 public class LKADemoApplication {
@@ -135,32 +53,32 @@ public class LKADemoApplication {
 }
 ```
 
-## 3.3 在application.yml文件中添加如下配置
+#### 在application.yml文件中添加如下配置
 
 ```yaml
 lkad:
-#要扫描接口的包路径，多个用","号隔开，指定父包可以扫描所有父包下的子包（必配）
+#要扫描接口的包路径，多个用","号隔开，指定父包可以扫描所有父包下的子包【必须】
  basePackages: com.lkad.api
-#项目名称（选配）
+#项目名称【可选】
  projectName: Lkadoc测试项目
-#项目描述（选配）
+#项目描述【可选】
  description: 智能、便捷、高效
-#要聚合的项目地址，"-"前面是项目名称（可省略），后面是项目的地址（也可以用域名），多个用","号隔开，用来聚合其它项目的接口信息，可以在UI界面切换（选配）
- serverNames: 租房系统-192.168.0.77:9010/,缴费系统-192.168.0.77:8888/
-#项目的版本号（选配）
+#要聚合的项目地址，"^"前面是项目名称（可省略），后面是项目的地址（也可以用域名），多个用","号隔开，用来聚合其它项目的接口信息，可以在UI界面切换【可选】
+ serverNames: 其它项目1^192.168.0.77:8081/,其它项目2^192.168.0.77:8082/
+#项目的版本号【可选】
  version: 1.0
-#接口文档启动开关,true是开启，false是禁用,默认为开启，此开关对数据校验没有影响（选配）
+#接口文档启动开关,true是开启，false是禁用,默认为开启【可选】
  enabled: true
-#可以为没有加@LKAProperty注解的属性自动翻译英文为中文展示（sconAll为true才会有效果）,默认为false
+#是否开启对未加注解描述的参数进行自动识别，默认为false【可选】
  sconAll: false
- #设置查看接口文档所需的密码，默认不需要密码
+ #设置查看接口文档所需的密码，默认不需要密码【可选】
  password: ""
 ```
 
-或者在启动类注解@LKADocument上设置如下属性（和上面配置二选一即可,效果一模一样）
+**或者在启动类注解@LKADocument上设置如下属性（和上面配置二选一即可,效果一模一样）**
 
 ```java
-@LKADocument(basePackages="com.lkad.api",projectName="Lkadoc测试项目",description="智能、便捷、高效",version="1.0",serverNames="租房系统-192.168.0.77:9010/,缴费系统-192.168.0.77:8888/",enabled=true,pssword="123")
+@LKADocument(basePackages="com.lkad.api",projectName="Lkadoc测试项目",description="智能、便捷、高效",version="1.0",serverNames="其它项目1^192.168.0.52:8081/,其它项目2^192.168.0.52:8082/")
 @SpringBootApplication
 public class LKADemoApplication {
     public static void main(String[] args) {
@@ -169,7 +87,8 @@ public class LKADemoApplication {
 }
 ```
 
-## 3.4 准备测试代码
+**准备测试代码**
+
 ```java
 package com.lkad.api;
 
@@ -198,151 +117,68 @@ public class LKADemoController {
 }
 ```
 
-## 3.5 打开浏览器，输入地址http://127.0.0.1:8080/lkadoc.html 查看效果如下：
+**打开浏览器，输入地址http://127.0.0.1:8080/lkadoc.html 查看效果如下**
 
-![](https://img-blog.csdnimg.cn/2020073115413653.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
+![](C:\Users\liukai\Desktop\lkadoc\教程图片\快速入门.png)
 
-# 4. 基础入门
+## 注解介绍
 
-## 4.1 LKAType注解
+&emsp;&emsp;Lkadoc 是基于注解来自动生成接口文档的，注解功能非常强大，要想灵活的使用 Lkadoc，那么就必须掌握注解相关的知识。Lkadoc为 swagger 大部分注解做了兼容处理，只需修改引入的包路径为com.lk.api.*即可。
 
-```yaml
-LKAType注解:用来描述接口对应的处理类
+#### @LKADocument
+
+```properties
+#@LKADocument是加在SpringBoot启动类上的注解，必须加上，否则Lkadoc接口文档不可使用，用来描述项目信息，该注解下的属性可以代替application配置文件里面的lkad相关配置，非常方便
 #常用属性：
-value:类的作用（必配）
-description:类的描述（选配）
-hidden:是否在UI界面隐藏该类的信息，默认为false（选配）
+basePackages:扫描接口的包路径，多个用","号隔开，指定父包路径可以扫描所有父包下的子包路径【必须】
+projectName:项目名称【可选】
+description:项目描述【可选】
+serverNames:要聚合的项目地址，"^"前面是项目名称（可省略），后面是项目的地址（也可以用域名），多个用","号隔开，用来聚合其它项目的接口信息，可以在UI界面切换【可选】
+version:项目的版本号,配合@LKAMethod注解的version属性可以快速定位新接口【可选】
+enabled:接口文档启动开关,true是开启，false是禁用,默认为开启【可选】
+sconAll: 是否开启对未加注解描述的参数进行自动识别，默认为false【可选】
+password:设置查看接口文档所需的密码，默认不需要密码【可选】
 ```
 
-*注意：Lkadoc为swagger大部分注解做了兼容处理，只需修改引入的包路径为com.lk.api.*即可*
+#### @LKAType
 
-## 4.2 LKAMethod注解
-
-```yaml
-LKAMethod注解:用来描述接口信息
+```properties
+#用来描述类的信息
 #常用属性：
-value:接口的作用（必配）
-description:接口的描述（选配）
-contentType:请求头ContentType类型，默认为application/x-www-form-urlencoded（选配）
-author:作者（选配）
-createTime:接口创建时间（选配）
-updateTime:接口修改时间（选配）
-hidden:是否在UI界面隐藏该接口，默认为false（选配）
-version:接口版本号，如果项目版本号相同，在UI界面会标记为新接口（选配）
-download:是否是下载的方法，如果该接口涉及到下载文件必须设置成true，默认是false（选配）
-token:是否需要在接口文档UI界面显示authorize token标签，只标识该接口需要token验证，不会影响正常业务，默认是true（选配）
-order:排序，数字越少越靠前
-directory:指定上级目录（上级目录必须存在，不然不会展示在接口文档，默认当前类的目录）
+value:类的作用【必须】
+description:类的描述【可选】
+hidden:是否在UI界面隐藏该类的信息，默认为false，如果设置为ture那么该类下在的所有接口也会隐藏【可选】
+order:排序，值越少越靠前【可选】
 ```
 
-### 4.2.1 LKAType和LKAMethod演示代码
+#### @LKAMethod
 
-```java
-package com.lkad.api;
-
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.lk.api.annotation.*;
-import com.lk.api.constant.ContentType;
-
-@LKAType(value="第一个测式类",description="用来演示LKADocument",hidden=false)
-@RestController
-@RequestMapping("lkadocument/demo")
-public class LKADemoController {
- 
-    @LKAMethod(value="登录",description="用户登录验证",contentType=ContentType.URLENCODED,
-author="liukai",hidden=false,version="1.0",download=false,createTime="2020-7-20",updateTime="2020-7-20")
-    @LKAParam(names= {"name","pwd"},values= {"用户名","密码"})
-    @LKARespose(names= {"code","msg"},values= {"状态码","消息"})
-    @PostMapping("login")
-    public Map<String,Object> login(String name,String pwd) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("code",200);
-        map.put("msg","登录成功，欢迎"+name+"光临本系统");
-        return map;
-    }
-}
+```properties
+#用来描述接口的信息
+#常用属性：
+value:接口的作用【必须】
+description:接口的描述【可选】
+contentType:请求头ContentType类型，默认为application/x-www-form-urlencoded【可选】
+author:作者【可选】
+createTime:接口创建时间【可选】
+updateTime:接口修改时间【可选】
+hidden:是否在UI界面隐藏该接口，默认为false【可选】
+version:接口版本号，如果项目版本号相同，在UI界面会标记为新接口【可选】
+download:是否是下载的方法，如果该接口涉及到下载文件必须设置成true，默认是false【可选】
+token:是否需要token验证，只标识该接口需要token验证，不会影响正常业务，默认是true【可选】
+order:排序，数字越少越靠前【可选】
+directory:指定上级目录（这里目录是指@LKAType的value属性值，上级目录必须存在，不然不会展示在接口文档，默认当前类的目录）【可选】
 ```
 
-效果图：
+#### @LKAParam / @LKAParams
 
-![](https://img-blog.csdnimg.cn/20200731154236309.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 4.3 运用版本号快速定位新接口
-&emsp;&emsp;大家应该还有印象，在用@LKADocument注解配置项目信息时有一个version属性用来设置项目的版本号，然后@LKAMethod注解也有一个version属性用来设置接口的版本号，在实际工作中，往往一个项目版本升级并不代表所有接口都需要升级，也可能会增加一些新接口。那么我们怎么才能在众多的接口中定位哪一个接口是新接口或最新修改的接口呢？很简单，我们只需把新接口或最新修改的接口的@LKAMethod注解version属性的版本值设置和@LKADocument注解的version属性的版本值设置成一致就可以了，这样Lkadoc会用红色标记出新接口。那么后端在和前端同事对接口时就可以很快定位哪些是新接口了。
-
-
-### 4.3.1 案例：
-```java
-package com.lkad.api;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.lk.api.annotation.*;
-
-/**
- * 在这里我们再准备一个测试
- */
-@LKAType("Hello类")
-@RestController
-public class HelloController {
-    /**
-     * 注意：这个接口并没有设置version版本值，但4.2.1那个测试代码的登录接口设置了version值和项目的
-     * version值一致，我们对比一下看看两个接口在UI展示有什么不一样。
-     */
-    @LKAMethod(value="Hello方法")
-    @GetMapping("hello")
-    public String hello() {
-        return "hello Lkadoc!";
-    }
-}
-```
-
-效果图：
-
-![](https://img-blog.csdnimg.cn/20200731154302326.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 4.4 LKAParam和LKAParams注解
-
-### 4.4.1 常用属性解析
-
-```yaml
-LKAParam/LKAParams:描述请求参数信息，LKAParams注解可以包含多个LKAParam注解，用来描述多个请求参数。
-
-#常用属性,带s复数属性代表可以设置多个参数,但要注意参数顺序。带s和不带s设置时只能二选一
-name/names:参数名称（用name设置参数名称时必配;用names设置参数名称时可省略，但JDK版本要1.8以上，编译的时候还要加上–parameters参数，这样Lkadoc可自动获取到参数名称,否则必配）
-#例如:
-#单个参数配置:
-#@LKAParam(name="name",...)
-#多个参数配置:
-#@LKAParam(names={"name","pwd","age"},...)//这里如果和接口入参顺序一样，可省略不用配置
-    #或者
-#@LKAParams({
-    #@LKAParam(name="name",...),
-    #@LKAParam(name="pwd",...),
-    #@LKAParam(name="age",...)
-#})
-
-value/values:参数作用（必配）
-#例如:
-#单个参数配置:
-#@LKAParam(name="name",value="用户名")
-#多个参数配置:
-#@LKAParam(values={"用户名","密码","年龄"})//这里把names省略了(注意入参顺序)，可自动获取
-    #或者
-#@LKAParams({
-    #@LKAParam(name="name",value="用户名"),
-    #@LKAParam(name="pwd",value="密码"),
-    #@LKAParam(name="age",value="年龄")
-#})
-
-description/descriptions:参数的描述（选配）
-#例如：和value/values用法一样（略）
-
-dataType/dataTypes:数据类型，（用dataType配置时默认值String.class;用dataTypes配置时可自动获取参数的数据类型，可省略不配置，但要注意参数的顺序。）（选配）(1.2.7版本以后可自动识别基本数据类型，如果是基本数据类型可以不用配置)
+```properties
+#用来描述请求参数的信息
+#常用属性：带s复数属性代表可以设置多个参数,但要注意参数顺序。带s和不带s设置时只能二选一
+name/names:参数名称【必须】（用name设置参数名称时必须;用names设置参数名称时可省略，但JDK版本要1.8以上，编译的时候还要加上–parameters参数，这样Lkadoc可自动获取到参数名称,否则必须）
+value/values:参数作用【必须】
+description/descriptions:参数的描述【可选】
+dataType/dataTypes:数据类型【可选】（用dataType配置时默认值String.class;用dataTypes配置时可自动获取参数的数据类型，可省略不配置，但要注意参数的顺序。）
 #例如:
 #单个参数配置:
 #@LKAParam(name="name",value="用户名",dataType=String.class)//这里可省略，因为默认是String
@@ -354,391 +190,60 @@ dataType/dataTypes:数据类型，（用dataType配置时默认值String.class;�
     #@LKAParam(name="pwd",value="密码",dataType=String.class),
     #@LKAParam(name="age",value="年龄",dataType=Integer.class)
 #})
-
-required/requireds:是否必传，默认为true（选配）(更简便的用法是在参数名后加"-n"代表非必传或者在入参value属性值前面加“n~”代表非必传参数)
+required/requireds:是否必传，默认为true【可选】(更简便的用法是在参数名后加"-n"代表非必传或者在入参value属性值前面加“n~”代表非必传参数)
 #例如:
 #@LKAParam(name="name",value="用户名",required=false)
 #或者
 #@LKAParam(name="name-n",value="用户名") //参数名称后面加"-n"代表非必传
 #或者
 #@LKAParam(name="name",value="n~用户名") //value属性值前面加“n~”代表非必传参数
-
-paramType/paramTypes:参数位置，query、header、path三选一，（用paramType配置时默认为query;用paramTypes配置时Lkadoc可根据参数注解@PathVariable、@RequestHeader自动获取参数位置，可省略不配）(1.2.7版本以后可自动识别，无需配置）
-
-isArray/isArrays:是否是集合或数组，默认false（选配）
-
-testData/testDatas:测试数据（选配）(更简便的用法是在value/values后面的"^"符号后面加上测试数据)
+paramType/paramTypes:参数位置，query、header、path三选一【可选】（用paramType配置时默认为query;用paramTypes配置时Lkadoc可根据参数注解@PathVariable、@RequestHeader自动获取参数位置，可省略不配）
+isArray/isArrays:是否是集合或数组，默认false【可选】
+testData/testDatas:测试数据【可选】(更简便的用法是在value后面的"^"符号后面加上测试数据)
 #例如:
 #@LKAParam(name="name",value="用户名",required=false,testData="张三")
 #或者
-#@LKAParam(name="name-n",value="用户名^张三") //在value/values后面的"^"符号后面加上测试数据
-
-type:入参对象类型（当接口请求参数是一个对象时使用，但一般不需要设置，可自动识别）
-
-group:和type配合使用，对象参数分组，可过滤没必要的参数
-
-#数据校验相关属性（后面会详细讲解）
-valids:数据校验常用规则或正则匹配
-msgs:数据校验消息
-range:数值范围限制判断
-size:集合、数组大小限制判断
-length:字符串长度限制判断
+#@LKAParam(name="name-n",value="用户名^张三") //在value后面的"^"符号后面加上测试数据
+type:入参对象类型【可选】（当接口请求参数是一个对象时使用，但一般不需要设置，可自动识别）
+group:和type配合使用，对象参数分组，可过滤没必要的参数【可选】
 ```
 
-### 4.4.2 测试代码
+#### @LKAModel
 
-```java
-/**
-* 在LKADemoController类中加一个测试接口getUsers
-* 说明：
-* dataType和paramType均可自动获取,所以可省略不配
-* required在name后用"-n"代替，所以可以省略不配
-* testData可在value后面的"^"加上，所以可以省略不配
-*/
-@LKAMethod("获取用户信息")
-@LKAParam(names= {"name","age-n","roleType-n","token"},values= {"用户名^张三","年龄^22","角色类型^1","授权token^aa"})
-@LKARespose(names= {"code","msg","data"},values= {"状态码","消息","数据"})
-@PostMapping("getUsers/{roleType}")
-public Map<String,Object> getUsers(
-    String name,
-    Integer age,
-    @PathVariable("roleType")Integer roleType,//path参数
-    @RequestHeader("token")String token) { //header参数
-    Map<String,Object> map = new HashMap<>();
-    map.put("code",200);
-    map.put("msg","获取信息成功");
-    map.put("data","姓名："+name+",年龄："+age+",角色类型："+(roleType==1?"经理":"员工")+",token："+token);
-    return map;
-}
+```properties
+#用来描述实体类的信息
+#常用属性：
+value:属性的作用【可选】
+description:属性的描述【可选】
 ```
 
-效果图:
+#### @LKAProperty
 
-![](https://img-blog.csdnimg.cn/20200731154334748.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 4.5 调试API功能
-
-### 4.5.1 测试API请求
-&emsp;&emsp;Lkadoc支持对单个接口进入调试，我们只需要准备好请求参数的测试数据，然后点击"测试API请求"按钮，就可以在调试窗口看到结果信息了。
-
-
-![](https://img-blog.csdnimg.cn/20200731154359423.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-### 4.5.2 压力测试
-&emsp;&emsp;我们可以通过选择执行方式来决定接口采用"同步"还是"异步"执行，如果选择"同步"测试，可以选择执行次数，和时间间隔，这样可以模拟对接口进行压力测试。如果选择"异步"测试，可以选择执行次数，这样可以模拟对接口进行并发测试。所有测试结果会打印在调试窗口中。
-![](https://img-blog.csdnimg.cn/20200731154418627.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 4.6 全局token锁定
-&emsp;&emsp;我们在调试需要token授权的接口时,需要在每个需要授权接口的请求头带上一个类似token的参数，调试时非常不方便，所以Lkadoc提供了一个可以给全局接口锁定一个请求头参数，这样就不需要在每一个需要授权的接口中去设置这个授权参数了。
-
-
-![](https://img-blog.csdnimg.cn/20200731154447314.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 4.7 数组传参
-### 4.7.1 注意事项
-```
-数组传参注意事项
-1.isArray要设置成true，代表是数组
-2.参数类型dataType一定要是一个数组类型，例如：String[].class
-3.接口调试时要勾选“阻止深度序列化”
-```
-### 4.7.2 测试代码
-```java
-/**在LKADemoController类中加一个测试接口*/
-@LKAMethod(value="数组传参")
-@LKAParam(name="ids",value="用户id",isArray=true,dataType=String[].class)
-@LKARespose(names= {"code","msg","data"},values= {"状态码","消息","数据"})
-@PostMapping("arrTest")
-public Map<String,Object> arrTest(String[] ids) {
-    String arr = "";
-    if(ids != null) {
-        for (String id : ids) {
-            if("".equals(arr)) {
-                arr = id;
-            }else {
-                arr = arr+","+id;
-            }
-        }
-    }
-    Map<String,Object> map = new HashMap<>();
-    map.put("code",200);
-    map.put("msg","获取信息成功");
-    map.put("data","ids="+arr);
-    return map;
-}
+```properties
+#用来描述实体类的属性的信息
+#常用属性:
+value:属性的作用【必须】
+description:属性的描述【可选】
+hidden:是否在UI界面隐藏该属性，默认为false【可选】
+testData:测试数据【可选】（更简便的用法是在value后面的"^"符号后面加上测试数据）
+required:是否必传，默认为true【可选】（更简便的用法是在value前面加"n~"代表非必传）
+isArray:是否是数组或集合，不设置也可自动识别【可选】
+type:当属性为对象类型时，可以用type来指定，不设置也可自动识别【可选】
+groups:用来进行参数分组设置，可设置多个组名【可选】（required在分组时用法是在groups属性里面的组名后面加"-n"代表不是必传，不加默认是必传）
 ```
 
-效果图:
+#### @LKAGroup
 
-![](https://img-blog.csdnimg.cn/20200731154506448.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 4.8 文件上传
-
-### 4.8.1 注意事项
-```
-文件上传(支持单个或批量上传)注意事项
-1.如果是批量上传isArray要设置成true，代表是数组
-2.单个文件上传dataType类型要设置成"MultipartFile.class",批量上传dataType参数类型要设置成“MultipartFile[].class”
-3.前端需要把from表单的enctype属性设置成'multipart/form-data'
-4.请求类型必须是"post"
+```properties
+#@LKAGroup是一个入参注解，作用是指定对象是哪组参数用来作为入参
 ```
 
-### 4.8.2 测试代码
+#### @LKARespose/@LKAResposes
 
-```java
-/**在LKADemoController类中加一个测试接口*/
-@LKAMethod(value="文件批量上传",contentType=ContentType.FORMDATA)
-@LKAParam(name= "files",value="上传文件",isArrays= true,dataType=MultipartFile[].class)
-@LKARespose(names= {"code","msg","data"},values= {"状态码","消息","数据"})
-@PostMapping("fileUpload")
-public Map<String,Object> fileUpload(MultipartFile[] files) {
-    String fileNames = "";
-    if(files != null) {
-        for (MultipartFile f : files) {
-            if("".equals(fileNames)) {
-                fileNames = f.getOriginalFilename();
-            }else {
-                fileNames = fileNames + ","+f.getOriginalFilename();
-            }
-        }
-    }
-    //上传后续业务处理：略
-    Map<String,Object> map = new HashMap<>();
-    map.put("code",200);
-    map.put("msg","上传文件成功!");
-    map.put("data","文件名："+fileNames);
-    return map;
-}
-```
-
-效果图:
-
-![](https://img-blog.csdnimg.cn/20200731154524535.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 4.9 文件下载
-
-### 4.9.1 注意事项
-&emsp;&emsp;LKAMethod注解里面的download属性要设置成true,代表是下载的接口
-### 4.9.2 测试代码
-
-```java
-/**在LKADemoController类中加一个测试接口*/
-@LKAMethod(value="文件下载",download=true)
-@PostMapping("fileDownload")
-public void fileDownload(HttpServletResponse response) throws Exception {
-    String path = "D:\\test.txt";
-    File file = new File(path);
-    String ext = file.getName().substring(file.getName().lastIndexOf(".") + 1).toUpperCase();
-    InputStream fis = new BufferedInputStream(new FileInputStream(path));
-    byte[] buffer = new byte[fis.available()];
-    fis.read(buffer);
-    fis.close();
-    response.reset();
-    response.addHeader("Content-Disposition", "attachment;filename=" + new String(file.getName().getBytes()));
-    response.addHeader("Content-Length", "" + file.length());
-    OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
-    response.setContentType("application/octet-stream");
-    toClient.write(buffer);
-    toClient.flush();
-    toClient.close();
-}
-```
-
-![](https://img-blog.csdnimg.cn/20200731154542920.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-# 5. 高级应用
-
-## 5.1 LKAModel注解
-
-```yaml
-LKAModel注解:用来标识需要扫描的实体类
-```
-
-## 5.2 LKAProperty注解
-
-```yaml
-LKAProperty注解:用来描述实体类的属性信息
+```properties
+#用来描述响应参数的信息
 #常用属性
-value:属性的作用
-description:属性的描述
-hidden:是否在UI界面隐藏该属性，默认为false（选填）
-testData:测试数据（选配）
-	1.更简便的用法是在value后面的"^"符号后面加上测试数据
-required:是否必传，默认为true（选配）
-	1.更简便的用法是在value前面加"n~"代表非必传
-	2.分组时用法是在groups属性里面的组名后面加"-n"代表不是必传，不加默认是必传
-isArray:是否是数组或集合，1.2.7版本以后无需指定，可自动识别
-type:当属性为对象类型时，需用type来指定，1.2.7版本以后无需指定，可自动识别
-groups:用来进行参数分组
-#数据校验相关属性（后面会详细讲解）
-valids:数据校验常用规则或正则匹配
-msgs:数据校验消息
-range:数值范围限制判断
-size:集合、数组大小限制判断
-length:字符串长度限制判断
-```
-
-## 5.3 基本对象入参
-
-### 5.3.1 注意事项
-&emsp;&emsp;当我们入参是一个对象时，如果该对象上有@LKAModel注解，并且它的属性上有@LKAProperty注解，那么Lkadoc会去自动扫描这个对象信息，我们无需在接口上加额外的注解去描述对象参数。这样如果我们用对象去操作入参的话，可以大大减少接口上的注解数量，显得更加简洁。
-
-
-### 5.3.2 测试代码
-
-```java
-/**准备一个角色对象*/
-@LKAModel
-public class Role {
-    @LKAProperty(value="角色id^1")
-    private Integer id;
-    @LKAProperty(value="角色^名称")
-    private String name;
-    
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-}
-
-/**在LKADemoController类中加一个测试接口*/
-@LKAMethod("基本对象入参")
-@GetMapping("getRole")
-public Role getRole(Role role) {
-    return role;
-}
-```
-
-效果图：
-![](https://img-blog.csdnimg.cn/20200731154641377.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 5.4 复杂的对象入参
-
-### 5.4.1 注意事项
-
-```
-1.复杂的对象需把@LKAMethod注解的contentType属性设置为"application/json"
-2.如果contentType="application/json"，需在接收对象参数前面加@RequestBody注解
-3.如果contentType="application/json"，那么接口的请求类型不能是get
-4.如果对象参数是实体类型需要用@LKAProperty注解的type属性来指定类型
-5.如果对象参数是数组或List或Set集合需要把@LKAProperty注解的isArray设置成true
-```
-
-### 5.4.2 测试代码
-```java
-/**再增加两个对象address和User，加上之前Role一共有3个对象*/
-@LKAModel
-public class Address {
-    @LKAProperty(value="地址ID^1")
-    private Integer id;
-    @LKAProperty(value="地址信息^深圳市龙华区")
-    private String info;
-    ....get/set方法.....
-}
-
-@LKAModel
-public class User {
-    @LKAProperty(value="用户ID",hidden=true)//hidden设置成true，该属性不会在UI界面展示
-    private Integer id;
-    @LKAProperty(value="用户名称^张三")
-    private String name;
-    @LKAProperty(value="n~年龄^20",description="范围0-120")
-    private String age;
-    @LKAProperty(value="角色对象")
-    private Role role;
-    @LKAProperty(value="用户爱好^运动")
-    private String[] likes;
-    @LKAProperty(value="地址信息")
-    private List<Address> addresses;
-    ....get/set方法.....
-}
-
-/**在LKADemoController类中加一个测试接口*/
-@LKAMethod(value="复杂的对象传参",contentType=ContentType.JSON)
-@PostMapping("addUser")
-public User addUser(@RequestBody User user) {
-    return user;
-}    
-```
-
-效果图1：
-
-![](https://img-blog.csdnimg.cn/2020073115470261.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-效果图2：
-
-![](https://img-blog.csdnimg.cn/20200731154718870.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 5.5 对象参数分组
-    	我们感受到了用对象接收请求参数更具便利性，那怎么去过滤对象属性呢？例如：有一个查询接口，只用到user对象的name、age和addresses属性对象的info参数，但对于前端的友好度，我们不需要展示所有对象属性到UI界面，这时我们就可以用分组来实现.
-
-
-### 5.5.1 注意事项
-```
-1.分组可以用@LKAProperty注解的groups属性来设置组名
-2.一个属性可以属于多个组，组名不能重复
-3.组名没有任何限制，只要不是空白的字符串即可
-4.如果用到嵌套对象里面属性，嵌套对象名称和对应属性上都要设置相同的组名
-5.入参对象需要用@LKAGroup注解来指定对象是哪组参数用来作为入参
-```
-
-### 5.5.2 测试代码
-
-```java
-/**这里我们设置一个组名叫addUser（和接口名保持一致，方便区分）,分别用到user对象的name参数、age参数和addresses属性对象的info参数*/
-@LKAModel
-public class User {
-    @LKAProperty(value="用户ID",hidden=true)//hidden设置成true，该不会在UI界面展示
-    private Integer id;
-    @LKAProperty(value="用户名称^张三",groups= {"addUser"})
-    private String name;
-    @LKAProperty(value="n~年龄^20",description="范围0-120",groups= {"addUser"})
-    private String age;
-    @LKAProperty(value="角色对象")
-    private Role role;
-    @LKAProperty(value="用户爱好^运动")
-    private String[] likes;
-    @LKAProperty(value="地址信息",groups= {"addUser"})
-    private List<Address> addresses;
-    .......get/set.......
-}
-@LKAModel
-public class Address {
-    @LKAProperty(value="地址ID",testData="5")
-    private Integer id;
-    @LKAProperty(value="地址信息",testData="深圳市龙华区",groups= {"addUser"})
-    private String info;
-    .......get/set.......
-}
-
-
-/**在LKADemoController类中的addUser接口入参对象User前面加一个注解@LKAGroup("addUser")*/
-@LKAMethod(value="复杂的对象传参",contentType=ContentType.JSON)
-@PostMapping("addUser")
-public User addUser(@RequestBody @LKAGroup("addUser") User user) {
-    return user;
-}
-```
-
-效果图：
-
-![](https://img-blog.csdnimg.cn/20200731154746766.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 5.6 响应参数的基本用法
-### 5.6.1 LKARespose/LKAResposes注解
-
-```yaml
-LKARespose/LKAResposes:描述响应参数信息，LKAResposes注解可以包含多个LKARespose注解，用来描述多个响应参数。
-#常用属性
-name/names:参数名称，和type参数二选一（必填）
+name/names:参数名称，和type参数二选一【必须】
 #例如:
 #单个参数配置:
 #@LKARespose(name="code",...)
@@ -750,336 +255,24 @@ name/names:参数名称，和type参数二选一（必填）
     #@LKARespose(name="msg",...),
     #@LKARespose(name="data",...)
 #})
-value/values:参数作用（必填）
-description/descriptions:参数的描述（选填）
-dataType/dataTypes:参数数据类型，默认String.class（选填）,1.2.7可自动识别基本数据类型
-isArray/isArrays:是否是集合或数组，默认false（选填）
-type:出参对象类型，和name/names参数二选一（必填），1.2.7可自动识别
-group:和type配合使用，对象参数分组，可过滤没必要的参数（选填）
+value/values:参数作用【必须】
+description/descriptions:参数的描述【必须】
+dataType/dataTypes:参数数据类型，当使用dataTypes不设置也可以自动识别【可选】
+isArray/isArrays:是否是集合或数组，默认false【可选】
+type:出参对象类型，和name/names参数二选一，可自动识别【可选】
+group:和type配合使用，对象参数分组，可过滤没必要的参数【可选】
 #父参数
-parentName:父参名称（选填）
-parentValue:父参作用（选填）
-parentDescription:父参描述（选填）
-parentIsArray:父参是否是数组或集合（选填）
+parentName:父参名称【可选】
+parentValue:父参作用【可选】
+parentDescription:父参描述【可选】
+parentIsArray:父参是否是数组或集合【可选】
 #爷参数
-grandpaName:爷参名称（选填）
-grandpaValue:爷参作用（选填）
-grandpaDescription:爷参描述（选填）
-grandpaIsArray:爷参是否是数组或集合（选填）
-```
-### 5.6.2 简单Map集合出参
-```java
-/**
- 我们回过头来看之前用过的一个接口-获取用户信息，这个接口响应参数是一个Map集合,这个Map集合结构比较简单，就  三个不带嵌套结构的属性，这个描述非常简单，一条@LKARespose注解搞定。
-*/
-@LKAMethod("获取用户信息")
-@LKAParam(names= {"name","age-n","roleType-n","token"},values= {"用户名^张三","年龄^22","角色类型^1","授权token^aa"})
-@LKARespose(names= {"code","msg","data"},values= {"状态码","消息","数据"})
-@PostMapping("getUsers/{roleType}")
-public Map<String,Object> getUsers(
-    String name,
-    Integer age,
-    @PathVariable("roleType")Integer roleType,//path参数
-    @RequestHeader("token")String token) { //header参数
-    Map<String,Object> map = new HashMap<>();
-    map.put("code",200);
-    map.put("msg","获取信息成功");
-    map.put("data","姓名："+name+",年龄："+age+",角色类型："+(roleType==1?"经理":"员工")+",token："+token);
-    return map;
-}
-```
-效果图：
-
-![](https://img-blog.csdnimg.cn/20200731154807202.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-### 5.6.3 对象出参
-```java
-/**
-如果出参是一个对象，且对象有加@LKAModel及属性有加@LKAProperty注解，那么Lkadoc会自动扫描该出参对象，我们可以看如下接口入参和出参都是一个对象，那么就不需注解去描述出参和入参了，非常简洁。
-*/
-@LKAMethod(value="复杂的对象传参",contentType=ContentType.JSON)
-@PostMapping("addUser")
-public User addUser(@RequestBody @LKAGroup("addUser") User user) {
-    return user;
-}
+grandpaName:爷参名称【可选】
+grandpaValue:爷参作用【可选】
+grandpaDescription:爷参描述【可选】
+grandpaIsArray:爷参是否是数组或集合【可选】
 ```
 
-效果图1：
-
-![](https://img-blog.csdnimg.cn/20200731154830120.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-效果图2：
-![](https://img-blog.csdnimg.cn/20200731154848518.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 5.7 复杂的Map结构出参
-
-### 5.7.1 说明
-&emsp;&emsp;当一个接口出参是一个带嵌套结构的Map集合，我们该怎么描述它呢？如果涉及到对象，我们可以用@LKARespose注解的type属性去指定对象类型，如果涉及到多层嵌套结构，我们可以通过@LKARespose注解的parentXXX和grandpaXXX属性来指定。
-
-### 5.7.2 测试代码
-```java
-/**在LKADemoController类中加一个测试接口*/
-@LKAMethod(value="响应参数复杂的Map结构用法")
-@LKAResposes({
-    @LKARespose(names= {"code","msg"},values= {"状态码","消息"}),
-    @LKARespose(name="total",value="总记录数",parentName="result",parentValue="响应数据"),
-    @LKARespose(type=User.class,parentName="users",parentIsArray=true,parentValue="用户对象列表",grandpaName="result")
-})
-@GetMapping("getMap")
-public Map<String,Object> getMap() {
-    Map<String,Object> map = new HashMap<>();
-    map.put("code",200);
-    map.put("msg","操作成功！");
-    Map<String,Object> data = new HashMap<>();
-    data.put("total",10);
-    List<User> users = new ArrayList<>();
-    User user1 = new User();
-    user1.setName("张三");
-    User user2 = new User();
-    user2.setName("李四");
-    users.add(user1);
-    users.add(user2);
-    data.put("users",users);
-    map.put("result",data);
-    return map;
-}
-```
-
-表格展示效果图：
-
-![](https://img-blog.csdnimg.cn/20200731154909163.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-JSON格式化展示效果图：
-
-![](https://img-blog.csdnimg.cn/20200731154924489.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-### 5.7.3 超过3层嵌套结构用法技巧
-
-&emsp;&emsp;通过parentXXX和grandPaXXX相关属性用一条@LKARespose注解只能一次性描述1到3级节点，如果有5级或者10级节点该怎么办？ 也有解决办法，非常简单，但注解可能会比较多，例如有这么一个结构{a:{b:{c:{d:1}}}},我们可以这么做:
- @LKARespose(name="a",value="一级"),
- @LKARespose(name="b",value="二级",parentName="a"),
- @LKARespose(name="c",value="三级",parentName="b"),
- @LKARespose(name="d",value="四级",parentName="c")
-
-
-### 5.7.4 测试代码
-```java
-/**在LKADemoController类中加一个测试接口*/
-@LKAMethod(value="超过3层嵌套结构用法技巧")
-@LKAResposes({
-    @LKARespose(name="a",value="一级"),
-    @LKARespose(name="b",value="二级",parentName="a"),
-    @LKARespose(name="c",value="三级",parentName="b"),
-    @LKARespose(name="d",value="四级",parentName="c")
-})
-@GetMapping("getMoreMap")
-public Map<String,Object> getMoreMap(){
-    Map<String,Object> mapa= new HashMap<>();
-    Map<String,Object> mapb= new HashMap<>();
-    Map<String,Object> mapc= new HashMap<>();
-    Map<String,Object> mapd= new HashMap<>();
-    mapa.put("a",mapb);
-    mapb.put("b",mapc);
-    mapc.put("c",mapd);
-    mapd.put("d",1);
-    return mapa;
-}
-```
-
-效果图：
-
-![](https://img-blog.csdnimg.cn/20200731154943829.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 5.8 复杂的对象结构出参
-
-### 5.8.1 准备一个响应封装对象
-
-```java
-@LKAModel
-public class ApiResult {
-    @LKAProperty(value="响应状态",description="200-正常,其它-错误")
-    private String code;
-    @LKAProperty(value="响应消息")
-    private String msg;
-    @LKAProperty(value="响应数据")
-    private Map<String,Object> result = new HashMap<>();
-    
-    private ApiResult() {}
-    
-    public static ApiResult ok() {
-        ApiResult res = new ApiResult();
-        return res;
-    }
-    
-    public ApiResult put(String key,Object value) {
-        this.result.put(key, value);
-        return this;
-    }
-    ..........get/set方法...........
-}
-```
-
-### 5.8.2 准备一个测试接口
-
-```java
-/**
-这个方法其实和上面5.7.2那个测试方法响应参数结构是一样的，不一样的地方是一个是Map,一个是ApiResut对象。但是我们发现这个方法在响应参数描述是少用一个注解：
-@LKARespose(names= {"code","msg"},values= {"状态码","消息"})
-这是因为ApiResult对象已经通过@LKAProperty注解描述过"code","msg"属性了，Lkadoc会去自动扫描带有@LKAModel注解的响应对象。还有如果@LKARespose注解描述的参数和对象里面的属性一致的话，@LKARespose注解描述的参数会覆盖掉对象里面的属性
-*/
-@LKAMethod(value="响应参数复杂的对象结构用法")
-@LKAResposes({
-    @LKARespose(name="total",value="总记录数",parentName="result",parentValue="响应数据"),
-    @LKARespose(type=User.class,parentName="users",parentIsArray=true,parentValue="用户对象列表",grandpaName="result")
-})
-@PostMapping("getObj")
-public ApiResult getObj() {
-    List<User> users = new ArrayList<>();
-    User user1 = new User();
-    user1.setName("张三");
-    User user2 = new User();
-    user2.setName("李四");
-    users.add(user1);
-    users.add(user2);
-    return ApiResult.ok().put("total",10).put("users",users);
-}
-```
-
-效果图：
-
-![](https://img-blog.csdnimg.cn/20200731155006871.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-## 5.9 响应参数对象属性分组
-&emsp;&emsp;@LKARespose注解的group属性也可以实现响应参数分组，使用原理和请求参数分组是一样的。
-
-### 5.9.1 准备一个对象属性过滤器
-
-```java
-/**
-对象字段过滤器(为了模拟真实业务场景加了这个工具，与Lkadoc没有任何关联。)
-这里用到了一个fastJson的jar工具
-<dependency>
-    <groupId>com.alibaba</groupId>
-    <artifactId>fastjson</artifactId>
-    <version>1.2.31</version>
-</dependency>
-*/
-public class FieldsFilter {
-
-    public static<T> Map<String,Object> filter(T object,List<String> fieldNames){
-        if(object == null){
-            return null;
-        }
-        Map<String,Object> map = new HashMap<>();
-        //把object转换成json对象
-        JSONObject json = JSON.parseObject(JSON.toJSONString(object));
-        //判断要过滤的字段
-        for (String fieldName : fieldNames) {
-            Object value = json.get(fieldName);
-            map.put(fieldName,value);
-        }
-        return map;
-    }
-
-    public static<T> List<Map<String,Object>> filter(List<T> list,List<String> fields){
-        if(list == null || list.size() == 0){
-            return null;
-        }
-        List<Map<String,Object>> maps = new ArrayList<>();
-        for (Object object : list) {
-            Map<String, Object> filter = filter(object, fields);
-            maps.add(filter);
-        }
-        return maps;
-    }
-}
-```
-
-### 5.9.2 给对象属性分组
-
-```java
-/**
-我们可以看到，这里一共有两个分组，一个是'addUser'给之前一个叫addUser接口入参数使用的，另一个是'getObj'这个就是我们等下要演示响应对象属性分组用的。'getObj'组包含的属性有User对象的用户名称、年龄、用户爱好，Role对象的角色名称。
-*/
-@LKAModel
-public class User {
-    @LKAProperty(value="用户ID",hidden=true)//hidden设置成true，该不会在UI界面展示
-    private Integer id;
-    @LKAProperty(value="用户名称^张三",groups= {"addUser","getObj"})
-    private String name;
-    @LKAProperty(value="年龄^20",required=false,description="范围0-120",groups= {"addUser","getObj"})
-    private String age;
-    @LKAProperty(value="角色对象",type=Role.class,groups= {"getObj"})
-    private Role role;
-    @LKAProperty(value="用户爱好^运动",isArray=true,groups= {"getObj"})
-    private String[] likes;
-    @LKAProperty(value="地址信息",isArray=true,type=Address.class,groups= {"addUser"})
-    private List<Address> addresses;
-    ..........get/set方法...........
-}
-
-@LKAModel
-public class Role {
-    @LKAProperty(value="角色id^1")
-    private Integer id;
-    @LKAProperty(value="角色名称^经理",groups= {"getObj"})
-    private String name;
-    ..........get/set方法...........
-}
-```
-
-### 5.9.3 测试代码： 
-
-```java
-/**我们修改一下5.8.2的测试接口如下*/
-@LKAMethod(value="响应参数复杂的对象结构用法")
-@LKAResposes({
-  @LKARespose(name="total",value="总记录数",parentName="result",parentValue="响应数据"),
-  @LKARespose(type=User.class,group="getObj",parentName="users",parentIsArray=true,parentValue="用户对象列表",grandpaName="result")
-})
-@PostMapping("getObj")
-public ApiResult getObj() {
-    List<User> users = new ArrayList<>();
-    User user1 = new User();
-    user1.setName("张三");
-    User user2 = new User();
-    user2.setName("李四");
-    users.add(user1);
-    users.add(user2);
-    Role role = new Role();
-    role.setId(1);
-    role.setName("经理");
-    user1.setRole(role);
-    return ApiResult.ok().put("total",10).put("users",        FieldsFilter.filter(users,Arrays.asList("name","age","likes","role")));
-}
-```
-
-效果图：
-
-![](https://img-blog.csdnimg.cn/20200731155031408.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-# 6. 辅助功能
-## 6.1 导出PDF或MarkDown文档
-&emsp;&emsp;如果需提供接口文档给第三方进行对接，可以使用Lkadoc的导出功能，Lkadoc支持导出标准化格式的PDF或MarkDown接口文档，功能非常强大，能满足大部分场景需求。（目前只支持导出本地项目的接口）
-&emsp;&emsp;导出PDF文档前需要检查系统是否存在simsun.ttc字体，如果系统没有这个字体的话，导出PDF文档中文不能正确显示。 windows系统字体路径：C:/Windows/fonts/simsun.ttc
-linux系统字体路径：/usr/share/fonts/win/simsun.ttc
-mac系统字体路径：/System/Library/Fonts/simsun.ttc
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200805180724360.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
-
-
-PDF效果截图：
-
-![](https://img-blog.csdnimg.cn/20200731155150650.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)MD效果截图
-![MD效果图](https://img-blog.csdnimg.cn/20200805180546345.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
-
-
-## 6.2 多项目聚合
-&emsp;&emsp;当我们在使用微服务或多个子项目时，我们可以把多个项目的接口文档信息聚合到一个UI界面，只需要在@LKADocument注解配置serverNames属性即可：
-&emsp;&emsp;serverNames="租房系统-192.168.0.77:9010,缴费系统-192.168.0.77:8888"
-&emsp;&emsp;多个项目之间用英文“,”号隔开，“-”符号左右是项目名称，右边是项目地址，也可以是域名，这样我们就可以在UI界面自由的在当前项目和配置好的其它项目切换接口信息了。
-
-切换项目后的效果图：
-![](https://img-blog.csdnimg.cn/20200731155208356.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70)
 
 项目开源地址：https://gitee.com/liuk168/lkadoc
 

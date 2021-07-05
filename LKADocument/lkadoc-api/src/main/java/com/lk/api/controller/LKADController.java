@@ -103,9 +103,6 @@ public class LKADController {
 	/*项目版本号*/
 	@Value("${lkad.version:}")
 	private String version;
-	/* 入参翻译开关 */
-	/*@Value("${lkad.enToCn:false}")
-	private Boolean enToCn;*/
 	/* 扫描所有参数 */
 	@Value("${lkad.sconAll:false}")
 	private Boolean sconAll;
@@ -266,7 +263,6 @@ public class LKADController {
 					Class<? extends Object> bootClass = obj.getClass();
 					LKADocument annotation = bootClass.getAnnotation(LKADocument.class);
 					bpk = annotation.basePackages();
-					//enToCn = annotation.enToCn();
 					sconAll = annotation.sconAll();
 					if("".equals(bpk)) {
 						bool = false;

@@ -5,6 +5,7 @@
 <link rel="icon" href="img/logo.png" type="image/x-icon" />
 <link rel="stylesheet" type="text/css" href="css/jquery.json-viewer.css" />
 <link rel="stylesheet" id="cssfile" type="text/css" href="css/green.css" />
+<link rel="stylesheet" id="cssfile" type="text/css" href="css/syalert.min.css" />
 <link rel="stylesheet" id="cssfile" type="text/css"
 	href="css/jquery.contextMenu.css" />
 <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
@@ -13,7 +14,9 @@
 <script type="text/javascript" src="js/jquery.cookie.js"></script>
 <script type="text/javascript" src="js/html2canvas.js"></script>
 <script type="text/javascript" src="js/jspdf.debug.js"></script>
+<script type="text/javascript" src="js/syalert.min.js"></script>
 <script type="text/javascript" src="js/lkadoc.js"></script>
+
 
 </head>
 <body>
@@ -77,6 +80,21 @@
 	<br>
 	<br>
 	<br>
+	
+	<!-- 自定义输入密码窗 -->
+	<div class="sy-alert sy-alert-model animated" sy-enter="zoomIn" sy-leave="zoomOut" sy-type="confirm" sy-mask="true" id="alert4">
+	  <div class="sy-title">密码</div>
+	  <div class="sy-content">
+	    <div class="form">
+	    <input type="hidden" id="syServerName"/><input type="hidden" id="syType"/>
+	    <p class="input-item"><input type="password" id="syPassword" placeholder="请输入密码" /></p>
+	    </div>
+	  </div> 
+	  <div class="sy-btn">
+	    <button onClick="syclose()">取消</button>
+	    <button onClick="syok()">确定</button>
+	  </div> 
+	</div>
 </body>
 
 </html>

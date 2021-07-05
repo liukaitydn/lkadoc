@@ -41,14 +41,14 @@ public @interface LKAProperty {
 	/*是否隐藏*/
 	boolean hidden() default false;
 	
-	/*数据校验规则*/
+	/*数据校验规则
 	String[] valids() default{};
-	/*数据校验消息*/
+	数据校验消息
 	String[] msgs() default{};
-	/*数值范围*/
+	数值范围
 	String range() default "";
-	/*集合大小限制*/
+	集合大小限制
 	String size() default "";
-	/*字符串大小限制*/
-	String length() default "";
+	字符串大小限制
+	String length() default "";*/
 }

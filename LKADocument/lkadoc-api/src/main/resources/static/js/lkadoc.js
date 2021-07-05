@@ -1,4 +1,6 @@
 
+var  sybool = false;
+
 function changeStyle(sel){
 	css=document.getElementById("cssfile");
 	css.href='/css/'+sel.value+'.css';
@@ -460,75 +462,21 @@ $(function(){
 			    success:function(data){
 			    	if(data == 1){
 						//需要密码
-						password = prompt("请输入密码","");
+			    		$("#syServerName").val(serverName);
+			    		$("#syType").val(type);
+						syalert.syopen('alert4')
+					}else{
+						//不需要密码
+						loadData(serverName,password,type)
 					}
 			    }
 			})
 		}
-		
-		$.ajax({
-		    url:"lkad/doc",
-		    type:"get",
-		    dataType:"json",
-		    async:false,
-		    data:{"serverName":serverName,"pwd":password,"type":type},
-		    success:function(data){
-		    	$(".navBox").html('');
-		    	if(data != null){
-		    		if(data.enabled == 'no'){
-		    			$("body").html("");
-		    			window.location = "lkad404.html";
-		    		}else{
-		    			if(data.error != null && data.error != ""){
-		    				$("body").html(data.error);
-		    			}else{
-							$("#projectName").html(data.projectName);
-							$("#description").html(data.description);
-							var tVersion = data.version;//获取总版本号
-							if(serverName == '' && $("#changeProject").val() != 'now'){
-								if(data.serverNames == null || data.serverNames == ''){
-									$("#changeProject").append('<option value="now">当前项目</option>');
-								}else{
-									$("#changeProject").append('<option value="now">当前项目</option>');
-									var ips = data.serverNames.split(",");
-									if(ips.length > 0){
-										for(var i = 0;i<ips.length;i++){
-											var arrips = ips[i].split("^");
-											if(arrips.length < 2){
-												$("#changeProject").append('<option value="'+ips[i]+'">'+ips[i]+'</option>');
-											}else{
-												$("#changeProject").append('<option value="'+arrips[1]+'">'+arrips[0]+'</option>');
-											}
-										}
-									}
-								}
-							}
-							var doc = data.apiDoc;
-							if(doc != null && doc.length > 0){
-								var num = 1;
-								for(var i = 0;i<doc.length;i++){
-									$(".navBox").append(buildMenu(doc[i],tVersion,num));
-									num++;
-								}
-								$(".navBox").append("<div class='leave-a-note'></div>");
-								leftMenu()
-								
-							}
-		    			}
-		    		}
-				}
-		    },
-		    error:function(respose){
-		    	alert("status："+respose.status+"\nstatusText："+respose.statusText+"\nmessage："+respose.responseJSON.message);
-		    }
-		});
-		
-		/*$(".isRequired").each(function(){
+		$(".isRequired").each(function(){
 		if($(this).html() == '是'){
-			$(this).css("color","#6fb4ce");
+			$(this).css("color","red");
 		}
-		})*/
-		
+		})
 		
 		$(".paramType").each(function(){
 			if($(this).html() == 'header'){
@@ -1964,3 +1912,71 @@ function filter(value,doc,arr){
 	}
 } 
 
+
+function loadData(serverName,password,type){
+	$.ajax({
+	    url:"lkad/doc",
+	    type:"get",
+	    dataType:"json",
+	    async:false,
+	    data:{"serverName":serverName,"pwd":password,"type":type},
+	    success:function(data){
+	    	$(".navBox").html('');
+	    	if(data != null){
+    			if(data.error != null && data.error != ""){
+    				window.location = "lkad404.html?error="+data.error;
+    			}else if(data.projectName == null || data.projectName==""){
+    				alert(data);
+    			}else{
+					$("#projectName").html(data.projectName);
+					$("#description").html(data.description);
+					var tVersion = data.version;//获取总版本号
+					if(serverName == '' && $("#changeProject").val() != 'now'){
+						if(data.serverNames == null || data.serverNames == ''){
+							$("#changeProject").append('<option value="now">当前项目</option>');
+						}else{
+							$("#changeProject").append('<option value="now">当前项目</option>');
+							var ips = data.serverNames.split(",");
+							if(ips.length > 0){
+								for(var i = 0;i<ips.length;i++){
+									var arrips = ips[i].split("^");
+									if(arrips.length < 2){
+										$("#changeProject").append('<option value="'+ips[i]+'">'+ips[i]+'</option>');
+									}else{
+										$("#changeProject").append('<option value="'+arrips[1]+'">'+arrips[0]+'</option>');
+									}
+								}
+							}
+						}
+					}
+					var doc = data.apiDoc;
+					if(doc != null && doc.length > 0){
+						var num = 1;
+						for(var i = 0;i<doc.length;i++){
+							$(".navBox").append(buildMenu(doc[i],tVersion,num));
+							num++;
+						}
+						$(".navBox").append("<div class='leave-a-note'></div>");
+						leftMenu()
+						
+					}
+    			}
+    		}
+	    },
+	    error:function(respose){
+	    	alert("status："+respose.status+"\nstatusText："+respose.statusText+"\nmessage："+respose.responseJSON.message);
+	    }
+	});
+}
+
+function syok(){
+	var serverName = $("#syServerName").val();
+	var type = $("#syType").val();
+	var password = $("#syPassword").val();
+	loadData(serverName,password,type);
+	syalert.syhide('alert4');
+}
+function syclose(){
+	window.location = "lkad404.html?error=请输入密码，否则您无权查看文档";
+	syalert.syhide('alert4');
+}

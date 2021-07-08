@@ -471,6 +471,9 @@ $(function(){
 					}
 			    }
 			})
+		}else{
+			//不需要密码
+			loadData(serverName,password,type)
 		}
 		$(".isRequired").each(function(){
 		if($(this).html() == '是'){
@@ -508,6 +511,7 @@ $(function(){
 	
 	//搜索接口名称
 	$("#search-button").click(function(){
+		console.log(1)
 		reloadDoc(getServerName(),0);
 		indexFlag=null
 		$("#tabBox>li").hide();

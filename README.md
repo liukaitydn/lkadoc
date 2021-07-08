@@ -1,3 +1,4 @@
+
 ##  简介
 
 &emsp;&emsp;Lkadoc是一款开源的接口文档自动生成工具，基于SpringBoot平台，拥有非常强大的接口文档管理功能。为解决Java后台开发人员编写接口文档、调试接口而生。同时提供了简洁、大气、功能丰富的接口文档UI操作界面，方便后端与前端之间的接口对接。
@@ -26,17 +27,20 @@
 
 **接口调试页面**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\接口调试界面.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708160753707.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 ## 快速入门
 
 #### 用IDEA创建一个SpringBoot项目，项目名叫LkadocDemo，点击Next
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\1.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708160833486.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 勾选Spring web组件，点击Finish
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\2.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708160844470.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 在LkadocDemo项目的pom.xml文件中引入lkadoc的依赖
 
@@ -84,7 +88,8 @@ public class LKADemoController {
 
 #### 启动项目，打开浏览器，输入地址http://127.0.0.1:8080/lkadoc.html 
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\3.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708160907620.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **如果能看到如上界面，那么就恭喜客官，Lkadoc能够为您服务了**
 
@@ -337,7 +342,8 @@ public String reg(String name,String pwd,String email,Integer age) {
 
 **启动项目，打开浏览器，输入地址http://127.0.0.1:8080/lkadoc.html ，界面如下：**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\4.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708160929403.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### path和header请求入参示例
 
@@ -357,7 +363,8 @@ public String getUser(@RequestHeader("token") String token,
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\5.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708160942810.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 数组请求入参示例
 
@@ -376,7 +383,7 @@ public String array(Integer[] ids,String name) {
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\6.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708160953264.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
 
 #### 文件上传请求入参示例
 
@@ -405,7 +412,8 @@ public String fileUpload(MultipartFile[] files) {
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\7.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161003316.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 文件下载示例
 
@@ -436,7 +444,8 @@ public void fileDownload(HttpServletResponse response) throws Exception {
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\8.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161013191.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 简单的对象请求入参示例
 
@@ -471,7 +480,8 @@ public Role getRole(Role role) {
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\9.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161024314.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 复杂的对象请示入参示例
 
@@ -540,11 +550,13 @@ public User addUser(@RequestBody User user) {
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\10.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161039999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **通过点击"树状展示请求参数"按钮，可以很直观的显示复杂的入参结构**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\11.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161048303.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 对象参数分组示例
 
@@ -601,7 +613,8 @@ public User getUserArray(@RequestBody @LKAGroup("getUser") User user) {
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\12.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161059967.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 简单的响应参数示例
 
@@ -628,7 +641,8 @@ public class LKADemoController2 {
 
 **重启项目，刷新Lkadoc界面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\13.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161111159.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 对象响应参数示例
 
@@ -645,7 +659,8 @@ public User getUser(@RequestBody User user) {
 
 **重启项目，刷新Lkadoc界面响应参数展示结果如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\14.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161122996.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 复杂的Map结构响应参数示例
 
@@ -680,11 +695,13 @@ public Map<String,Object> getMap() {
 
 **重启项目，刷新Lkadoc界面响应参数展示结果如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\15.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161134706.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **通过点击"树状展示响应参数"按钮，可以很直观的显示复杂的响应参数结构**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\16.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161145219.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 超过3层嵌套结构响应参数用法示例
 
@@ -720,11 +737,13 @@ public Map<String,Object> getMoreMap(){
 
 **重启项目，刷新Lkadoc界面响应参数展示结果如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\17.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161157929.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **JSON格式化展示**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\18.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/202107081612078.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 复杂的对象结构响应参数示例
 
@@ -791,11 +810,13 @@ public class ApiResult {
 
 **重启项目，刷新Lkadoc界面响应参数展示结果如下，实际上和上面复杂的Map结构响应参数示例结果是一样的:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\15.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161235410.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **通过点击"树状展示响应参数"按钮，可以很直观的显示复杂的响应参数结构**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\16.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/202107081612456.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 响应参数对象参数分组
 
@@ -826,7 +847,8 @@ public class ApiResult {
 
 **重启项目，刷新Lkadoc界面响应参数展示结果如下**：
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\19.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161408101.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 ## 高级特性
 
@@ -836,11 +858,13 @@ public class ApiResult {
 
 &emsp;&emsp;Lkadoc支持对单个接口进入调试，我们只需要准备好请求参数的测试数据，然后点击"执行接口"按钮，就可以在调试窗口看到调试结果信息了。
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\20.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161533581.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 &emsp;&emsp;Lkadoc还可以通过选择执行方式来决定接口采用"同步"还是"异步"执行，如果选择"同步"测试，可以选择执行次数，和时间间隔，这样可以模拟对接口进行压力测试。如果选择"异步"测试，可以选择执行次数，这样可以模拟对接口进行并发测试。所有测试结果会打印在调试窗口中。
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\21.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021070816154966.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 全局请求头令牌(Token)锁定
 
@@ -848,7 +872,8 @@ public class ApiResult {
 
 &emsp;&emsp;同时我们可以通过@LKAMethod的token属性来控制当前接口是否需要token校验，如果token=true的话，那么在Lkadoc调试接口的时候，会自动带上锁定的请求头参数到后台。
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\22.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021070816160298.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 快速定位新接口
 
@@ -883,7 +908,8 @@ public String reg(String name,String pwd,String email,Integer age) {
 
 **重启项目，刷新Lkadoc页面如下:**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\23.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161700416.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 自动识别未加注解参数
 
@@ -934,15 +960,19 @@ public ApiResult testSconAll2(Integer age,String[] likes){
 
 **重启项目，刷新文档页面如下：**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\24.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161725627.png#pic_center)
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\25.png)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161735314.png#pic_center)
+
 
 **我们可以发现入参都可以识别出来，同时我们可以通过在参数名称上点击鼠标右键，修改参数作用说明，还可以设置高亮和删除状态**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\26.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161749623.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\27.png)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161800208.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 项目聚合
 
@@ -964,7 +994,8 @@ public class LkadocDemoApplication {
 
 **重启项目，刷新文档如下：**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\28.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161812534.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 文档导出功能
 
@@ -972,15 +1003,18 @@ public class LkadocDemoApplication {
   导出PDF文档前需要检查系统是否存在simsun.ttc字体，如果系统没有这个字体的话，导出PDF文档中文不能正确显示。 windows系统字体路径：C:/Windows/fonts/simsun.ttc
 linux系统字体路径：/usr/share/fonts/win/simsun.ttc
 mac系统字体路径：/System/Library/Fonts/simsun.ttc
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\29.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161822940.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **PDF效果：**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\30.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161833861.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **MarkDown效果：**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\31.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161843638.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 #### 给Lkadoc设置查看密码
 
@@ -999,11 +1033,13 @@ public class LkadocDemoApplication {
 
 **重启项目，刷新文档，这样就需要先输入密码才能进入Lkadoc界面：**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\32.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161855359.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **如果密码错误就进入错误提示页面：**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\33.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/202107081619059.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
 
 **注意：除了给文档设置密码之外，在生产环境，还可以通过设置enabled属性值为false来关闭文档功能，这里就不演示了。**
 
@@ -1011,7 +1047,9 @@ public class LkadocDemoApplication {
 
 **@LKAType 和 LKAMethod 都提示了一个order属性，用来设置目录和接口的排序规则，值越少，那么就越靠前。**
 
-![](C:\Users\liukai\Desktop\lkadoc\教程图片\34.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210708161945815.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdWthaXR5ZG4=,size_16,color_FFFFFF,t_70#pic_center)
+
+
 
 #### 目录合并和接口切换目录
 

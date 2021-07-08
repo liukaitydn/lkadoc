@@ -474,13 +474,13 @@ $(function(){
 		}
 		$(".isRequired").each(function(){
 		if($(this).html() == '是'){
-			$(this).css("color","red");
+			$(this).css("color","#bf7a6a");
 		}
 		})
 		
 		$(".paramType").each(function(){
 			if($(this).html() == 'header'){
-				$(this).css("color","#f1f1f1");
+				$(this).css("color","#bf7a6a");
 			}
 			if($(this).html() == 'path'){
 				$(this).css("color","#6fb4ce");
@@ -499,7 +499,7 @@ $(function(){
 		if(serverName == null || serverName == 'now'){
 			serverName = '';
 		}else{
-			if(!serverName.toLowerCase().startsWith("http://")){
+			if(!serverName.toLowerCase().startsWith("http://") && !serverName.toLowerCase().startsWith("https://")){
 				serverName = "http://"+serverName;
 			}
 		}
@@ -1054,7 +1054,11 @@ $(function(){
 					    	requestStatus.html(xhr.status+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg：'+xhr.statusText);
 					    	var dataSize = xhr.getResponseHeader("Content-Length");
 					    	if(dataSize == null || dataSize == 'null'){
-					    		dataSize = 0;
+					    		if(data != null && data != ''){
+					    			dataSize = bytesLnegth(data);
+					    		}else{
+					    			dataSize = 0;
+					    		}
 					    	}
 					    	requestLength.html(dataSize+"byte");
 							requestTime.html(totalTime+"ms");
@@ -1082,7 +1086,7 @@ $(function(){
 					    	var countTime = new Date().getTime()-ajaxTime;
 					    	var totalTime = new Date().getTime()-totalStartTime;
 					    	requestStatus.html(respose.status+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg：'+respose.statusText);
-					    	var dataSize = xhr.getResponseHeader("Content-Length");
+					    	var dataSize = respose.getResponseHeader("Content-Length");
 					    	if(dataSize == null || dataSize == 'null'){
 					    		dataSize = 0;
 					    	}
@@ -1759,7 +1763,7 @@ function buildMenu(doc,tVersion,num) {
     		var imgName = mVersion == tVersion?"xinxin.png":"file.gif";
     		str += "<li data='"+met_index+"' urlname='"+methods[i].name+"' class='secondary' title=''>" +
     				"<input type='hidden' value='"+methods[i].name+"-"+methods[i].url+"'>" +
-    				"<h5><img src='img/"+imgName+"' height='10px' width='10px'><span>"+num+"."+num2+"."+methods[i].name+"</span></h5></li>";
+    				"<h5><img src='img/"+imgName+"' height='10px' width='10px'><span>"+num+"."+num2+"&nbsp;"+methods[i].name+"</span></h5></li>";
     		var request = methods[i].request;
     		var respose = methods[i].respose;
     		var str2 ="<div id='method_"+met_index+"' class='method-table' hidden='hidden'><div class='div-method-ul'>" +
@@ -1979,4 +1983,15 @@ function syok(){
 function syclose(){
 	window.location = "lkad404.html?error=请输入密码，否则您无权查看文档";
 	syalert.syhide('alert4');
+}
+
+//获取字节大小
+function bytesLnegth(str){
+    var count=str.length;
+   for(var i=0;i<str.length;i++){
+        if(str.charCodeAt(i)>255){
+           count++;
+        }    
+    }
+    return count;
 }

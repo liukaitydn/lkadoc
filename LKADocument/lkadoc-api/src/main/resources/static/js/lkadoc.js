@@ -1204,10 +1204,34 @@ $(function(){
 		}
 	})
 	
-	
+	//如果README.html被拦截，则显示图片
+	if(!isExistsFile("../README.html")){
+		$(".welcome").html('<img alt="说明" src="../img/info.png">');
+	}
 	
 })
 
+//判断文件是否存在
+function isExistsFile(filepath){
+    var xmlhttp=null;
+    if (window.XMLHttpRequest){
+      xmlhttp=new XMLHttpRequest();
+    }else if (window.ActiveXObject){
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.open("GET",filepath,false);
+    try{
+    	xmlhttp.send();
+    }catch{
+    	return false;
+    }
+    if(xmlhttp.readyState==4){ 
+        if(xmlhttp.status==200) return true; //url存在 
+        else if(xmlhttp.status==404) return false; //url不存在 
+        else return false;//其他状态 
+    }
+    return false;
+}
 
 function assembleJson(paramNames,testDatas,dataTypes,paramTypes,type){// 参数名称，参数值，参数类型
 	var paramJson = {};

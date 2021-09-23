@@ -124,11 +124,11 @@ public class ExportMarkDownController {
 				if(updateTime == null || "".equals(updateTime)) {
 					updateTime = "未设置";
 				}
-				pw.println("**版本号：**"+methodModel.getVersion());
-				pw.println("**Method Type：**"+methodModel.getRequestType());
-				pw.println("**Url：**"+methodModel.getUrl());
-				pw.println("**Content Type：**"+methodModel.getContentType());
-				pw.println("**Author：**"+author+" **CreateTime：**"+createTime+" **updateTime：**"+updateTime);
+				pw.println("**版本号：** "+methodModel.getVersion());
+				pw.println("**Method Type：** "+methodModel.getRequestType());
+				pw.println("**Url：** "+methodModel.getUrl());
+				pw.println("**Content Type：** "+methodModel.getContentType());
+				pw.println("**Author：** "+author+" **CreateTime：** "+createTime+" **updateTime：** "+updateTime);
 				pw.println("##### 请求参数");
 				//请求参数设置
 				pw.println("| 名称 | 作用 | 是否必须 | 数据类型 | 参数类型 | 描述 |");

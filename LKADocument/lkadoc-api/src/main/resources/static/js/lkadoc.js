@@ -883,10 +883,20 @@ $(function(){
 		}
 		// 请求头令牌设置
 		if(token == 'token：是'){
-			var tokenKey = $(".headerKey").val();
-			var tokenValue = $(".headerValue").val();
+			let tokenKey = $(".headerKey").val();
+			let tokenValue = $(".headerValue").val();
 			if(tokenKey != null && tokenValue != null && tokenKey != "" && tokenValue != ""){
-				headerJson[tokenKey] = tokenValue;
+				
+				let keyArr = tokenKey.split(";");
+				let valueArr = tokenValue.split(";");
+				if(keyArr.length == valueArr.length){
+					for(let i = 0;i<keyArr.length;i++){
+						headerJson[keyArr[i]] = valueArr[i];
+					}
+				}else{
+					alert("HeaderToken参数key与value数量不一致");
+					return;
+				}
 			} 
 		}
 		

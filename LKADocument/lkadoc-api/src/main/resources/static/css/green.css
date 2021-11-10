@@ -146,10 +146,6 @@ a:active{
     padding-bottom: 0.1rem;
     margin-top: 17px;
     box-sizing: border-box;
-    -webkit-transition: all 0.8s ease;
-    -moz-transition: all 0.8s ease;
-    -o-transition: all 0.8s ease;
-    -ms-transition: all 0.8s ease;
 }
 .obtain{
 	padding-bottom:6px;
@@ -261,10 +257,6 @@ h5{
 #menu #open .navBox ul li .secondary {
     overflow: hidden;
     height: 0;
-    -webkit-transition: all 0.6s ease;
-    -moz-transition: all 0.6s ease;
-    -o-transition: all 0.6s ease;
-    -ms-transition: all 0.6s ease;
 }
 
 .method-reqtype{

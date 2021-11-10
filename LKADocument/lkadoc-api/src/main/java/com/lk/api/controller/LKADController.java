@@ -421,6 +421,7 @@ public class LKADController {
 	 * @return list 集合
 	 * @throws Exception 异常
 	 */
+	@SuppressWarnings("deprecation")
 	public List<TypeModel> scanType(String[] basePackages) throws Exception {
 		List<TypeModel> typeModels = new ArrayList<TypeModel>();
 		// 判断是否是目录
@@ -3096,6 +3097,7 @@ public class LKADController {
 	 * @return ParamModel 对象
 	 * @throws Exception 异常
 	 */
+	@SuppressWarnings("deprecation")
 	public ParamModel analysisModel(String url,Class<?> typeCls,String group) throws Exception {
 		reqNum++; //防止递归死循环
 		if(reqNum > 10) {
@@ -3398,6 +3400,7 @@ public class LKADController {
 	 * @return PropertyModel 对象
 	 * @throws Exception 异常
 	 */
+	@SuppressWarnings("deprecation")
 	public PropertyModel analysisProModel(String url,Class<?> typeCls,String group,Integer proType) throws Exception {
 		proNum++;
 		if(proNum > 10) {
@@ -3699,6 +3702,7 @@ public class LKADController {
 	 * @return ResposeModel 对象
 	 * @throws Exception 异常
 	 */
+	@SuppressWarnings("deprecation")
 	public ResposeModel analysisResModel(String url,Class<?> typeCls,String group) throws Exception {
 		respNum++;
 		if(respNum > 10) {

@@ -28,14 +28,14 @@ public @interface LKAParam {
 	/*参数说明*/
 	String description() default "";
 	/*参数类型(基本类型和字符串)*/
-	Class<?> dataType() default String.class;
+	Class<?> dataType() default Object.class;
 	/*测试数据*/
 	String testData() default "";
 	/*参数位置
 	 * header-请求头获取：@RequestHeader
      * query-请求对象获取：@RequestParam
      * rest-用于restful接口获取：@PathVariable*/
-	String paramType() default "query";
+	String paramType() default "";
 	/*是否是数组*/
 	boolean isArray() default false;
 	/*分组**/

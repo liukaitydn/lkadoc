@@ -111,7 +111,6 @@ public class LKADController {
 	private String password;
 
 	private int reqNum = 0,respNum = 0,proNum = 0;
-	
 	/**
 	 * 	调试其它项目的接口
 	 * @param path 路径
@@ -460,9 +459,9 @@ public class LKADController {
 					List<MethodModel> methodModels = new ArrayList<MethodModel>();
 					for (Method method : methods) {
 						if (method == null)continue;
-						// 判断是否有LKAMethod注解
-						if (!method.isAnnotationPresent(LKAMethod.class) && !method.isAnnotationPresent(ApiOperation.class))continue;
 						MethodModel methodModel = new MethodModel();
+						// 判断是否有LKAMethod注解
+						if (!method.isAnnotationPresent(LKAMethod.class) && !method.isAnnotationPresent(ApiOperation.class)) continue;
 						if(method.isAnnotationPresent(LKAMethod.class)) {
 							LKAMethod lkaMethod = method.getAnnotation(LKAMethod.class);
 							if(lkaMethod.hidden())continue;
@@ -988,6 +987,18 @@ public class LKADController {
 													paramModel.setValue(param.name());
 												}
 												paramModel.setDataType(param.dataType().getSimpleName());
+												if("Object".equals(param.dataType().getSimpleName())) {
+													paramModel.setDataType("String");
+													try {
+														for(Parameter ps:parameters) {
+															if(ps.getName().equals(paramModel.getValue())){
+																paramModel.setDataType(ps.getType().getSimpleName());
+																break;
+															}
+														}
+													} catch (Exception e) {
+													}
+												}
 												paramModel.setDescription(param.description());
 												paramModel.setName(param.value());
 												paramModel.setTestData(param.testData());
@@ -1002,6 +1013,25 @@ public class LKADController {
 													if(split3[0].contains("n"))paramModel.setRequired(false);
 												}
 												paramModel.setParamType(param.paramType());
+												if("".equals(param.paramType())) {
+													paramModel.setParamType(ParamType.QUERY);
+													try {
+														for(Parameter ps:parameters) {
+															if(ps.getName().equals(paramModel.getValue())){
+																if(ps.isAnnotationPresent(PathVariable.class)) {
+																	paramModel.setParamType(ParamType.PATH);
+																}else if(ps.isAnnotationPresent(RequestHeader.class)) {
+																	paramModel.setParamType(ParamType.HEADER);
+																}else {
+																	paramModel.setParamType(ParamType.QUERY);
+																}
+																break;
+															}
+														}
+													} catch (Exception e) {
+														//todo
+													}
+												}
 												paramModel.setArray(param.isArray());
 												request.add(paramModel);
 											}
@@ -1181,11 +1211,52 @@ public class LKADController {
 													paramModel.setValue(param.name());
 												}
 												paramModel.setDataType(param.dataType().getSimpleName());
+												if("Object".equals(param.dataType().getSimpleName())) {
+													paramModel.setDataType("String");
+													try {
+														for(Parameter ps:parameters) {
+															if(ps.getName().equals(paramModel.getValue())){
+																paramModel.setDataType(ps.getType().getSimpleName());
+																break;
+															}
+														}
+													} catch (Exception e) {
+													}
+												}
 												paramModel.setDescription(param.description());
 												paramModel.setName(param.value());
-												paramModel.setParamType(param.paramType());
-												paramModel.setArray(param.isArray());
 												paramModel.setTestData(param.testData());
+												String[] split2 = param.value().split("\\^");
+												if(split2.length == 2) {
+													paramModel.setName(split2[0]);
+													paramModel.setTestData(split2[1]);
+												}
+												String[] split3 = split2[0].split("\\~");
+												if(split3.length == 2) {
+													paramModel.setName(split3[1]);
+													if(split3[0].contains("n"))paramModel.setRequired(false);
+												}
+												paramModel.setParamType(param.paramType());
+												if("".equals(param.paramType())) {
+													paramModel.setParamType(ParamType.QUERY);
+													try {
+														for(Parameter ps:parameters) {
+															if(ps.getName().equals(paramModel.getValue())){
+																if(ps.isAnnotationPresent(PathVariable.class)) {
+																	paramModel.setParamType(ParamType.PATH);
+																}else if(ps.isAnnotationPresent(RequestHeader.class)) {
+																	paramModel.setParamType(ParamType.HEADER);
+																}else {
+																	paramModel.setParamType(ParamType.QUERY);
+																}
+																break;
+															}
+														}
+													} catch (Exception e) {
+														//todo
+													}
+												}
+												paramModel.setArray(param.isArray());
 												request.add(paramModel);
 											}
 											if(param.values() != null && param.values().length>0) {
@@ -1362,6 +1433,18 @@ public class LKADController {
 											paramModel.setValue(param.name());
 										}
 										paramModel.setDataType(param.dataType().getSimpleName());
+										if("Object".equals(param.dataType().getSimpleName())) {
+											paramModel.setDataType("String");
+											try {
+												for(Parameter ps:parameters) {
+													if(ps.getName().equals(paramModel.getValue())){
+														paramModel.setDataType(ps.getType().getSimpleName());
+														break;
+													}
+												}
+											} catch (Exception e) {
+											}
+										}
 										paramModel.setDescription(param.description());
 										paramModel.setName(param.value());
 										paramModel.setTestData(param.testData());
@@ -1376,6 +1459,25 @@ public class LKADController {
 											if(split3[0].contains("n"))paramModel.setRequired(false);
 										}
 										paramModel.setParamType(param.paramType());
+										if("".equals(param.paramType())) {
+											paramModel.setParamType(ParamType.QUERY);
+											try {
+												for(Parameter ps:parameters) {
+													if(ps.getName().equals(paramModel.getValue())){
+														if(ps.isAnnotationPresent(PathVariable.class)) {
+															paramModel.setParamType(ParamType.PATH);
+														}else if(ps.isAnnotationPresent(RequestHeader.class)) {
+															paramModel.setParamType(ParamType.HEADER);
+														}else {
+															paramModel.setParamType(ParamType.QUERY);
+														}
+														break;
+													}
+												}
+											} catch (Exception e) {
+												//todo
+											}
+										}
 										paramModel.setArray(param.isArray());
 										request.add(paramModel);
 									}
@@ -1549,6 +1651,18 @@ public class LKADController {
 											paramModel.setValue(param.name());
 										}
 										paramModel.setDataType(param.dataType().getSimpleName());
+										if("Object".equals(param.dataType().getSimpleName())) {
+											paramModel.setDataType("String");
+											try {
+												for(Parameter ps:parameters) {
+													if(ps.getName().equals(paramModel.getValue())){
+														paramModel.setDataType(ps.getType().getSimpleName());
+														break;
+													}
+												}
+											} catch (Exception e) {
+											}
+										}
 										paramModel.setDescription(param.description());
 										paramModel.setName(param.value());
 										paramModel.setTestData(param.testData());
@@ -1557,14 +1671,31 @@ public class LKADController {
 											paramModel.setName(split2[0]);
 											paramModel.setTestData(split2[1]);
 										}
-
 										String[] split3 = split2[0].split("\\~");
 										if(split3.length == 2) {
 											paramModel.setName(split3[1]);
 											if(split3[0].contains("n"))paramModel.setRequired(false);
 										}
-										
 										paramModel.setParamType(param.paramType());
+										if("".equals(param.paramType())) {
+											paramModel.setParamType(ParamType.QUERY);
+											try {
+												for(Parameter ps:parameters) {
+													if(ps.getName().equals(paramModel.getValue())){
+														if(ps.isAnnotationPresent(PathVariable.class)) {
+															paramModel.setParamType(ParamType.PATH);
+														}else if(ps.isAnnotationPresent(RequestHeader.class)) {
+															paramModel.setParamType(ParamType.HEADER);
+														}else {
+															paramModel.setParamType(ParamType.QUERY);
+														}
+														break;
+													}
+												}
+											} catch (Exception e) {
+												//todo
+											}
+										}
 										paramModel.setArray(param.isArray());
 										request.add(paramModel);
 									}

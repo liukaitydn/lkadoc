@@ -164,9 +164,7 @@ public class LKADController {
 		if("application/json".equals(contentType)) {
 	        HttpEntity<String> requestEntity = new HttpEntity<>(queryData, requestHeaders);
 	        if("get".equals(type.toLowerCase())) {
-	        	return "<span style='color:red'>ContentType值为application/json时只支持post、put、delete请求！<span>";
-	        	//object = restTemplate.exchange(path+data,HttpMethod.GET,requestEntity,String.class);
-	        }
+	        	return "<span style='color:red'>ContentType值为application/json时只支持post、put、delete请求！<span>";	        }
 	        if("post".equals(type.toLowerCase())) {
 	        	object = restTemplate.exchange(path,HttpMethod.POST,requestEntity, String.class);
 	        }

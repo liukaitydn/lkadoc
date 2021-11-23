@@ -109,6 +109,10 @@ public class LKADController {
 	/*项目接口文档密码*/
 	@Value("${lkad.password:}")
 	private String password;
+	
+	/*项目最大扫描类的数量*/
+	@Value("${lkad.classNum:5000}")
+	private String classNum;
 
 	private int reqNum = 0,respNum = 0,proNum = 0;
 	/**
@@ -261,6 +265,7 @@ public class LKADController {
 					LKADocument annotation = bootClass.getAnnotation(LKADocument.class);
 					bpk = annotation.basePackages();
 					sconAll = annotation.sconAll();
+					classNum = annotation.classNum();
 					if("".equals(bpk)) {
 						bool = false;
 						break;
@@ -297,7 +302,14 @@ public class LKADController {
 		}
 		
 		//排序算法
-		List<TypeModel> typeModels = scanType(bpk.split(","));
+		List<TypeModel> typeModels;
+		try {
+			typeModels = scanType(bpk.split(","));
+		} catch (Exception e) {
+			map.put("error",e.getMessage());
+			e.printStackTrace();
+			return map;
+		}
 		//类排序
 		Collections.sort(typeModels);
 		List<MethodModel> tempMethod = new ArrayList<>();
@@ -419,7 +431,7 @@ public class LKADController {
 	 * @return list 集合
 	 * @throws Exception 异常
 	 */
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({"unchecked" })
 	public List<TypeModel> scanType(String[] basePackages) throws Exception {
 		List<TypeModel> typeModels = new ArrayList<TypeModel>();
 		// 判断是否是目录
@@ -432,8 +444,17 @@ public class LKADController {
 				sconPackages.addAll(sconPackage.getFullyQualifiedClassNameList());
 			}
 			
-			for (String sconPackage : sconPackages) {
-				Class<?> cls = Class.forName(sconPackage);
+			for (int n = 0;n<sconPackages.size();n++) {
+				if(n>=Integer.parseInt(classNum)) break;
+				Class<?> cls = null;
+				try {
+					cls = Class.forName(sconPackages.get(n));
+					if(cls == null) {
+						continue;
+					}
+				} catch (Throwable e) {
+					continue;
+				}
 				// 判断是否有LKAType或者Api注解
 				if (!cls.isAnnotationPresent(LKAType.class) && !cls.isAnnotationPresent(Api.class))continue;
 				TypeModel typeModel = new TypeModel();
@@ -500,8 +521,37 @@ public class LKADController {
 						}
 						
 						for (Map<String, Object> map : methodURLs) {
-							if(map.get("className") != null) {
-								if (method.getDeclaringClass().getName().equals(map.get("className").toString()) && method.getName().equals(map.get("methodName"))) {
+							if(map.get("className") != null && 
+									map.get("methodName") != null && 
+									method.getDeclaringClass() != null && 
+									method.getDeclaringClass().getName() != null) {
+								
+								Object params = map.get("params");
+								Object className = map.get("className").toString();
+								Object methodName = map.get("methodName").toString();
+								String classn = method.getDeclaringClass().getName();
+								
+								if (classn.equals(className) && method.getName().equals(methodName)) {
+									//参数判断	
+									if(params != null && params instanceof Parameter[]) {
+										Parameter[] parameters = (Parameter[])params;
+										Parameter[] parameters2 = method.getParameters();
+										if(parameters2 != null && parameters2.length > 0) {
+											if(parameters.length != parameters2.length) {
+												continue;
+											}
+											for(int i = 0;i<parameters.length;i++) {
+												if(parameters[i].getType()!= null && parameters2[i].getType() != null) {
+													String simpleName = parameters[i].getType().getSimpleName();
+													String simpleName2 = parameters2[i].getType().getSimpleName();
+													if(!simpleName.equals(simpleName2)) {
+														continue;
+													}
+												}
+											}
+										}
+									}
+									
 									Object url = map.get("methodURL");
 									Object requestType = map.get("requestType");
 									if (url == null) {
@@ -516,26 +566,51 @@ public class LKADController {
 									methodModel.setUrl(url.toString());
 									methodModel.setRequestType(requestType.toString());
 								}else {
-									@SuppressWarnings("unchecked")
-									List<String> list = (List<String>)map.get("interfacesNames");
-									for (String str : list) {
-										if(method.getDeclaringClass().getName().equals(str) && method.getName().equals(map.get("methodName"))) {
-											Object url = map.get("methodURL");
-											Object requestType = map.get("requestType");
-											if (url == null) {
-												url = "该API未设置请求路径";
-												requestType = "未知";
-											}else {
-												url = url.toString().substring(1,url.toString().length());
-											}
-											if (url != null && requestType == null) {
-												requestType = "通用";
-											}
-											methodModel.setUrl(url.toString());
-											methodModel.setRequestType(requestType.toString());
-											break;
-										}
+									Object interfacesNames = map.get("interfacesNames");
+									if(interfacesNames == null) {
+										continue;
 									}
+									if(interfacesNames instanceof List) {
+										List<String> list = (List<String>)interfacesNames;
+											for (String str : list) {
+												if(classn.equals(str) && method.getName().equals(methodName)) {
+													//参数判断													
+													if(params != null && params instanceof Parameter[]) {
+														Parameter[] parameters = (Parameter[])params;
+														Parameter[] parameters2 = method.getParameters();
+														if(parameters2 != null && parameters2.length > 0) {
+															if(parameters.length != parameters2.length) {
+																continue;
+															}
+															for(int i = 0;i<parameters.length;i++) {
+																if(parameters[i].getType()!= null && parameters2[i].getType() != null) {
+																	String simpleName = parameters[i].getType().getSimpleName();
+																	String simpleName2 = parameters2[i].getType().getSimpleName();
+																	if(!simpleName.equals(simpleName2)) {
+																		continue;
+																	}
+																}
+															}
+														}
+													}
+													
+													Object url = map.get("methodURL");
+													Object requestType = map.get("requestType");
+													if (url == null) {
+														url = "该API未设置请求路径";
+														requestType = "未知";
+													}else {
+														url = url.toString().substring(1,url.toString().length());
+													}
+													if (url != null && requestType == null) {
+														requestType = "通用";
+													}
+													methodModel.setUrl(url.toString());
+													methodModel.setRequestType(requestType.toString());
+													break;
+												}
+											}
+										}
 								}
 							}
 						}
@@ -3048,12 +3123,22 @@ public class LKADController {
 		// 获取url与类和方法的对应信息
 		Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
 		List<Map<String,Object>> resultList = new ArrayList<Map<String, Object>>();
+		if(map == null || map.entrySet() == null) {
+			return resultList;
+		}
 		for (Map.Entry<RequestMappingInfo, HandlerMethod> mappingInfoHandlerMethodEntry : map.entrySet()) {
 			Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
 
 			RequestMappingInfo requestMappingInfo = mappingInfoHandlerMethodEntry.getKey();
 			HandlerMethod handlerMethod = mappingInfoHandlerMethodEntry.getValue();
-
+			
+			if(requestMappingInfo == null || 
+					handlerMethod == null || 
+					handlerMethod.getMethod() ==null || 
+					handlerMethod.getMethod().getDeclaringClass() == null) {
+				continue;
+			}
+			
 			resultMap.put("className", handlerMethod.getMethod().getDeclaringClass().getName()); // 类名
 			Class<?>[] interfaces = handlerMethod.getMethod().getDeclaringClass().getInterfaces();
 			List<String> interfacesNames = new ArrayList<String>();
@@ -3063,23 +3148,37 @@ public class LKADController {
 				}
 			}
 			resultMap.put("interfacesNames",interfacesNames);
-			Annotation[] parentAnnotations = handlerMethod.getBeanType().getAnnotations();
-			for (Annotation annotation : parentAnnotations) {
-				if (annotation instanceof RequestMapping) {
-					RequestMapping requestMapping = (RequestMapping) annotation;
-					if (null != requestMapping.value() && requestMapping.value().length > 0) {
-						resultMap.put("classURL", requestMapping.value()[0]);// 类URL
+			if(handlerMethod.getBeanType() != null) {
+				Annotation[] parentAnnotations = handlerMethod.getBeanType().getAnnotations();
+				if(parentAnnotations != null && parentAnnotations.length > 0) {
+					for (Annotation annotation : parentAnnotations) {
+						if (annotation instanceof RequestMapping) {
+							RequestMapping requestMapping = (RequestMapping) annotation;
+							if (null != requestMapping.value() && requestMapping.value().length > 0) {
+								resultMap.put("classURL", requestMapping.value()[0]);// 类URL
+							}
+						}
 					}
 				}
 			}
 			resultMap.put("methodName", handlerMethod.getMethod().getName()); // 方法名
+			Parameter[] parameters = handlerMethod.getMethod().getParameters();//方法参数
+			if(parameters != null && parameters.length > 0) {
+				resultMap.put("params", parameters);
+			}
 			PatternsRequestCondition p = requestMappingInfo.getPatternsCondition();
-			for (String url : p.getPatterns()) {
-				resultMap.put("methodURL", url);// 请求URL
+			if(p !=null && p.getPatterns() != null) {
+				for (String url : p.getPatterns()) {
+					resultMap.put("methodURL", url);// 请求URL
+				}
 			}
 			RequestMethodsRequestCondition methodsCondition = requestMappingInfo.getMethodsCondition();
-			for (RequestMethod requestMethod : methodsCondition.getMethods()) {
-				resultMap.put("requestType", requestMethod.toString());// 请求方式：POST/PUT/GET/DELETE
+			if(methodsCondition != null && methodsCondition.getMethods() != null) {
+				for (RequestMethod requestMethod : methodsCondition.getMethods()) {
+					if(requestMethod != null) {
+						resultMap.put("requestType", requestMethod.toString());// 请求方式：POST/PUT/GET/DELETE
+					}
+				}
 			}
 			resultList.add(resultMap);
 		}
@@ -3095,7 +3194,6 @@ public class LKADController {
 	 * @return ParamModel 对象
 	 * @throws Exception 异常
 	 */
-	@SuppressWarnings("deprecation")
 	public ParamModel analysisModel(String url,Class<?> typeCls,String group) throws Exception {
 		reqNum++; //防止递归死循环
 		if(reqNum > 10) {
@@ -3398,7 +3496,6 @@ public class LKADController {
 	 * @return PropertyModel 对象
 	 * @throws Exception 异常
 	 */
-	@SuppressWarnings("deprecation")
 	public PropertyModel analysisProModel(String url,Class<?> typeCls,String group,Integer proType) throws Exception {
 		proNum++;
 		if(proNum > 10) {
@@ -3700,7 +3797,6 @@ public class LKADController {
 	 * @return ResposeModel 对象
 	 * @throws Exception 异常
 	 */
-	@SuppressWarnings("deprecation")
 	public ResposeModel analysisResModel(String url,Class<?> typeCls,String group) throws Exception {
 		respNum++;
 		if(respNum > 10) {

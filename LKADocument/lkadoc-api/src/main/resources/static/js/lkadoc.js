@@ -1966,7 +1966,7 @@ function loadData(serverName,password,type){
 	    	$(".navBox").html('');
 	    	if(data != null){
     			if(data.error != null && data.error != ""){
-    				window.location = "lkad404.html?error="+data.error;
+    				alert(data.error);
     			}else if(data.projectName == null || data.projectName==""){
     				alert(data);
     			}else{
@@ -2000,7 +2000,8 @@ function loadData(serverName,password,type){
 						}
 						$(".navBox").append("<div class='leave-a-note'></div>");
 						leftMenu()
-						
+					}else{
+						$(".navBox").html("没有任何接口信息，请检查您的lkadoc配置是否正确");
 					}
     			}
     		}

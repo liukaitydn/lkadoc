@@ -511,7 +511,6 @@ $(function(){
 	
 	//搜索接口名称
 	$("#search-button").click(function(){
-		console.log(1)
 		reloadDoc(getServerName(),0);
 		indexFlag=null
 		$("#tabBox>li").hide();
@@ -735,6 +734,41 @@ $(function(){
 		}
 	})
 	
+	//执行入参单击事件
+	 $(".checkData").click(function() {
+        if ($(this).is(":checked")== true) {
+			//选中触发事件
+			if($(this).parent().parent().hasClass("parentParam")){
+				var ptxt = $(this).parent().parent().find(".paramValue").html();
+				var paramValues = $(this).parents("table").find(".paramValue");
+				for(var i = 0;i<paramValues.length;i++){
+					var txt = paramValues[i].innerHTML;
+					if(txt.indexOf(".") != -1 
+					&& txt.substr(0,ptxt.length) == ptxt
+					&& txt.charAt(ptxt.length) == '.'){
+						$(paramValues[i]).parent().find(".checkData").attr("disabled",false);
+					}
+				}
+			}
+        } else {
+           //取消选中触发事件
+			if($(this).parent().parent().hasClass("parentParam")){
+				var ptxt = $(this).parent().parent().find(".paramValue").html();
+				var paramValues = $(this).parents("table").find(".paramValue");
+				for(var i = 0;i<paramValues.length;i++){
+					var txt = paramValues[i].innerHTML;
+					if(txt.indexOf(".") != -1 && 
+					txt.substr(0,ptxt.length) == ptxt && 
+					txt.charAt(ptxt.length) == '.'){
+						console.log(txt)
+						$(paramValues[i]).parent().find(".checkData").attr("disabled",true);
+					}
+				}
+			}
+        }
+    });
+	
+	
 	
 	$(".saveToken").click(function(){
 		if($(this).val()=='修改'){
@@ -860,7 +894,8 @@ $(function(){
 		var isRequireds = $(this).parents("table").find(".isRequired");
 		// 获取数据类型
 		var dataTypes = $(this).parents("table").find(".dataType");
-		
+		// 获取参数选中状态
+		var checkDatas = $(this).parents("table").find(".checkData");
 		var queryJson = {};
 		var headerJson = {};
 		var restJson = {};
@@ -868,9 +903,9 @@ $(function(){
 		for(var i = 0;i<paramValues.length;i++){
 			paramNames.push(paramValues.eq(i).html());
 		}
-		var queryJson = assembleJson(paramNames,testDatas,dataTypes,paramTypes,"query");
-		var headerJson = assembleJson(paramNames,testDatas,dataTypes,paramTypes,"header");
-		var pathJson = assembleJson(paramNames,testDatas,dataTypes,paramTypes,"path");
+		var queryJson = assembleJson(paramNames,testDatas,dataTypes,paramTypes,checkDatas,"query");
+		var headerJson = assembleJson(paramNames,testDatas,dataTypes,paramTypes,checkDatas,"header");
+		var pathJson = assembleJson(paramNames,testDatas,dataTypes,paramTypes,checkDatas,"path");
 		// rest风格url参数设置
 		for (var val in pathJson) {
 			path = path.replace('{'+val+'}',pathJson[val]);
@@ -1243,22 +1278,30 @@ function isExistsFile(filepath){
     return false;
 }
 
-function assembleJson(paramNames,testDatas,dataTypes,paramTypes,type){// 参数名称，参数值，参数类型
+function assembleJson(paramNames,testDatas,dataTypes,paramTypes,checkDatas,type){// 参数名称，参数值，参数类型
 	var paramJson = {};
 	var namesArr = new Array();
 	for(var i = 0;i<paramNames.length;i++){ // 遍历参数名称
 		// 判断是否有数据类型
 		var dataType;
 		var paramType;
+		var checkData;
 		try{
 			dataType = dataTypes.eq(i);
 			paramType = paramTypes.eq(i);
+			checkData = checkDatas.eq(i);
 		}catch(e){
 			dataType = dataTypes[i];
 			paramType = paramTypes[i];
+			checkData = checkDatas[i];
 		}
 
 		if(paramType.parent().children(":first").css("textDecoration").indexOf('line-through') != -1){
+			namesArr.push(paramNames[i]);
+			continue;
+		}
+		
+		if(!checkData.prop("checked")){
 			namesArr.push(paramNames[i]);
 			continue;
 		}
@@ -1299,18 +1342,22 @@ function assembleJson(paramNames,testDatas,dataTypes,paramTypes,type){// 参数�
 						var arrTest = new Array();
 						var arrData = new Array();
 						var arrType = new Array();
+						var arrCheck = new Array();
 						for(var j = 0;j<paramNames.length;j++){
 							var td;
 							var dt;
 							var pt;
+							var ac;
 							try{
 								td = testDatas.eq(j);
 								dt = dataTypes.eq(j);
 								pt = paramTypes.eq(j);
+								ac = checkDatas.eq(j);
 							}catch(e){
 								td = testDatas[j];
 								dt = dataTypes[j];
 								pt = paramTypes[j];
+								ac = checkDatas[j];
 							}
 							if(dt.html() != null && pt.html() == type){ // 有数据类型
 								if(paramNames[j].indexOf(".") != -1){
@@ -1319,16 +1366,18 @@ function assembleJson(paramNames,testDatas,dataTypes,paramTypes,type){// 参数�
 										arrTest.push(td);
 										arrData.push(dt);
 										arrType.push(pt);
+										arrCheck.push(ac);
 										paramNames.splice(j,1);
 										testDatas.splice(j,1);
 										dataTypes.splice(j,1);
 										paramTypes.splice(j,1);
+										checkDatas.splice(j,1);
 						    			j--;
 									}
 								}
 							}
 						}
-						paramJson[paramStr] = assembleJson(arrParam,arrTest,arrData,arrType,type);
+						paramJson[paramStr] = assembleJson(arrParam,arrTest,arrData,arrType,arrCheck,type);
 					}
 				}
 			}else{// 是数组
@@ -1370,18 +1419,22 @@ function assembleJson(paramNames,testDatas,dataTypes,paramTypes,type){// 参数�
 						var arrTest = new Array();
 						var arrData = new Array();
 						var arrType = new Array();
+						var arrCheck = new Array();
 						for(var j = 0;j<paramNames.length;j++){
 							var td;
 							var dt;
 							var pt;
+							var ac;
 							try{
 								td = testDatas.eq(j);
 								dt = dataTypes.eq(j);
 								pt = paramTypes.eq(j);
+								ac = checkDatas.eq(j);
 							}catch(e){
 								td = testDatas[j];
 								dt = dataTypes[j];
 								pt = paramTypes[j];
+								ac = checkDatas[j];
 							}
 							if(dt.html() != null && pt.html() == type){ // 有数据类型
 								if(paramNames[j].indexOf(".") != -1){
@@ -1390,17 +1443,19 @@ function assembleJson(paramNames,testDatas,dataTypes,paramTypes,type){// 参数�
 										arrTest.push(td);
 										arrData.push(dt);
 										arrType.push(pt);
+										arrCheck.push(ac);
 										paramNames.splice(j,1);
 										testDatas.splice(j,1);
 										dataTypes.splice(j,1);
 										paramTypes.splice(j,1);
+										checkDatas.splice(j,1);
 						    			j--;
 									}
 								}
 							}
 						}
 						var arr = new Array();
-						arr[0] = assembleJson(arrParam,arrTest,arrData,arrType,type);
+						arr[0] = assembleJson(arrParam,arrTest,arrData,arrType,arrCheck,type);
 						paramJson[paramStr] = arr;
 					}
 				}
@@ -1832,8 +1887,8 @@ function buildParams(doc,type,loc,flag,contentType){
 	if(loc == "loc_method"){
 	 	str = "<table class='hovertable'>";
 		if(type=="req" || type=="param"){
-			str += "<thead class='reqcls'><tr><td colspan='7'>请求参数</td></tr>"
-			str += "<tr><td>名称</td><td>作用</td><td>是否必须</td><td>数据类型</td><td>参数类型</td><td>测试数据</td><td>描述</td></tr>"
+			str += "<thead class='reqcls'><tr><td colspan='8'>请求参数</td></tr>"
+			str += "<tr><td>名称</td><td>作用</td><td>是否必须</td><td>数据类型</td><td>参数类型</td><td>测试数据</td><td>描述</td><td>是否入参</td></tr>"
 			str +="</thead><tbody>"
 		}else if(type=="resp"){
 			str += "<thead class='respcls'><tr><td colspan='4'>响应参数</td></tr>"
@@ -1867,7 +1922,7 @@ function buildParams(doc,type,loc,flag,contentType){
 						str+=buildParams(model.propertyModels,"resps",val,3);
 					}
 					if(type=="params"){
-						str+="<tr class='parentParam'><td class='paramValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='paramInfo'>"+name+"</td><td>"+description+"</td><td class='dataType paramType testData'></td><td></td><td colspan='2'></td></tr>"								
+						str+="<tr class='parentParam'><td class='paramValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='paramInfo'>"+name+"</td><td>"+description+"</td><td class='dataType paramType testData'></td><td></td><td colspan='2'></td><td><input type='checkbox' checked class='checkData'></td></tr>"								
 						str+=buildParams(model.propertyModels,"params",val,2);
 					}else if(type=="resps"){
 						str+="<tr class='parentParam'><td class='addinfo' title='右键可修改参数状态'>"+val+"</td><td>"+name+"</td><td>"+description+"</td><td></td></tr>"
@@ -1880,7 +1935,7 @@ function buildParams(doc,type,loc,flag,contentType){
 						(required==true?'是':'否')+"</td><td class='dataType'>"+dataType+"</td><td class='paramType'>"+paramType+"</td><td>"+
 						(dataType=='MultipartFile'?"<form class='upload' enctype='multipart/form-data'>"+"<input type='file' class='testData' name='"+value+"'>"+"</form>":
 							dataType=='MultipartFile[]'?"<form class='upload' enctype='multipart/form-data'>"+"<input type='hidden' value='"+value+"' class='fileValue'><input type='file' class='testData' name='"+value+"'><input type='button' class='subFile' value='-'><input type='button' class='addFile' value='+'></form>":"<input class='testData tdcss' type='"+(dataType=='Date'?'date':'text')+"' value='"+testData+"'>"+
-						(dataType==null?"":dataType.indexOf('[]')==-1?"":"<input type='button' class='subtract' value='-'><input type='button' class='add' value='+'>")+"</td>")+"<td>"+description+"</td></tr>"
+						(dataType==null?"":dataType.indexOf('[]')==-1?"":"<input type='button' class='subtract' value='-'><input type='button' class='add' value='+'>")+"</td>")+"<td>"+description+"</td><td><input type='checkbox' checked class='checkData'></td></tr>"
 					}else{
 						str+="<tr><td class='respValue addinfo' title='右键可修改参数状态'>"+val+"</td><td class='respInfo'>"+name+"</td><td class='respType'>"+dataType+"</td><td>"+description+"</td></tr>"
 					}
@@ -1889,8 +1944,8 @@ function buildParams(doc,type,loc,flag,contentType){
 		}
 		if(loc == "loc_method"){
 			if(type=="req" || type=="param"){
-				str+="<tr><td colspan='7' class='requestData' hidden='hidden'></td></tr>"
-				str+="<tr class='testSend'><td colspan='7'>"+
+				str+="<tr><td colspan='8' class='requestData' hidden='hidden'></td></tr>"
+				str+="<tr class='testSend'><td colspan='8'>"+
 				"<input type='button' class='testSendButton' value='执行接口'>&nbsp;&nbsp;"+
 				"执行次数：<input type='number' class='conutNumber' value='1'>&nbsp;&nbsp;" +
 				"时间间隔(ms)：<input class='timeNumber' disabled='true' style='background-color:#333' type='number' value='1'>&nbsp;&nbsp;"+
@@ -1899,20 +1954,20 @@ function buildParams(doc,type,loc,flag,contentType){
 				"<input type='button' class='request-json' value='树状展示请求参数'>&nbsp;&nbsp;"+
 				"<input type='button' class='switch-resp-json' value='树状展示响应参数'>"+
 				"</td></tr>"
-				str+="<tr><td colspan='7' class='close-resposeData' align='center'><a style='font-size:12;color:#6fb4ce;cursor:pointer'>打开调试窗口</a>" +
+				str+="<tr><td colspan='8' class='close-resposeData' align='center'><a style='font-size:12;color:#6fb4ce;cursor:pointer'>打开调试窗口</a>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status：</span><span class='request-status'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time：</span><span class='request-time'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successful：</span><span class='request-success'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;failures：</span><span class='request-fail'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size：</span><span class='request-length'></span>" +
 						"</td></tr>"
-				str+="<tr><td colspan='7' class='resposeData' hidden='hidden'>暂无调试信息</td></tr>"
+				str+="<tr><td colspan='8' class='resposeData' hidden='hidden'>暂无调试信息</td></tr>"
 			}
 		}
 	}else if(loc == "loc_method"){
 		if(type=="req" || type=="param"){
-			str+="<tr><td colspan='7' style='color:#8b99b1'>该接口没有设置请求参数</td></tr>"
-				str+="<tr class='testSend'><td colspan='7'>"+
+			str+="<tr><td colspan='8' style='color:#8b99b1'>该接口没有设置请求参数</td></tr>"
+				str+="<tr class='testSend'><td colspan='8'>"+
 				"<input type='button' class='testSendButton' value='测试API请求'>&nbsp;&nbsp;"+
 				"执行次数：<input type='number' class='conutNumber' value='1'>&nbsp;&nbsp;" +
 				"时间间隔(ms)：<input class='timeNumber' disabled='true' style='background-color:#333' type='number' value='1'>&nbsp;&nbsp;"+
@@ -1921,14 +1976,14 @@ function buildParams(doc,type,loc,flag,contentType){
 				"<input type='button' class='request-json' value='树状展示请求参数'>&nbsp;&nbsp;"+
 				"<input type='button' class='switch-resp-json' value='树状展示响应参数'>"+
 				"</td></tr>"
-				str+="<tr><td colspan='7' class='close-resposeData' align='center'><a style='font-size:12;color:#6fb4ce;cursor:pointer'>打开调试窗口</a>" +
+				str+="<tr><td colspan='8' class='close-resposeData' align='center'><a style='font-size:12;color:#6fb4ce;cursor:pointer'>打开调试窗口</a>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status：</span><span class='request-status'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time：</span><span class='request-time'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successful：</span><span class='request-success'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;failures：</span><span class='request-fail'></span>" +
 						"<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size：</span><span class='request-length'></span>" +
 						"</td></tr>"
-				str+="<tr><td colspan='7' class='resposeData' hidden='hidden'>暂无调试信息</td></tr>"
+				str+="<tr><td colspan='8' class='resposeData' hidden='hidden'>暂无调试信息</td></tr>"
 		}else{
 			str+="<tr><td colspan='4' style='color:#8b99b1'>该接口没有设置响应参数</td></tr>"
 		}

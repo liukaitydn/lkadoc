@@ -477,16 +477,16 @@ $(function(){
 		}
 		$(".isRequired").each(function(){
 		if($(this).html() == '是'){
-			$(this).css("color","#bf7a6a");
+			$(this).css("color","#A12F2F");
 		}
 		})
 		
 		$(".paramType").each(function(){
 			if($(this).html() == 'header'){
-				$(this).css("color","#bf7a6a");
+				$(this).css("color","#A12F2F");
 			}
 			if($(this).html() == 'path'){
-				$(this).css("color","#6fb4ce");
+				$(this).css("color","#068043");
 			}
 		})
 		
@@ -882,6 +882,8 @@ $(function(){
 		var path = $(this).parents("table").parent().parent().find(".method-URL").html();
 		//获取是否是下载方法
 		var download = $(this).parents("table").parent().parent().find(".method-download").val();
+		//获取返回值是否是集合
+		var returnArray = $(this).parents("table").parent().parent().find(".method-returnArray").val();
 		//contentType
 		var contentType =  $(this).parents("table").parent().parent().find(".content-TYPE").html();
 		// 获取请求参数名称
@@ -1124,11 +1126,11 @@ $(function(){
 						    	}catch(e){
 						    		resposeData.html(data);
 						    	}
+
 					    	}else{
-					    		resposeData.html(resposeData.html()+"<span style='color:green;'>conut："+(countNum++)+"&nbsp;&nbsp;status："+xhr.status+"&nbsp;&nbsp;"
-					    				+"msg："+xhr.statusText+"&nbsp;&nbsp;time："+countTime+"ms</span><br/>"+"<span style='color:#888'>"+data+"</span><br/><br/>");
+								resposeData.html(resposeData.html()+"<span style='color:green;'>conut："+(countNum++)+"&nbsp;&nbsp;status："+xhr.status+"&nbsp;&nbsp;"
+				    				+"msg："+xhr.statusText+"&nbsp;&nbsp;time："+countTime+"ms</span><br/>"+"<span style='color:#888'>"+data+"</span><br/><br/>");
 					    	}
-					    	
 					    },
 					    error:function(respose){
 					    	requestFail.html(Number(requestFail.html())+1);
@@ -1843,30 +1845,31 @@ function buildMenu(doc,tVersion,num) {
 			str +="<ul>"
 		}
 		var num2 = 0;
-    	for(var i = 0;i<methods.length;i++){
+    	for(let i = 0;i<methods.length;i++){
     		num2++;
     		if(searchText != null && searchText != '' && methods[i].name.indexOf(searchText) < 0){
     			continue;
     		}
     		searchbool = true;
     		met_index++;
-    		var createTime = methods[i].createTime;
-    		var updateTime = methods[i].updateTime;
-    		var mVersion = methods[i].version;
-    		var imgName = mVersion == tVersion?"xinxin.png":"file.gif";
+    		let createTime = methods[i].createTime;
+    		let updateTime = methods[i].updateTime;
+    		let mVersion = methods[i].version;
+			let returnArray = methods[i].returnArray;
+    		let imgName = mVersion == tVersion?"xinxin.png":"file.gif";
     		str += "<li data='"+met_index+"' urlname='"+methods[i].name+"' class='secondary' title=''>" +
     				"<input type='hidden' value='"+methods[i].name+"-"+methods[i].url+"'>" +
     				"<h5><img src='img/"+imgName+"' height='10px' width='10px'><span>"+num+"."+num2+"&nbsp;"+methods[i].name+"</span></h5></li>";
-    		var request = methods[i].request;
-    		var respose = methods[i].respose;
-    		var str2 ="<div id='method_"+met_index+"' class='method-table' hidden='hidden'><div class='div-method-ul'>" +
+    		let request = methods[i].request;
+    		let respose = methods[i].respose;
+    		let str2 ="<div id='method_"+met_index+"' class='method-table' hidden='hidden'><div class='div-method-ul'>" +
     				"<ul class='method-ul'>" +
-    				"<li><span class='method-name-pdf'>"+methods[i].name+"</span>&nbsp;&nbsp;<span class='docDescription'>"+methods[i].description+"</span>&nbsp;&nbsp;<span>version："+methods[i].version+"</span>&nbsp;&nbsp;<span class='method-token'>token："+(methods[i].token==true?"是":"否")+"</span><span>&nbsp;&nbsp;"+(methods[i].contentType=="application/json" && methods[i].requestType=="GET"?"注意：ContentType为application/json传参时只支持post、put、delete请求！":"")+"</span></li>"+
-    				"<li class='method-requestParamInfo'><span>Method Type：</span><span class='method-requestType'>"+methods[i].requestType+"</span>&nbsp;&nbsp;&nbsp;<span><b>Content Type：</b></span><span class='content-TYPE'>"+methods[i].contentType+"</span></span>&nbsp;&nbsp;&nbsp;<span><b>URL：</b></span><span class='method-URL'>"+methods[i].url+"</li>"+
-    				"<li class='method-requestParamInfo'><span></span><span><b>Author：</b>"+(methods[i].author==null || methods[i].author==''?'未设置':methods[i].author)+"&nbsp;&nbsp;&nbsp;<b>CreateTime：</b>"+(createTime==null || createTime==''?'未设置':createTime)+"&nbsp;&nbsp;&nbsp;<b>UpdateTime：</b>"+(updateTime==null || updateTime==''?'未设置':updateTime)+"</span><span><input class='method-download' type='hidden' value='"+methods[i].download+"'></span></li>"+
-    				"</ul>"+
-    				"</div><div>"+buildParams(request,"req","loc_method",1,methods[i].contentType)+"</div>";
-    		str2 +="<div>"+buildParams(respose,"resp","loc_method",1)+"</div><div class='leave-a-note'></div></div>";
+    				"<li><span class='method-name-pdf'>"+methods[i].name+"</span>&nbsp;&nbsp;<span class='docDescription'>"+methods[i].description+"</span>&nbsp;&nbsp;<span><b>version：</b>"+methods[i].version+"</span>&nbsp;&nbsp;<span class='method-token'>token："+(methods[i].token==true?"是":"否")+"</span><span>&nbsp;&nbsp;"+(methods[i].contentType=="application/json" && methods[i].requestType=="GET"?"注意：ContentType为application/json传参时只支持post、put、delete请求！":"")+"</span></li>"+
+    				"<li class='method-requestParamInfo'><span><b>Method Type：</b></span><span class='method-requestType'>"+methods[i].requestType+"</span>&nbsp;&nbsp;&nbsp;<span><b>Content Type：</b></span><span class='content-TYPE'>"+methods[i].contentType+"</span></span>&nbsp;&nbsp;&nbsp;<span><b>URL：</b></span><span class='method-URL'>"+methods[i].url+"</li>"+
+    				"<li class='method-requestParamInfo'><span></span><span><b>Author：</b>"+(methods[i].author==null || methods[i].author==''?'未设置':methods[i].author)+"&nbsp;&nbsp;&nbsp;<b>CreateTime：</b>"+(createTime==null || createTime==''?'未设置':createTime)+"&nbsp;&nbsp;&nbsp;<b>UpdateTime：</b>"+(updateTime==null || updateTime==''?'未设置':updateTime)+
+					"</span><span><input class='method-download' type='hidden' value='"+methods[i].download+"'><input class='method-returnArray' type='hidden' value='"+returnArray+"'></span></li>"+
+    				"</ul></div><div>"+buildParams(request,"req","loc_method",1,returnArray)+"</div>";
+    		str2 +="<div>"+buildParams(respose,"resp","loc_method",1,returnArray)+"</div><div class='leave-a-note'></div></div>";
     		$(".right-box").append(str2);
     	}
     	str+="</ul>";
@@ -1881,22 +1884,21 @@ function buildMenu(doc,tVersion,num) {
 
 var radioRandom = 0;
 
-function buildParams(doc,type,loc,flag,contentType){
+function buildParams(doc,type,loc,flag,returnArray){
 	radioRandom++;
 	var str = "";
 	if(loc == "loc_method"){
 	 	str = "<table class='hovertable'>";
 		if(type=="req" || type=="param"){
 			str += "<thead class='reqcls'><tr><td colspan='8'>请求参数</td></tr>"
-			str += "<tr><td>名称</td><td>作用</td><td>是否必须</td><td>数据类型</td><td>参数类型</td><td>测试数据</td><td>描述</td><td>是否入参</td></tr>"
+			str += "<tr class='requestDataTable reqtitle'><td>名称</td><td>作用</td><td>是否必须</td><td>数据类型</td><td>参数类型</td><td>测试数据</td><td>描述</td><td>是否入参</td></tr>"
 			str +="</thead><tbody>"
 		}else if(type=="resp"){
 			str += "<thead class='respcls'><tr><td colspan='4'>响应参数</td></tr>"
 			str += "<tr class='resposeDataJson' hidden='hidden'><td colspan='4'></td></tr>"
-			str += "<tr class='resposeDataTable'><td>名称</td><td>作用</td><td>数据类型</td><td>描述</td></tr>"
+			str += "<tr class='resposeDataTable restitle'><td>名称</td><td>作用</td><td>数据类型</td><td>描述</td></tr>"
 			str +="</thead><tbody class='resposeDataTable'>"
 		}
-		
 	}
 	if(doc != null && doc.length > 0){
 		for(var i = 0;i<doc.length;i++){
@@ -1910,7 +1912,7 @@ function buildParams(doc,type,loc,flag,contentType){
 					str+=buildParams(arr,"param",val,2);
 				}else{
 					str+="<tr class='parentParam'><td class='addinfo' title='右键可添加参数状态'>"+val+"</td><td>"+name+"</td><td>"+description+"</td><td></td></tr>"
-					str+=buildParams(arr,"resp",val,2);
+					str+=buildParams(arr,"resp",val,2,false);
 				}
 			}else{
 				var model =doc[i].modelModel;

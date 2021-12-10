@@ -22,6 +22,7 @@ public class MethodModel implements Comparable<MethodModel>{
 	private boolean token;
 	private int order;
 	private String directory;
+	private boolean returnArray;
 	
 	/**
      * 将对象按名称典序升序排序
@@ -52,8 +53,6 @@ public class MethodModel implements Comparable<MethodModel>{
 	public void setOrder(int order) {
 		this.order = order;
 	}
-
-
 
 	public boolean isToken() {
 		return token;
@@ -141,6 +140,12 @@ public class MethodModel implements Comparable<MethodModel>{
 	public void setRespose(List<ResposeModel> respose) {
 		this.respose = respose;
 	}
-	
-	
+
+	public boolean isReturnArray() {
+		return returnArray;
+	}
+
+	public void setReturnArray(boolean returnArray) {
+		this.returnArray = returnArray;
+	}
 }

@@ -270,34 +270,34 @@ h5{
 	background-color:#2a3039;
 }
 
-.method-ul{
-	margin-top:20px;
-}
-
 .method-ul li{
 	list-style: none;
-	line-height: 35px;
+	line-height: 22px;
 	color: #bf7a6a;
-	line-height:35px;
+}
+.method-ul li:first-child{
+	padding-top:6px;
+}
+.method-ul li:last-child{
+	padding-bottom:6px;
 }
 .method-requestParamInfo{
 	padding-left:5px;
-	margin-bottom:5px;
 	
-}
-.method-ul li span:first-child{
-	font-weight:700;
 }
 .method-ul li:first-child span:first-child{
 	font-size:14px;
 	padding-left:5px;
+	font-weight:700;
 }
 .method-ul li:first-child span:nth-child(3){
 	padding:3px;
 	border-radius:50px;
 	font-size:12px;
 }
-
+.method-token{
+	font-weight:700;
+}
 .method-table{
 	margin-top:-10px;
 }
@@ -334,10 +334,12 @@ table.hovertable tbody tr td {
 	word-wrap:break-word;
 }
 .reqcls tr:first-child td{
+	color:#bf7a6a;
 	text-align: center;
 	border-bottom:1px solid #313742;
 }
 .respcls tr:first-child td{
+	color:#bf7a6a;
 	text-align: center;
 	border-bottom:1px solid #313742;
 }
@@ -360,6 +362,10 @@ table.hovertable tbody tr td {
 }
 .reqcls{
 	background: #2a3039;
+}
+.reqtitle td,.restitle td{
+	color:#bf7a6a;
+	font-weight:700;
 }
 .add,.subtract { 
 	width: 20px; 

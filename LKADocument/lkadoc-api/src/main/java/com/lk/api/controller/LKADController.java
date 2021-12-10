@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -72,6 +73,7 @@ import com.lk.api.domain.ParamModel;
 import com.lk.api.domain.PropertyModel;
 import com.lk.api.domain.ResposeModel;
 import com.lk.api.domain.TypeModel;
+import com.lk.api.utils.TypeCls;
 
 /**
  * 	文档信息处理类
@@ -623,45 +625,63 @@ public class LKADController {
 						if(returnType != null && !"void".equals(returnType.getName())) {
 							boolean bool2 = false;
 							boolean isParentArray = false;
+							boolean isParentArray2 = false;
+							boolean isParentArray3 = false;
+							boolean isParentArray4 = false;
 							Class<?> proType = null;
+							Class<?> proType2 = null;
+							Class<?> proType3 = null;
+							Class<?> proType4 = null;
 							Class<?> parentProType = null;
 							if(returnType.isArray()) {//数组
 								// 获取数组元素的类型
 								proType = returnType.getComponentType();
 								isParentArray = true;
 							}else {
-								//当前集合的泛型类型
+								//返回一个Type对象，该对象表示此Method对象表示的方法的正式返回类型
 								Type genericReturnType = method.getGenericReturnType();
 								if(genericReturnType instanceof ParameterizedType) {
 			                        ParameterizedType pt = (ParameterizedType) genericReturnType;
 			                        //得到泛型里的class类型对象
 									try {
-										proType = (Class<?>)pt.getActualTypeArguments()[0];
-										if(returnType.getSimpleName().equals("List") || 
-											returnType.getSimpleName().equals("Set") ||
-											returnType.getSimpleName().equals("ArrayList") ||
-											returnType.getSimpleName().equals("LinkedList") ||
-											returnType.getSimpleName().equals("Vector") ||
-											returnType.getSimpleName().equals("SortedSet") ||
-											returnType.getSimpleName().equals("HashSet") ||
-											returnType.getSimpleName().equals("TreeSet") ||
-											returnType.getSimpleName().equals("LinkedHashSet")) {
-											isParentArray = true;
-										}
+										isParentArray = isParentArray(returnType);
+										proType = (Class<?>)pt.getActualTypeArguments()[0];										
 									} catch (Exception e) {
 										try {
 											ParameterizedType pt2 =(ParameterizedType)pt.getActualTypeArguments()[0];
-											proType = (Class<?>)pt2.getActualTypeArguments()[0];
-											parentProType = (Class<?>)pt2.getRawType();
+											proType = (Class<?>)pt2.getRawType();
+											try {
+												isParentArray2 = isParentArray(proType);
+												proType2 = (Class<?>)pt2.getActualTypeArguments()[0];
+											} catch (Exception e1) {
+												ParameterizedType pt3 =(ParameterizedType)pt2.getActualTypeArguments()[0];
+												proType2 = (Class<?>)pt3.getRawType();
+												try {
+													isParentArray3 = isParentArray(proType2);
+													proType3 = (Class<?>)pt3.getActualTypeArguments()[0];													
+												} catch (Exception e2) {
+													ParameterizedType pt4 =(ParameterizedType)pt3.getActualTypeArguments()[0];
+													proType3 = (Class<?>)pt4.getRawType();
+													try {
+														isParentArray4 = isParentArray(proType3);
+														proType4 = (Class<?>)pt4.getActualTypeArguments()[0];
+													} catch (Exception e3) {
+														ParameterizedType pt5 =(ParameterizedType)pt4.getActualTypeArguments()[0];
+														proType4 = (Class<?>)pt5.getRawType();
+													}
+												}
+											}
 										} catch (Exception e1) {
-											//最多判断两层,两层以上待定
+											//最多判断四层,四层以上待定
 										}
 									}
 								}
 							}
 							if(isParentArray || returnType.isAnnotationPresent(LKAModel.class) || returnType.isAnnotationPresent(ApiModel.class)){
+								methodModel.setReturnArray(false);
 								if(isParentArray) {
 									returnType = proType;
+									methodModel.setReturnArray(true);
 								}
 								// 获取model描述信息
 								ModelModel modelModel = new ModelModel();
@@ -723,23 +743,121 @@ public class LKADController {
 										}
 										if(!bool) {
 											Class<?> type = field.getType();
+											//用于判断接下来传递泛形对象是哪一个
+											int proNum = 1;
 											if(proType != null) {
 												if("Object".equals(type.getSimpleName())) {
 													type = proType;
+													proNum = 2;
 												}
 											}
-											if (!field.isAnnotationPresent(LKAProperty.class) && 
-													!field.isAnnotationPresent(ApiModelProperty.class)) {
+											PropertyModel propertyModel = null;
+											TypeCls tcls = getGenericType(type, field);
+											Class<?> ptype = tcls.getCls();
+											if(ptype == null) {
+												//如果成立代表ptype是集合并且泛形为T
+												if(proType != null) {
+													ptype = proType;
+													proNum = 2;
+												}else {
+													ptype = type;
+												}
+											}
+											if("Object".equals(field.getType().getSimpleName()) && tcls.isArray()) {
+												//代表是泛形集合
+												if(proType2 != null) {
+													ptype = proType2;
+													proNum = 3;
+												}
+											}
+											if (field.isAnnotationPresent(LKAProperty.class) || 
+													field.isAnnotationPresent(ApiModelProperty.class)) {
+												Class<?> propertyType = null;
+												String proPertyTypeName = "";
+												String proPertyValue = "";
+												String proPertyDesc = "";
+												if(field.isAnnotationPresent(LKAProperty.class)){
+													LKAProperty property = field.getAnnotation(LKAProperty.class);
+													if(property.hidden()) { continue;}
+													propertyType = property.type();
+													proPertyTypeName = propertyType.getName();
+													proPertyValue = property.value();
+													proPertyDesc = property.description();
+												}else{
+													ApiModelProperty property = field.getAnnotation(ApiModelProperty.class);
+													if(property.hidden()) { continue;}
+													propertyType = property.type();
+													proPertyTypeName = propertyType.getName();
+													proPertyValue = property.value();
+													proPertyDesc = property.description();
+												}
+												if(proPertyTypeName.equals("java.lang.Object") && isObj(ptype) != 3) {
+													propertyModel = new PropertyModel();
+												}else {
+													if(isObj(ptype) == 3) {
+														//自动判断属性类型
+														Class<?> p1 = proNum==1?proType:proNum==2?proType2:proNum==3?proType3:proNum==4?proType4:null;
+														Class<?> p2 = proNum==1?proType2:proNum==2?proType3:proNum==3?proType4:null;
+														Class<?> p3 = proNum==1?proType3:proNum==2?proType4:null;
+														Class<?> p4 = proNum==1?proType4:null;
+														propertyModel = analysisProModel(methodModel.getUrl(),ptype,null,2,p1,p2,p3,p4);
+														if(propertyModel == null) {
+															propertyModel = new PropertyModel();
+															propertyModel.setDataType("Object");
+														}
+													}else {
+														//通过type属性判断类型
+														propertyModel = analysisProModel(methodModel.getUrl(),propertyType,null,2,null);
+														if(propertyModel == null) {
+															propertyModel = new PropertyModel();
+															propertyModel.setDataType("Object");
+														}
+													}
+												}
+												propertyModel.setArray(false);
+												if(tcls.isArray() || isObj(type) == 2 || 
+														isObj(type) == 4 || 
+														(field.getType().getSimpleName().equals("Object") && 
+																parentProType != null && 
+																(parentProType.getSimpleName().equals("List") || 
+																 parentProType.getSimpleName().equals("Set") ||
+																 parentProType.getSimpleName().equals("ArrayList") ||
+																 parentProType.getSimpleName().equals("LinkedList") ||
+																 parentProType.getSimpleName().equals("Vector") ||
+																 parentProType.getSimpleName().equals("SortedSet") ||
+																 parentProType.getSimpleName().equals("HashSet") ||
+																 parentProType.getSimpleName().equals("TreeSet") ||
+																 parentProType.getSimpleName().equals("LinkedHashSet")
+																		))) {
+													propertyModel.setArray(true);
+												}
+												propertyModel.setValue(pValue);
+												propertyModel.setName(proPertyValue);
+												String[] split = proPertyValue.split("\\^");
+												if(split.length == 2) {
+													propertyModel.setName(split[0]);
+													propertyModel.setTestData(split[1]);
+												}
+												String[] split2 = split[0].split("\\~");
+												if(split2.length == 2) {
+													propertyModel.setName(split2[1]);
+													if(split2[0].contains("n"))propertyModel.setRequired(false);
+												}
+												propertyModel.setDescription(proPertyDesc);
+												propertyModel.setDataType(field.getType().getSimpleName());
+												propertyModels.add(propertyModel);
+											}else {
 												if(sconAll) {
-													PropertyModel propertyModel = new PropertyModel();
-													//int isArray = isObj(type);
-													type = getGenericType(type, field);
-													
 													//判断数据类型
 													propertyModel.setDataType(type.getSimpleName());
 													int flag = isObj(type);
 										            if(flag == 3) {
-										            	propertyModel = analysisProModel(methodModel.getUrl(),type,"",2);
+										            	//自动判断属性类型
+										            	Class<?> p1 = proNum==1?proType:proNum==2?proType2:proNum==3?proType3:proNum==4?proType4:null;
+														Class<?> p2 = proNum==1?proType2:proNum==2?proType3:proNum==3?proType4:null;
+														Class<?> p3 = proNum==1?proType3:proNum==2?proType4:null;
+														Class<?> p4 = proNum==1?proType4:null;
+										            	propertyModel = analysisProModel(methodModel.getUrl(),type,"",2,p1,p2,p3,p4);
 										            	if(propertyModel == null) { 
 										            		propertyModel = new PropertyModel();
 										            		propertyModel.setDataType("Object");
@@ -747,7 +865,7 @@ public class LKADController {
 										            }
 										            String name = field.getName();
 										            propertyModel.setArray(false);
-										            if(isObj(type) == 2 || 
+										            if(tcls.isArray() || isObj(type) == 2 || 
 															isObj(type) == 4 || 
 															(field.getType().getSimpleName().equals("Object") && 
 																	parentProType != null && 
@@ -782,115 +900,6 @@ public class LKADController {
 													}
 													propertyModels.add(propertyModel);
 												}
-											}else {
-												PropertyModel propertyModel = null;
-												Class<?> ptype = getGenericType(type, field);
-												if(field.isAnnotationPresent(LKAProperty.class)){
-													LKAProperty property = field.getAnnotation(LKAProperty.class);
-													if(property.hidden()) continue;
-													if(property.type().getName().equals("java.lang.Object") && isObj(ptype) != 3) {
-														propertyModel = new PropertyModel();
-													}else {
-														if(isObj(ptype) == 3) {
-															propertyModel = analysisProModel(methodModel.getUrl(),ptype,null,2);
-															if(propertyModel == null) {
-																propertyModel = new PropertyModel();
-																propertyModel.setDataType("Object");
-															}
-														}else {
-															propertyModel = analysisProModel(methodModel.getUrl(),property.type(),null,2);
-															if(propertyModel == null) {
-																propertyModel = new PropertyModel();
-																propertyModel.setDataType("Object");
-															}
-														}
-													}
-													propertyModel.setArray(false);
-													if(isObj(type) == 2 || 
-															isObj(type) == 4 || 
-															(field.getType().getSimpleName().equals("Object") && 
-																	parentProType != null && 
-																	(parentProType.getSimpleName().equals("List") || 
-																	 parentProType.getSimpleName().equals("Set") ||
-																	 parentProType.getSimpleName().equals("ArrayList") ||
-																	 parentProType.getSimpleName().equals("LinkedList") ||
-																	 parentProType.getSimpleName().equals("Vector") ||
-																	 parentProType.getSimpleName().equals("SortedSet") ||
-																	 parentProType.getSimpleName().equals("HashSet") ||
-																	 parentProType.getSimpleName().equals("TreeSet") ||
-																	 parentProType.getSimpleName().equals("LinkedHashSet")
-																			))) {
-														propertyModel.setArray(true);
-													}
-													propertyModel.setValue(pValue);
-													propertyModel.setName(property.value());
-													String[] split = property.value().split("\\^");
-													if(split.length == 2) {
-														propertyModel.setName(split[0]);
-														propertyModel.setTestData(split[1]);
-													}
-													String[] split2 = split[0].split("\\~");
-													if(split2.length == 2) {
-														propertyModel.setName(split2[1]);
-														if(split2[0].contains("n"))propertyModel.setRequired(false);
-													}
-													propertyModel.setDescription(property.description());
-													propertyModel.setDataType(field.getType().getSimpleName());
-													propertyModels.add(propertyModel);
-												}else {
-													ApiModelProperty property = field.getAnnotation(ApiModelProperty.class);
-													if(property.hidden()) continue;
-													if(property.type().getName().equals("java.lang.Object") && isObj(ptype) != 3) {
-														propertyModel = new PropertyModel();
-													}else {
-														if(isObj(ptype) == 3) {
-															propertyModel = analysisProModel(methodModel.getUrl(),ptype,null,2);
-															if(propertyModel == null) {
-																propertyModel = new PropertyModel();
-																propertyModel.setDataType("Object");
-															}
-														}else {
-															propertyModel = analysisProModel(methodModel.getUrl(),property.type(),null,2);
-															if(propertyModel == null) {
-																propertyModel = new PropertyModel();
-																propertyModel.setDataType("Object");
-															}
-														}
-													}
-													propertyModel.setArray(false);
-													if(isObj(type) == 2 || 
-															isObj(type) == 4 || 
-															(field.getType().getSimpleName().equals("Object") && 
-																	parentProType != null && 
-																	(parentProType.getSimpleName().equals("List") || 
-																	 parentProType.getSimpleName().equals("Set") ||
-																	 parentProType.getSimpleName().equals("ArrayList") ||
-																	 parentProType.getSimpleName().equals("LinkedList") ||
-																	 parentProType.getSimpleName().equals("Vector") ||
-																	 parentProType.getSimpleName().equals("SortedSet") ||
-																	 parentProType.getSimpleName().equals("HashSet") ||
-																	 parentProType.getSimpleName().equals("TreeSet") ||
-																	 parentProType.getSimpleName().equals("LinkedHashSet")
-																	 ))) {
-														propertyModel.setArray(true);
-													}
-													propertyModel.setValue(pValue);
-													propertyModel.setName(property.value());
-													String[] split = property.value().split("\\^");
-													if(split.length == 2) {
-														propertyModel.setName(split[0]);
-														propertyModel.setTestData(split[1]);
-													}
-													String[] split2 = split[0].split("\\~");
-													if(split2.length == 2) {
-														propertyModel.setName(split2[1]);
-														if(split2[0].contains("n"))propertyModel.setRequired(false);
-													}
-													propertyModel.setDescription(property.description());
-													propertyModel.setDataType(field.getType().getSimpleName());
-													propertyModels.add(propertyModel);
-				
-												}	
 											}
 										}
 									}
@@ -3264,12 +3273,13 @@ public class LKADController {
 					if(sconAll) {
 						PropertyModel propertyModel = new PropertyModel();
 						int isArray = isObj(type);
-						type = getGenericType(type,field);
+						type = getGenericType(type,field).getCls();
+						if(type == null) type = field.getType();
 						//判断数据类型
 						propertyModel.setDataType(type.getSimpleName());
 						int flag = isObj(type);
 			            if(flag == 3) {
-			            	propertyModel = analysisProModel(url,type,"",1);
+			            	propertyModel = analysisProModel(url,type,"",1,null);
 			            	if(propertyModel == null) { 
 			            		propertyModel = new PropertyModel();
 			            		propertyModel.setDataType("Object");
@@ -3328,13 +3338,14 @@ public class LKADController {
 						String pValue = field.getName();
 						Class<?> pType = field.getType();
 						//获取泛形类型
-						Class<?> gType = getGenericType(pType, field);
+						Class<?> gType = getGenericType(pType, field).getCls();
+						if(gType == null) gType = pType;
 						PropertyModel propertyModel = new PropertyModel();
 						if (ctype.getName() != "java.lang.Object" || isObj(gType) == 3) {
 							if(ctype.getName() != "java.lang.Object") {
-								propertyModel = analysisProModel(url,ctype,group,1);
+								propertyModel = analysisProModel(url,ctype,group,1,null);
 							}else {
-								propertyModel = analysisProModel(url,gType,group,1);
+								propertyModel = analysisProModel(url,gType,group,1,null);
 							}
 							if (propertyModel == null) {
 								propertyModel = new PropertyModel();
@@ -3425,13 +3436,14 @@ public class LKADController {
 						Class<?> ctype = param.type();
 						String pValue = field.getName();
 						Class<?> pType = field.getType();
-						Class<?> gType = getGenericType(pType, field);
+						Class<?> gType = getGenericType(pType, field).getCls();
+						if(gType == null) gType = pType;
 						PropertyModel propertyModel = new PropertyModel();
 						if (ctype.getName() != "java.lang.Object" || isObj(gType) == 3) {
 							if(ctype.getName() != "java.lang.Object") {
-								propertyModel = analysisProModel(url,ctype,group,1);
+								propertyModel = analysisProModel(url,ctype,group,1,null);
 							}else {
-								propertyModel = analysisProModel(url,gType,group,1);
+								propertyModel = analysisProModel(url,gType,group,1,null);
 							}
 							if (propertyModel == null) {
 								propertyModel = new PropertyModel();
@@ -3509,10 +3521,11 @@ public class LKADController {
 	 * @param typeCls 类型
 	 * @param group 组名
 	 * @param proType protype
+	 * @param proCls 对象数组
 	 * @return PropertyModel 对象
 	 * @throws Exception 异常
 	 */
-	public PropertyModel analysisProModel(String url,Class<?> typeCls,String group,Integer proType) throws Exception {
+	public PropertyModel analysisProModel(String url,Class<?> typeCls,String group,Integer proType,Class<?>... proCls) throws Exception {
 		proNum++;
 		if(proNum > 10) {
 			proNum = 0;
@@ -3555,23 +3568,189 @@ public class LKADController {
 		}else {
 			arrays = fields;
 		}
-		
 		if (arrays != null && arrays.length > 0) {
 			List<PropertyModel> propertyModels = new ArrayList<PropertyModel>();
 			for (Object obj: arrays) {
 				Field field = (Field)obj;
-				if (!field.isAnnotationPresent(LKAProperty.class) && !field.isAnnotationPresent(ApiModelProperty.class)) {
+				if (field.isAnnotationPresent(LKAProperty.class) || field.isAnnotationPresent(ApiModelProperty.class)) {
+					boolean bool2=false;
+					String[] groups = null;
+					Class<?> ctype = null;
+					boolean paramIsArr = false;
+					String paramValue = "";
+					String paramDescription = "";
+					String paramTestData = "";
+					boolean bool = false;
+					if(field.isAnnotationPresent(LKAProperty.class)) {
+						LKAProperty param = field.getAnnotation(LKAProperty.class);
+						if(param.hidden())continue;
+						paramIsArr = param.isArray();
+						ctype = param.type();
+						groups = param.groups();
+						paramValue = param.value();
+						paramDescription = param.description();
+						paramTestData = param.testData();
+					}else {
+						ApiModelProperty param = field.getAnnotation(ApiModelProperty.class);
+						if(param.hidden())continue;
+						paramIsArr = param.isArray();
+						ctype = param.type();
+						groups = param.groups();
+						paramValue = param.value();
+						paramDescription = param.description();
+						paramTestData = param.testData();
+					}
+					if(group != null && !"".equals(group)) {
+						if(groups != null && groups.length > 0) {
+							for (String gst : groups) {
+								if(gst == null) continue;
+								String[] gs = gst.split("-");
+								if(gs == null || gs[0] == null || "".equals(gs[0]) || !gs[0].equals(group)) {
+									continue;
+								}else {
+									if(gs.length > 1 && gs[1].equals("n")) {
+										bool2 = true;
+									}
+									bool = true;
+									break;
+								}
+							}
+						}
+						if(!bool) continue;
+					}
+					String pValue = field.getName();
+					Class<?> pType = field.getType();
+					//获取泛形类型
+					Class<?> gType = getGenericType(pType, field).getCls();
+					PropertyModel propertyModel = new PropertyModel();
+					if (ctype.getName() != "java.lang.Object" || isObj(gType) == 3) {
+						if(ctype.getName() != "java.lang.Object") {
+							//通过type设置的类型
+							propertyModel = analysisProModel(url,ctype,group,proType,null);
+						}else {
+							//自动判断属性类型
+							if(gType == null || "Object".equals(gType.getSimpleName())) {
+								//泛形
+								if(proCls != null) {
+									if(proCls != null && proCls.length > 0 && proCls[0] != null) {
+										gType = proCls[0];
+										boolean isArr = false;
+										if(isObj(gType) == 2 || isObj(gType) == 4) {
+											try {
+												gType = proCls[1];
+												isArr = true;
+												paramIsArr = isArr;
+											} catch (Exception e) {
+												gType = proCls[0];
+											}
+										}
+										//数组移位
+										if(!isArr) {
+											if(proCls.length>1) {
+												Class<?> proCls2[] = new Class<?>[proCls.length-1];
+												for(int i = 0;i<proCls.length-1;i++) {
+													if(proCls[i+1] != null) {
+														proCls2[i] = proCls[i+1];
+													}else {
+														break;
+													}
+												}
+												proCls = proCls2;
+											}
+										}else {
+											if(proCls.length>2) {
+												Class<?> proCls2[] = new Class<?>[proCls.length-2];
+												for(int i = 0;i<proCls.length-2;i++) {
+													if(proCls[i+2] != null) {
+														proCls2[i] = proCls[i+2];
+													}else {
+														break;
+													}
+												}
+												proCls = proCls2;
+											}
+										}
+									}
+								}else {
+									gType = pType;
+								}
+							}
+							propertyModel = analysisProModel(url,gType,group,proType,proCls);
+						}
+						if (propertyModel == null) {
+							propertyModel = new PropertyModel();
+						}
+						propertyModel.setArray(paramIsArr);
+						if(!paramIsArr && (pType.getSimpleName().contains("[]") || 
+								pType.equals(List.class) || 
+								pType.equals(Set.class) || 
+								pType.equals(ArrayList.class) || 
+								pType.equals(LinkedList.class) ||
+								pType.equals(Vector.class) ||
+								pType.equals(SortedSet.class) ||
+								pType.equals(HashSet.class) ||
+								pType.equals(TreeSet.class) ||
+								pType.equals(LinkedHashSet.class))) {
+							propertyModel.setArray(true);
+						}
+						propertyModel.setValue(pValue);
+						propertyModel.setName(paramValue);
+						propertyModel.setDescription(paramDescription);
+						propertyModel.setDataType("Object");
+						propertyModels.add(propertyModel);
+					} else {
+						propertyModel.setDataType(pType.getSimpleName());
+						propertyModel.setDescription(paramDescription);
+						propertyModel.setName(paramValue);
+						propertyModel.setTestData(paramTestData);
+						String[] split = paramValue.split("\\^");
+						if(split.length == 2) {
+							propertyModel.setName(split[0]);
+							propertyModel.setTestData(split[1]);
+						}
+
+						String[] split2 = split[0].split("\\~");
+						if(split2.length == 2) {
+							propertyModel.setName(split2[1]);
+							if(split2[0].contains("n"))propertyModel.setRequired(false);
+						}
+						if(bool) {
+							propertyModel.setRequired(true);
+						}
+						if(bool2) {
+							propertyModel.setRequired(false);
+						}
+						propertyModel.setParamType("query");
+						propertyModel.setArray(paramIsArr);
+						if(!paramIsArr && (pType.getSimpleName().contains("[]") || 
+								pType.equals(List.class) || 
+								pType.equals(Set.class) || 
+								pType.equals(ArrayList.class) || 
+								pType.equals(LinkedList.class) ||
+								pType.equals(Vector.class) ||
+								pType.equals(SortedSet.class) ||
+								pType.equals(HashSet.class) ||
+								pType.equals(TreeSet.class) ||
+								pType.equals(LinkedHashSet.class))) {
+							propertyModel.setArray(true);
+						}
+						propertyModel.setValue(pValue);
+						propertyModels.add(propertyModel);
+					}
+				}else {
 					if(sconAll) {
 						Class<?> type = field.getType();
 						PropertyModel propertyModel = new PropertyModel();
 						int isArray = isObj(type);
-						type = getGenericType(type, field);
-						
+						type = getGenericType(type, field).getCls();
+						if(type == null) {
+							type = field.getType();
+						}
 						//判断数据类型
 						propertyModel.setDataType(type.getSimpleName());
 						int flag = isObj(type);
 			            if(flag == 3) {
-			            	propertyModel = analysisProModel(url,type,"",proType);
+			            	propertyModel = analysisProModel(url,type,"",proType,null);
 			            	if(propertyModel == null) { 
 			            		propertyModel = new PropertyModel();
 			            		propertyModel.setDataType("Object");
@@ -3600,203 +3779,7 @@ public class LKADController {
 						}
 						propertyModels.add(propertyModel);
 					}
-				}else {
-					boolean bool2=false;
-					if(field.isAnnotationPresent(LKAProperty.class)) {
-						LKAProperty param = field.getAnnotation(LKAProperty.class);
-						if(param.hidden())continue;
-						boolean bool = false;
-						if(group != null && !"".equals(group)) {
-							String[] groups = param.groups();
-							
-							if(groups != null && groups.length > 0) {
-								for (String gst : groups) {
-									if(gst == null) continue;
-									String[] gs = gst.split("-");
-									if(gs == null || gs[0] == null || "".equals(gs[0]) || !gs[0].equals(group)) {
-										continue;
-									}else {
-										if(gs.length > 1 && gs[1].equals("n")) {
-											bool2 = true;
-										}
-										bool = true;
-										break;
-									}
-								}
-							}
-							if(!bool) continue;
-						}
-						Class<?> ctype = param.type();
-						String pValue = field.getName();
-						Class<?> pType = field.getType();
-						//获取泛形类型
-						Class<?> gType = getGenericType(pType, field);
-						PropertyModel propertyModel = new PropertyModel();
-						if (ctype.getName() != "java.lang.Object" || isObj(gType) == 3) {
-							if(ctype.getName() != "java.lang.Object") {
-								propertyModel = analysisProModel(url,ctype,group,proType);
-							}else {
-								propertyModel = analysisProModel(url,gType,group,proType);
-							}
-							if (propertyModel == null) {
-								propertyModel = new PropertyModel();
-							}
-							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
-									pType.equals(List.class) || 
-									pType.equals(Set.class) || 
-									pType.equals(ArrayList.class) || 
-									pType.equals(LinkedList.class) ||
-									pType.equals(Vector.class) ||
-									pType.equals(SortedSet.class) ||
-									pType.equals(HashSet.class) ||
-									pType.equals(TreeSet.class) ||
-									pType.equals(LinkedHashSet.class))) {
-								propertyModel.setArray(true);
-							}
-							propertyModel.setValue(pValue);
-							propertyModel.setName(param.value());
-							propertyModel.setDescription(param.description());
-							propertyModel.setDataType("Object");
-							propertyModels.add(propertyModel);
-						} else {
-							propertyModel.setDataType(pType.getSimpleName());
-							propertyModel.setDescription(param.description());
-							propertyModel.setName(param.value());
-							propertyModel.setTestData(param.testData());
-							String[] split = param.value().split("\\^");
-							if(split.length == 2) {
-								propertyModel.setName(split[0]);
-								propertyModel.setTestData(split[1]);
-							}
-
-							String[] split2 = split[0].split("\\~");
-							if(split2.length == 2) {
-								propertyModel.setName(split2[1]);
-								if(split2[0].contains("n"))propertyModel.setRequired(false);
-							}
-							if(bool) {
-								propertyModel.setRequired(true);
-							}
-							if(bool2) {
-								propertyModel.setRequired(false);
-							}
-							propertyModel.setParamType("query");
-							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
-									pType.equals(List.class) || 
-									pType.equals(Set.class) || 
-									pType.equals(ArrayList.class) || 
-									pType.equals(LinkedList.class) ||
-									pType.equals(Vector.class) ||
-									pType.equals(SortedSet.class) ||
-									pType.equals(HashSet.class) ||
-									pType.equals(TreeSet.class) ||
-									pType.equals(LinkedHashSet.class))) {
-								propertyModel.setArray(true);
-							}
-							propertyModel.setValue(pValue);
-							propertyModels.add(propertyModel);
-						}
-					}else {
-						ApiModelProperty param = field.getAnnotation(ApiModelProperty.class);
-						if(param.hidden())continue;
-						boolean bool = false;
-						if(group != null && !"".equals(group)) {
-							String[] groups = param.groups();
-							
-							if(groups != null && groups.length > 0) {
-								for (String gst : groups) {
-									if(gst == null) continue;
-									String[] gs = gst.split("-");
-									if(gs == null || gs[0] == null || "".equals(gs[0]) || !gs[0].equals(group)) {
-										continue;
-									}else {
-										if(gs.length > 1 && gs[1].equals("n")) {
-											bool2 = true;
-										}
-										bool = true;
-										break;
-									}
-								}
-							}
-							if(!bool) continue;
-						}
-						Class<?> ctype = param.type();
-						String pValue = field.getName();
-						Class<?> pType = field.getType();
-						//获取泛形类型
-						Class<?> gType = getGenericType(pType, field);
-						PropertyModel propertyModel = new PropertyModel();
-						if (ctype.getName() != "java.lang.Object" || isObj(gType) == 3) {
-							if(ctype.getName() != "java.lang.Object") {
-								propertyModel = analysisProModel(url,ctype,group,proType);
-							}else {
-								propertyModel = analysisProModel(url,gType,group,proType);
-							}
-							if (propertyModel == null) {
-								propertyModel = new PropertyModel();
-								propertyModel.setDataType("Object");
-							}
-							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
-									pType.equals(List.class) || 
-									pType.equals(Set.class) || 
-									pType.equals(ArrayList.class) || 
-									pType.equals(LinkedList.class) ||
-									pType.equals(Vector.class) ||
-									pType.equals(SortedSet.class) ||
-									pType.equals(HashSet.class) ||
-									pType.equals(TreeSet.class) ||
-									pType.equals(LinkedHashSet.class))) {
-								propertyModel.setArray(true);
-							}
-							propertyModel.setValue(pValue);
-							propertyModel.setName(param.value());
-							propertyModel.setDescription(param.description());
-							propertyModels.add(propertyModel);
-						} else {
-							propertyModel.setDataType(pType.getSimpleName());
-							propertyModel.setDescription(param.description());
-							propertyModel.setName(param.value());
-							propertyModel.setTestData(param.testData());
-							String[] split = param.value().split("\\^");
-							if(split.length == 2) {
-								propertyModel.setName(split[0]);
-								propertyModel.setTestData(split[1]);
-							}
-
-							String[] split2 = split[0].split("\\~");
-							if(split2.length == 2) {
-								propertyModel.setName(split2[1]);
-								if(split2[0].contains("n"))propertyModel.setRequired(false);
-							}
-							if(bool) {
-								propertyModel.setRequired(true);
-							}
-							if(bool2) {
-								propertyModel.setRequired(false);
-							}
-							propertyModel.setParamType("query");
-							propertyModel.setArray(param.isArray());
-							if(!param.isArray() && (pType.getSimpleName().contains("[]") || 
-									pType.equals(List.class) || 
-									pType.equals(Set.class) || 
-									pType.equals(ArrayList.class) || 
-									pType.equals(LinkedList.class) ||
-									pType.equals(Vector.class) ||
-									pType.equals(SortedSet.class) ||
-									pType.equals(HashSet.class) ||
-									pType.equals(TreeSet.class) ||
-									pType.equals(LinkedHashSet.class))) {
-								propertyModel.setArray(true);
-							}
-							propertyModel.setValue(pValue);
-							propertyModels.add(propertyModel);
-						}
-					}
 				}
-				
 			}
 			modelModel.setPropertyModels(propertyModels);
 		}
@@ -3867,13 +3850,13 @@ public class LKADController {
 						Class<?> type = field.getType();
 						PropertyModel propertyModel = new PropertyModel();
 						int isArray = isObj(type);
-						type = getGenericType(type, field);
-						
+						type = getGenericType(type, field).getCls();
+						if(type == null) type = field.getType();
 						//判断数据类型
 						propertyModel.setDataType(type.getSimpleName());
 						int flag = isObj(type);
 			            if(flag == 3) {
-			            	propertyModel = analysisProModel(url,type,"",2);
+			            	propertyModel = analysisProModel(url,type,"",2,null);
 			            	if(propertyModel == null) { 
 			            		propertyModel = new PropertyModel();
 			            		propertyModel.setDataType("Object");
@@ -3932,13 +3915,14 @@ public class LKADController {
 						String pValue = field.getName();
 						Class<?> pType = field.getType();
 						//获取泛形类型
-						Class<?> gType = getGenericType(pType, field);
+						Class<?> gType = getGenericType(pType, field).getCls();
+						if(gType == null) gType = pType;
 						PropertyModel propertyModel = new PropertyModel();
 						if (ctype.getName() != "java.lang.Object" || isObj(gType) == 3) {
 							if(ctype.getName() != "java.lang.Object") {
-								propertyModel = analysisProModel(url,ctype,group,2);
+								propertyModel = analysisProModel(url,ctype,group,2,null);
 							}else {
-								propertyModel = analysisProModel(url,gType,group,2);
+								propertyModel = analysisProModel(url,gType,group,2,null);
 							}
 							if (propertyModel == null) {
 								propertyModel = new PropertyModel();
@@ -4028,13 +4012,14 @@ public class LKADController {
 						String pValue = field.getName();
 						Class<?> pType = field.getType();
 						//获取泛形类型
-						Class<?> gType = getGenericType(pType, field);
+						Class<?> gType = getGenericType(pType, field).getCls();
+						if(gType == null) gType = pType;
 						PropertyModel propertyModel = new PropertyModel();
 						if (ctype.getName() != "java.lang.Object" || isObj(gType) == 3) {
 							if(ctype.getName() != "java.lang.Object") {
-								propertyModel = analysisProModel(url,ctype,group,2);
+								propertyModel = analysisProModel(url,ctype,group,2,null);
 							}else {
-								propertyModel = analysisProModel(url,gType,group,2);
+								propertyModel = analysisProModel(url,gType,group,2,null);
 							}
 							if (propertyModel == null) {
 								propertyModel = new PropertyModel();
@@ -4375,6 +4360,7 @@ public class LKADController {
      * @return int 类型标识
      */
     public int isObj(Class<?> type) {
+    	if(type == null) return 3;
     	if(type.equals(Integer.class) || type.equals(int.class)){
 			return 0;
         }else if(type.equals(Byte.class) || type.equals(byte.class)){
@@ -4428,7 +4414,10 @@ public class LKADController {
      * @param field 属性
      * @return Class 泛形类型
      */
-    public Class<?> getGenericType(Class<?> type,Field field){
+    public TypeCls getGenericType(Class<?> type,Field field){
+    	TypeCls typeCls = new TypeCls();
+    	typeCls.setArray(false);
+    	typeCls.setName(type.getSimpleName());
 	    try {
 			if(type.equals(List.class) || 
 	        		type.equals(Set.class) || 
@@ -4439,6 +4428,7 @@ public class LKADController {
 	        		type.equals(HashSet.class) ||
 	        		type.equals(TreeSet.class) ||
 	        		type.equals(LinkedHashSet.class)) { //集合
+				typeCls.setArray(true);
 				// 当前集合的泛型类型
 			    Type genericType = field.getGenericType();
 			    if (null == genericType) {
@@ -4454,7 +4444,11 @@ public class LKADController {
 							ParameterizedType pt2 =(ParameterizedType)pt.getActualTypeArguments()[0];
 							type = (Class<?>)pt2.getRawType();
 						} catch (Exception e1) {
-							
+							TypeVariable<?> pt3 =(TypeVariable<?>)pt.getActualTypeArguments()[0];
+							String name = pt3.getName();
+							if("T".equals(name)) {
+								type = null;
+							}
 						}
 					}
 			    }
@@ -4464,6 +4458,23 @@ public class LKADController {
 			}
 		} catch (Exception e) {
 		}
-	    return type;
+	    typeCls.setCls(type);
+	    return typeCls;
+    }
+    
+    public boolean isParentArray(Class<?> returnType) {
+    	boolean isParentArray = false;
+    	if(returnType.getSimpleName().equals("List") || 
+				returnType.getSimpleName().equals("Set") ||
+				returnType.getSimpleName().equals("ArrayList") ||
+				returnType.getSimpleName().equals("LinkedList") ||
+				returnType.getSimpleName().equals("Vector") ||
+				returnType.getSimpleName().equals("SortedSet") ||
+				returnType.getSimpleName().equals("HashSet") ||
+				returnType.getSimpleName().equals("TreeSet") ||
+				returnType.getSimpleName().equals("LinkedHashSet")) {
+				isParentArray = true;
+			}
+    	return isParentArray;
     }
 }
